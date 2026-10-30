@@ -1,0 +1,23 @@
+Bauwerksbesichtigung 6622 – Demo (installierbare Web-App)
+
+Inhalt dieses Ordners = die komplette App. Sie braucht nur einen Webspeicher mit https.
+
+Variante 1: GitHub Pages (kostenlos, dauerhaft)
+ 1. github.com → New repository → Name z. B. "besichtigung" → Public → Create.
+ 2. "uploading an existing file" → alle Dateien aus diesem Ordner hineinziehen → Commit.
+ 3. Settings → Pages → Source: "Deploy from a branch", Branch "main", Ordner "/ (root)" → Save.
+ 4. Nach 1–2 Minuten: https://<benutzername>.github.io/besichtigung/
+
+Variante 2: Netlify Drop
+ 1. https://app.netlify.com/drop öffnen (kostenloses Konto anlegen, sonst wird die Seite nach kurzer Zeit gelöscht).
+ 2. Diesen Ordner in das Feld ziehen → Link wird angezeigt.
+
+Auf dem Handy installieren
+ - iPhone: Link in Safari öffnen → Teilen → "Zum Home-Bildschirm".
+ - Android: Link in Chrome öffnen → Menü ⋮ → "App installieren" / "Zum Startbildschirm hinzufügen".
+ - Beim ersten Öffnen von Kamera, Standort und Mikrofon jeweils "Erlauben".
+
+Hinweise
+ - Alle Daten (Fotos, Prüfpunkte, Sprachnotizen) bleiben nur auf dem Gerät. Nichts wird an einen Server geschickt.
+ - Das Diktat (Mikrofon-Taste an den Textfeldern) nutzt die Spracherkennung des Browsers; bei Chrome läuft diese über Google-Server.
+ - Vorlage für das Protokoll: vorlage.xlsm (M 204-Protokoll 2026).
