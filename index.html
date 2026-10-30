@@ -88,8 +88,15 @@ header.top{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:5;m
 .brand{flex:1;min-width:0;display:flex;flex-direction:column}
 .eyebrow{font:600 11px/1.3 var(--f);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.01em;text-wrap:balance}
-h1{font-size:19px} h2{font-size:22px} h3{font-size:16px}
+h1{font-size:19px} #title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} @media (max-width:420px){#title{font-size:17px}} h2{font-size:22px} h3{font-size:16px}
 .ibtn{flex-shrink:0;width:44px;height:44px;border-radius:22px;border:0;background:rgba(var(--gbase),.35);box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim2);color:var(--fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.ibtn.sync{position:relative}
+.ibtn.sync i{position:absolute;right:7px;bottom:8px;width:10px;height:10px;border-radius:5px;background:var(--muted);box-shadow:0 0 0 2px rgba(var(--gbase),.9)}
+.ibtn.sync[data-st="ok"] i{background:var(--ok)}
+.ibtn.sync[data-st="wait"] i{background:var(--warn)}
+.ibtn.sync[data-st="err"] i{background:var(--bad)}
+.ibtn.sync[data-st="busy"] i{background:var(--accent);animation:pulse 1s ease-in-out infinite alternate}
+@keyframes pulse{to{opacity:.3}}
 nav.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:6;width:min(420px,calc(100vw - 32px));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:6px;border-radius:34px}
 nav.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:54px;border-radius:28px;text-decoration:none;color:var(--muted);font:600 12px var(--f)}
 nav.tabbar a[aria-current="page"]{background:rgba(var(--gbase),.55);color:var(--fg);box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim2)}
@@ -201,6 +208,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div class="bgfx" id="bgfx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <header class="top glass">
   <div class="brand"><span class="eyebrow">-6622- · DIN 1076</span><h1 id="title">Bauwerksbesichtigung</h1></div>
+  <a class="ibtn sync" href="#einst" id="syncBtn" aria-label="Synchronisierung" data-st="off"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.1 4.75 4.75 0 0 0 7 18.5z"/></svg><i></i></a>
   <a class="ibtn" href="#einst" aria-label="Farbwelt und Hintergrund"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.7S5.5 9.6 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.6 12 2.7 12 2.7z"/></svg></a>
   <button class="ibtn" type="button" data-act="theme" aria-label="Hell oder dunkel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
 </header>
@@ -237,7 +245,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.3";
+var APPVER="0.4";
 var PP=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -271,12 +279,171 @@ function natCmp(a,b){return String(a).localeCompare(String(b),"de",{numeric:true
 var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true},ls("settings",{}));
 function saveSet(){lss("settings",SET)}
 
+/* ---------- Synchronisierung über Google Drive ----------
+   Jeder Datensatz (Bauwerk, Besichtigung) liegt als JSON in „Stützwände-App/_Daten“, Fotos/Audio/Protokolle
+   im Bauwerksordner. Lokal wird zuerst gespeichert (offline-fähig), danach abgeglichen: neuester Stand gewinnt,
+   Fotos werden zusammengeführt. Zugriff nur auf Dateien, die diese App selbst angelegt hat (drive.file). */
+var GCID="324838141782-7ocl55v7rmfidkn80itorkuddaakq5nc.apps.googleusercontent.com",GSCOPE="https://www.googleapis.com/auth/drive.file";
+var REDIR=location.origin+location.pathname.replace(/index\.html$/,"");
+var DAPI="https://www.googleapis.com/drive/v3/files",UAPI="https://www.googleapis.com/upload/drive/v3/files",FOLDER="application/vnd.google-apps.folder";
+var SY={tok:ls("tok",null),email:ls("gEmail",""),on:ls("syncOn",false),busy:false,err:"",last:ls("lastSync",0),
+  ob:Object.assign({rec:{},blobs:{},trash:[],prot:{}},ls("ob",{})),dm:Object.assign({folders:{},files:{}},ls("dmap",{})),tomb:ls("tomb",{}),pushed:{}};
+function saveOb(){lss("ob",SY.ob)} function saveDm(){lss("dmap",SY.dm)}
+(function(){ // Rückkehr von der Google-Anmeldung (#access_token=… bzw. #error=…)
+  var h=location.hash;if(h.indexOf("access_token=")<0&&h.indexOf("error=")<0)return;
+  var p=new URLSearchParams(h.slice(1)),back=ls("authBack","#einst");
+  if(p.get("access_token")&&p.get("state")&&p.get("state")===ls("authState","")){SY.tok={t:p.get("access_token"),exp:Date.now()+(+p.get("expires_in")||3600)*1000};lss("tok",SY.tok);SY.on=true;lss("syncOn",true);SY.justIn=true;SY.needLogin=false}
+  else if(p.get("error")){SY.needLogin=true;SY.err=p.get("error")==="access_denied"?"Anmeldung abgelehnt oder Konto nicht freigegeben":""}
+  lss("authState","");history.replaceState(null,"",location.pathname+location.search+back);
+})();
+function tokOk(){return !!(SY.tok&&SY.tok.exp>Date.now()+60000)}
+function login(silent){
+  var st=Math.random().toString(36).slice(2)+Date.now().toString(36);lss("authState",st);
+  lss("authBack",location.hash&&location.hash.length>1?location.hash:"#einst");if(silent)lss("silentTry",Date.now());
+  var q={client_id:GCID,redirect_uri:REDIR,response_type:"token",scope:GSCOPE,state:st,include_granted_scopes:"true",prompt:silent?"none":"select_account"};
+  if(SY.email)q.login_hint=SY.email;
+  location.href="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams(q).toString();
+}
+function logout(){if(SY.tok)fetch("https://oauth2.googleapis.com/revoke?token="+encodeURIComponent(SY.tok.t),{method:"POST"}).catch(function(){});
+  SY.tok=null;SY.on=false;lss("tok",null);lss("syncOn",false);updSync()}
+function editing(){var a=document.activeElement;return !!(a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type!=="range"&&a.type!=="file")))}
+function maybeSilent(){ // abgelaufenes Token still erneuern (kurzer Sprung zu Google und zurück)
+  if(!SY.on||tokOk()||!SY.email||!navigator.onLine||document.visibilityState!=="visible")return;
+  if(!$("cam").hidden||S.rec||editing()||!$("modal").hidden)return;
+  if(Date.now()-ls("silentTry",0)<10*60000)return;
+  login(true);
+}
+function api(method,url,body,headers){
+  if(!tokOk())return Promise.reject(new Error("auth"));
+  return fetch(url,{method:method,headers:Object.assign({Authorization:"Bearer "+SY.tok.t},headers||{}),body:body}).then(function(r){
+    if(r.status===401){SY.tok=null;lss("tok",null);throw new Error("auth")}
+    if(!r.ok)return r.text().then(function(t){var e=new Error("Drive "+r.status+": "+t.replace(/\s+/g," ").slice(0,140));e.status=r.status;throw e});
+    return r})}
+function jget(url){return api("GET",url).then(function(r){return r.json()})}
+function qs(o){return new URLSearchParams(o).toString()}
+function qv(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}
+function dList(q){var out=[];function page(t){var o={q:q,fields:"nextPageToken,files(id,name,appProperties,modifiedTime)",pageSize:"1000",spaces:"drive"};if(t)o.pageToken=t;
+  return jget(DAPI+"?"+qs(o)).then(function(j){out=out.concat(j.files||[]);return j.nextPageToken?page(j.nextPageToken):out})}return page()}
+function dCreate(meta,blob){
+  if(!blob)return api("POST",DAPI+"?fields=id,modifiedTime",JSON.stringify(meta),{"Content-Type":"application/json; charset=UTF-8"}).then(function(r){return r.json()});
+  var b="bb"+Math.random().toString(36).slice(2),body=new Blob(["--"+b+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(meta)+"\r\n--"+b+"\r\nContent-Type: "+(blob.type||"application/octet-stream")+"\r\n\r\n",blob,"\r\n--"+b+"--"]);
+  return api("POST",UAPI+"?uploadType=multipart&fields=id,modifiedTime",body,{"Content-Type":"multipart/related; boundary="+b}).then(function(r){return r.json()})}
+function dUpdate(id,blob){return api("PATCH",UAPI+"/"+id+"?uploadType=media&fields=id,modifiedTime",blob,{"Content-Type":blob.type||"application/octet-stream"}).then(function(r){return r.json()})}
+function dTrash(id){return api("PATCH",DAPI+"/"+id+"?fields=id",JSON.stringify({trashed:true}),{"Content-Type":"application/json"}).catch(function(e){if(e.status!==404)throw e})}
+function dGet(id){return api("GET",DAPI+"/"+id+"?alt=media")}
+function ensureFolder(prop,val,name,parent){
+  var key=prop+"="+val;if(SY.dm.folders[key])return Promise.resolve(SY.dm.folders[key]);
+  return dList("appProperties has { key='"+prop+"' and value='"+qv(val)+"' } and trashed=false").then(function(f){
+    if(f.length)return f[0].id;var m={name:name,mimeType:FOLDER,appProperties:{}};m.appProperties[prop]=val;if(parent)m.parents=[parent];
+    return dCreate(m).then(function(j){return j.id})}).then(function(id){SY.dm.folders[key]=id;saveDm();return id})}
+function ensureRoot(){return ensureFolder("bbApp","root","Stützwände-App")}
+function ensureData(){return ensureRoot().then(function(r){return ensureFolder("bbApp","daten","_Daten (nicht ändern)",r)})}
+function ensureBwFolder(bwId){var b=S.bw[bwId];return ensureRoot().then(function(r){return ensureFolder("bbFolder",bwId,((b?b.nr+" "+b.name:bwId)).replace(/[\/\\:*?"<>|]/g,"-"),r)})}
+
+function markDirty(key){SY.ob.rec[key]=1;saveOb();schedSync(3000);updSync()}
+function tombstone(key){SY.tomb[key]=Date.now();lss("tomb",SY.tomb);markDirty(key)}
+function queueBlob(key,owner,bw,name){SY.ob.blobs[key]={owner:owner,bw:bw,name:name};saveOb();schedSync(3000);updSync()}
+function queueTrash(id){if(id){SY.ob.trash.push(id);saveOb();schedSync(3000)}}
+function pending(){return Object.keys(SY.ob.rec).length+Object.keys(SY.ob.blobs).length+Object.keys(SY.ob.prot).length+SY.ob.trash.length}
+function remoteIdOf(k){var id=null;Object.keys(S.visits).some(function(v){var x=S.visits[v];return (x.fotos||[]).concat(x.audios||[]).some(function(f){if(f.key===k&&f.driveId){id=f.driveId;return true}})});
+  if(!id)Object.keys(S.bw).some(function(b){if(S.bw[b].refKey===k&&S.bw[b].refDriveId){id=S.bw[b].refDriveId;return true}});return id}
+var fetching={};
+function ensureBlob(k){return getBlob(k).then(function(bl){if(bl)return bl;var id=remoteIdOf(k);if(!id||!tokOk())return null;
+  if(!fetching[k])fetching[k]=dGet(id).then(function(r){return r.blob()}).then(function(b2){return putBlob(k,b2).then(function(){return b2})}).catch(function(){delete fetching[k];return null});return fetching[k]})}
+
+/* Abgleich */
+function mergeList(a,b,del){var seen={},out=[];a.concat(b).forEach(function(f){if(del.indexOf(f.key)>=0)return;if(seen[f.key]){if(!seen[f.key].driveId&&f.driveId)seen[f.key].driveId=f.driveId;return}seen[f.key]=Object.assign({},f);out.push(seen[f.key])});
+  return out.sort(function(x,y){return String(x.ts||x.zeit).localeCompare(String(y.ts||y.zeit))})}
+function applyRemote(d){
+  var t=d.k.split(":"),typ=t[0],id=t.slice(1).join(":"),loc=typ==="bw"?S.bw[id]:S.visits[id],lu=loc?(loc.upd||0):(SY.tomb[d.k]||0);
+  if(d.deleted){if(!loc||d.upd<=lu)return false;SY.tomb[d.k]=d.upd;lss("tomb",SY.tomb);delete SY.ob.rec[d.k];saveOb();
+    if(typ==="bw"){delete S.bw[id];del("bauwerke",id)}else{var xv=S.visits[id];(xv.fotos||[]).concat(xv.audios||[]).forEach(function(f){delBlob(f.key)});delete S.visits[id];del("visits",id)}return true}
+  if(!loc){if((SY.tomb[d.k]||0)>=d.upd)return false;if(typ==="bw")saveB(d.d,true);else saveV(d.d,true);return true}
+  if(typ==="bw"){if(d.upd<=lu)return false;saveB(d.d,true);delete SY.ob.rec[d.k];saveOb();return true}
+  var r=d.d,remoteWins=d.upd>lu,dl=(loc.del||[]).concat(r.del||[]).filter(function(k,i,a){return a.indexOf(k)===i});
+  var base=Object.assign({},remoteWins?r:loc);base.del=dl;base.fotos=mergeList(base.fotos||[],(remoteWins?loc:r).fotos||[],dl);base.audios=mergeList(base.audios||[],(remoteWins?loc:r).audios||[],dl);
+  if(base.protDriveId==null)base.protDriveId=loc.protDriveId||r.protDriveId;
+  var same=function(a,b){return JSON.stringify(a)===JSON.stringify(b)};
+  if(remoteWins){var extra=!same(base.fotos,r.fotos||[])||!same(base.audios,r.audios||[]);base.upd=d.upd;
+    if(extra){saveV(base)}else{saveV(base,true);delete SY.ob.rec[d.k];saveOb()}return true}
+  if(same(base.fotos,loc.fotos||[])&&same(base.audios,loc.audios||[]))return false;
+  saveV(base);return true;
+}
+function pull(){
+  return ensureData().then(function(dd){var since=ls("lastPull","");
+    return dList("'"+dd+"' in parents and trashed=false"+(since?" and modifiedTime >= '"+since+"'":"")).then(function(files){
+      var max=since,changed=false,todo=files.filter(function(f){var k=f.appProperties&&f.appProperties.bbKey;if(!k)return false;
+        if(f.modifiedTime>max)max=f.modifiedTime;var known=SY.dm.files[k];if(!known)SY.dm.files[k]=f.id;
+        return SY.pushed[f.id]!==f.modifiedTime});
+      saveDm();
+      var i=0;function next(){if(i>=todo.length)return Promise.resolve();var f=todo[i++];
+        return dGet(f.id).then(function(r){return r.json()}).then(function(d){if(d&&d.k&&applyRemote(d))changed=true}).catch(function(){}).then(next)}
+      return Promise.all([next(),next(),next(),next()]).then(function(){if(max)lss("lastPull",max);return changed})})})}
+function pushBlobs(){
+  var keys=Object.keys(SY.ob.blobs);
+  return keys.reduce(function(p,k){return p.then(function(){var q=SY.ob.blobs[k];if(!q)return;
+    return getBlob(k).then(function(bl){if(!bl){delete SY.ob.blobs[k];saveOb();return}
+      return ensureBwFolder(q.bw).then(function(fo){return dCreate({name:q.name,parents:[fo],appProperties:{bbBlob:k}},bl)}).then(function(j){
+        var t=q.owner.split(":"),oid=t.slice(1).join(":"),hit=false;
+        if(t[0]==="v"&&S.visits[oid]){var x=S.visits[oid];(x.fotos||[]).concat(x.audios||[]).forEach(function(f){if(f.key===k){f.driveId=j.id;hit=true}});if(hit)saveV(x);
+          Object.keys(S.bw).forEach(function(b){if(S.bw[b].refKey===k&&!S.bw[b].refDriveId){S.bw[b].refDriveId=j.id;saveB(S.bw[b])}})}
+        if(t[0]==="bw"&&S.bw[oid]&&S.bw[oid].refKey===k){S.bw[oid].refDriveId=j.id;saveB(S.bw[oid]);hit=true}
+        if(!hit)SY.ob.trash.push(j.id);
+        delete SY.ob.blobs[k];saveOb()})})})},Promise.resolve())}
+function pushRecs(){
+  return Object.keys(SY.ob.rec).reduce(function(p,key){return p.then(function(){
+    var t=key.split(":"),id=t.slice(1).join(":"),rec=t[0]==="bw"?S.bw[id]:S.visits[id];
+    var data=rec?{k:key,upd:rec.upd||0,d:rec}:{k:key,upd:SY.tomb[key]||Date.now(),deleted:true},u=data.upd;
+    var blob=new Blob([JSON.stringify(data)],{type:"application/json"}),fid=SY.dm.files[key];
+    return (fid?dUpdate(fid,blob).catch(function(e){if(e.status===404){delete SY.dm.files[key];return null}throw e}):Promise.resolve(null)).then(function(r){if(r)return r;
+      return ensureData().then(function(dd){return dCreate({name:key.replace(":","_")+".json",parents:[dd],appProperties:{bbKey:key}},blob)})})
+    .then(function(j){SY.dm.files[key]=j.id;SY.pushed[j.id]=j.modifiedTime;saveDm();
+      var now=t[0]==="bw"?S.bw[id]:S.visits[id],cu=now?(now.upd||0):(SY.tomb[key]||0);if(cu===u){delete SY.ob.rec[key];saveOb()}})})},Promise.resolve())}
+function pushProts(){
+  return Object.keys(SY.ob.prot).reduce(function(p,id){return p.then(function(){var x=S.visits[id];
+    if(!x||x.status!=="abgeschlossen"||!S.bw[x.bw]){delete SY.ob.prot[id];saveOb();return}
+    return buildProtokoll(x,S.bw[x.bw]).then(function(bl){
+      return (x.protDriveId?dUpdate(x.protDriveId,bl).catch(function(e){if(e.status===404)return null;throw e}):Promise.resolve(null)).then(function(r){if(r)return r;
+        return ensureBwFolder(x.bw).then(function(fo){return dCreate({name:protName(x,S.bw[x.bw]),parents:[fo],appProperties:{bbProt:id}},bl)})})})
+    .then(function(j){if(x.protDriveId!==j.id){x.protDriveId=j.id;saveV(x)}delete SY.ob.prot[id];saveOb()})})},Promise.resolve())}
+function pushTrash(){var l=SY.ob.trash.slice();return l.reduce(function(p,id){return p.then(function(){return dTrash(id).then(function(){SY.ob.trash=SY.ob.trash.filter(function(z){return z!==id});saveOb()})})},Promise.resolve())}
+function firstUpload(){ // nach der ersten Anmeldung: alles Lokale hochladen
+  if(ls("initPushed",false))return;
+  Object.keys(S.bw).forEach(function(id){var b=S.bw[id];SY.ob.rec["bw:"+id]=1;if(b.refKey&&!/^foto_/.test(b.refKey)&&!b.refDriveId)SY.ob.blobs[b.refKey]={owner:"bw:"+id,bw:id,name:b.nr+"_Vergleichsbild.jpg"}});
+  Object.keys(S.visits).forEach(function(id){var x=S.visits[id];SY.ob.rec["v:"+id]=1;
+    (x.fotos||[]).forEach(function(f,i){if(!f.driveId)SY.ob.blobs[f.key]={owner:"v:"+id,bw:x.bw,name:fotoName(x,i)}});
+    (x.audios||[]).forEach(function(a){if(!a.driveId)SY.ob.blobs[a.key]={owner:"v:"+id,bw:x.bw,name:audioName(x,a)}});
+    if(x.status==="abgeschlossen")SY.ob.prot[id]=1});
+  saveOb();lss("initPushed",true);
+}
+function audioName(x,a){return x.datum+"_Sprachnotiz_"+String(a.zeit).replace(":","")+(/mp4|aac|m4a/.test(a.mime||"")?".m4a":".webm")}
+var syT=0;function schedSync(ms){if(!SY.on)return;clearTimeout(syT);syT=setTimeout(function(){syncNow()},ms||3000)}
+function syncNow(){
+  if(!SY.on||SY.busy)return Promise.resolve();
+  if(!navigator.onLine){SY.err="Offline – wird später übertragen";updSync();return Promise.resolve()}
+  if(!tokOk()){SY.needLogin=true;updSync();maybeSilent();return Promise.resolve()}
+  SY.busy=true;SY.err="";updSync();var changed=false;
+  var email=SY.email?Promise.resolve():jget("https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)").then(function(j){SY.email=j.user&&j.user.emailAddress||"";lss("gEmail",SY.email)}).catch(function(){});
+  return email.then(function(){firstUpload();return pull()}).then(function(c){changed=c}).then(pushBlobs).then(pushProts).then(pushRecs).then(pushTrash)
+    .then(function(){SY.last=Date.now();lss("lastSync",SY.last);SY.needLogin=false})
+    .catch(function(e){if(e&&e.message==="auth"){SY.needLogin=true;SY.err="";maybeSilent()}else SY.err=navigator.onLine?String(e&&e.message||e):"Offline – wird später übertragen";console.warn(e)})
+    .then(function(){SY.busy=false;updSync();if(changed)renderSoon()});
+}
+function syncState(){if(!SY.on)return "off";if(SY.busy)return "busy";if(SY.needLogin||(SY.err&&!/Offline/.test(SY.err)))return "err";if(pending()||SY.err)return "wait";return "ok"}
+function syncText(){var st=syncState();
+  if(st==="off")return SY.needLogin&&SY.err?SY.err:"Nicht verbunden – Daten liegen nur auf diesem Gerät.";
+  if(st==="busy")return "Wird synchronisiert …";
+  if(SY.needLogin)return "Anmeldung abgelaufen – bitte erneut anmelden.";
+  var t=(SY.email?"Angemeldet als "+SY.email:"Angemeldet")+(SY.last?" · zuletzt "+hm(new Date(SY.last)):"");
+  if(SY.err)return t+" · "+SY.err;return t+(pending()?" · "+pending()+" ausstehend":" · alles aktuell")}
+function updSync(){var b=$("syncBtn");if(b){b.dataset.st=syncState();b.setAttribute("aria-label","Synchronisierung: "+syncText())}var s=$("syncStat");if(s)s.textContent=syncText()}
+
 /* ---------- Speicher (IndexedDB, nur auf diesem Gerät) ---------- */
 var DB=null;
 function dbOpen(){return new Promise(function(res,rej){var r=indexedDB.open("besichtigung-demo",2);
   r.onupgradeneeded=function(){var d=r.result;["visits","bauwerke"].forEach(function(n){if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:"id"})});if(!d.objectStoreNames.contains("blobs"))d.createObjectStore("blobs")};
   r.onsuccess=function(){DB=r.result;res()};r.onerror=function(){rej(r.error)}})}
-function tx(store,mode,fn){return new Promise(function(res,rej){var t=DB.transaction(store,mode),s=t.objectStore(store),out=fn(s);t.oncomplete=function(){res(out&&out.result!==undefined?out.result:out)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error)}})}
+function tx(store,mode,fn){return new Promise(function(res,rej){var t=DB.transaction(store,mode),s=t.objectStore(store),out=fn(s);t.oncomplete=function(){res(out&&typeof out==="object"&&"readyState" in out?out.result:out)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error)}})}
 function put(store,v){return tx(store,"readwrite",function(s){return s.put(v)})}
 function all(store){return tx(store,"readonly",function(s){return s.getAll()})}
 function del(store,id){return tx(store,"readwrite",function(s){return s.delete(id)})}
@@ -291,8 +458,8 @@ var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme"
 S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
 document.documentElement.setAttribute("data-glass",SET.glas);
 function vid(bw){return bw+"_"+today()}
-function saveV(v){S.visits[v.id]=v;if(S.files)delete S.files[v.id];return put("visits",v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
-function saveB(b){S.bw[b.id]=b;return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
+function saveV(v,remote){S.visits[v.id]=v;if(S.files)delete S.files[v.id];if(!remote){v.upd=Date.now();markDirty("v:"+v.id)}return put("visits",v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
+function saveB(b,remote){S.bw[b.id]=b;if(!remote){b.upd=Date.now();markDirty("bw:"+b.id)}return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
 function bwList(){return Object.keys(S.bw).map(function(k){return S.bw[k]})}
 function year(){return today().slice(0,4)}
 function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())}
@@ -427,6 +594,7 @@ function readEdit(old){
 function deleteBw(id){
   var vs=visitsOf(id),keys=[];vs.forEach(function(v){v.fotos.forEach(function(f){keys.push(f.key)});v.audios.forEach(function(a){keys.push(a.key)})});
   if(S.bw[id].refKey&&!/^foto_/.test(S.bw[id].refKey))keys.push(S.bw[id].refKey);
+  vs.forEach(function(v){tombstone("v:"+v.id)});tombstone("bw:"+id);queueTrash(SY.dm.folders["bbFolder="+id]);delete SY.dm.folders["bbFolder="+id];saveDm();
   return Promise.all(keys.map(delBlob).concat(vs.map(function(v){delete S.visits[v.id];return del("visits",v.id)}))).then(function(){delete S.bw[id];return del("bauwerke",id)});
 }
 
@@ -502,6 +670,10 @@ function viewEinst(){
   var t=document.documentElement.getAttribute("data-theme")||"auto";
   var h='<section class="glass panel"><h2>Einstellungen</h2>'+
     '<label class="fld">Name des Prüfers (erscheint im Protokoll bei „von“)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label></section>';
+  h+='<section class="glass panel" id="sync"><h3>Synchronisierung (Google Drive)</h3><span class="small" id="syncStat">'+esc(syncText())+'</span>'+
+    (!SY.on||SY.needLogin?'<button type="button" class="btn block" data-act="login">Mit Google anmelden</button>':'<button type="button" class="btn soft block" data-act="syncNow">Jetzt synchronisieren</button>')+
+    '<span class="muted small">Handy und Büro-PC mit <b>demselben</b> Google-Konto anmelden (6622brueckenbau@gmail.com). Daten, Fotos und Protokolle liegen dann im Drive-Ordner „Stützwände-App“ und sind auf allen Geräten gleich. Ohne Internet wird lokal gespeichert und später übertragen.</span>'+
+    (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
   h+='<section class="glass panel" id="darstellung"><h3>Darstellung</h3>'+
     '<span class="muted small">Hintergrund</span><div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbwelt</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
     (SET.hgFoto?'<div class="row"><label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label><span class="muted small">Ein farbiges Foto mit Kontrasten (Himmel, Grün, Menschen) lässt das Glas am lebendigsten wirken.</span></div>':"")+
@@ -517,11 +689,11 @@ function viewEinst(){
   h+='<section class="glass panel"><h3>Bauwerke</h3><a class="btn soft block" href="#neu">+ Neues Bauwerk anlegen</a>'+
     '<label class="btn soft block">Bauwerksliste importieren (CSV)<input type="file" accept=".csv,text/csv,text/plain" id="csvIn"></label>'+
     '<span class="muted small">CSV mit Kopfzeile, z. B. <span class="mono">Nr;Bezeichnung;Bezirk;Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span></section>';
-  h+='<section class="glass panel"><h3>Datensicherung</h3><span class="muted small">Alle Daten liegen nur auf diesem Gerät. Regelmäßig sichern – z. B. vor einem Handywechsel.</span>'+
+  h+='<section class="glass panel"><h3>Datensicherung</h3><span class="muted small">'+(SY.on?"Zusätzlich zur Synchronisierung kann eine Sicherung als ZIP heruntergeladen werden.":"Ohne Synchronisierung liegen alle Daten nur auf diesem Gerät. Regelmäßig sichern – z. B. vor einem Handywechsel.")+'</span>'+
     '<button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
     '<label class="btn soft block">Sicherung wiederherstellen<input type="file" accept=".zip,application/zip" id="restoreIn"></label>'+
     '<span class="muted small" id="usage"></span>'+
-    '<button type="button" class="btn danger block" data-act="wipe">Alle Daten auf diesem Gerät löschen</button></section>';
+    '<button type="button" class="btn danger block" data-act="wipe">Alle Daten auf diesem Gerät löschen</button><span class="muted small">Löscht nur die Kopie auf diesem Gerät. Bei aktiver Synchronisierung werden die Daten danach aus Google Drive neu geladen.</span></section>';
   h+='<p class="muted small" style="text-align:center">Version '+APPVER+" · Demo</p>";
   setTimeout(function(){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var u=$("usage");if(u)u.textContent="Belegter Speicher: "+(e.usage/1048576).toFixed(1).replace(".",",")+" MB"})},0);
   return h;
@@ -531,10 +703,10 @@ function viewEinst(){
 function hydrate(){
   document.querySelectorAll("img[data-key],audio[data-key]").forEach(function(el){
     var k=el.dataset.key;if(S.urls[k]){el.src=S.urls[k];return}
-    getBlob(k).then(function(bl){if(!bl)return;S.urls[k]=URL.createObjectURL(bl);el.src=S.urls[k]});
+    ensureBlob(k).then(function(bl){if(!bl)return;S.urls[k]=S.urls[k]||URL.createObjectURL(bl);el.src=S.urls[k]});
   });
 }
-function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return getBlob(k).then(function(bl){if(!bl)return null;S.urls[k]=URL.createObjectURL(bl);return S.urls[k]})}
+function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return ensureBlob(k).then(function(bl){if(!bl)return null;S.urls[k]=URL.createObjectURL(bl);return S.urls[k]})}
 
 /* ---------- Besichtigung ---------- */
 function startVisit(bwId){var b=S.bw[bwId],l=b.letzte||{ja:ja([3]),verunreinigungen:"",schaden:"",sonstige:"",datum:""};
@@ -545,6 +717,7 @@ function finishVisit(x){
   var same=x.ja.every(function(v,i){return v===x.ref[i]})&&!x.sonder;
   x.status="abgeschlossen";x.befund=same?"keine Schadenserweiterung":"Veränderung festgestellt";x.ende=new Date().toISOString();x.pruefer=SET.pruefer;
   var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
+  SY.ob.prot[x.id]=1;saveOb();
   return Promise.all([saveV(x),saveB(b)]);
 }
 function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;return Promise.all([saveV(x),saveB(b)])}
@@ -555,7 +728,7 @@ function toJpeg(src,w,h,max,q){var s=Math.min(1,max/Math.max(w,h)),c=document.cr
 function fileToJpeg(file,max){return createImageBitmap(file,{imageOrientation:"from-image"}).catch(function(){return createImageBitmap(file)}).then(function(bm){return toJpeg(bm,bm.width,bm.height,max||SET.fotoMax,0.8)})}
 function addFoto(x,blob,meta){
   x.seq=(x.seq||0)+1;var key="foto_"+x.id+"_"+x.seq+"_"+Date.now();
-  return putBlob(key,blob).then(function(){x.fotos.push(Object.assign({key:key,tag:S.tag,zeit:hm(),ts:new Date().toISOString()},meta||{}));return saveV(x)});
+  return putBlob(key,blob).then(function(){x.fotos.push(Object.assign({key:key,tag:S.tag,zeit:hm(),ts:new Date().toISOString()},meta||{}));queueBlob(key,"v:"+x.id,x.bw,fotoName(x,x.fotos.length-1));return saveV(x)});
 }
 
 /* ---------- Foto-Ansicht mit Vergleich alt / neu ---------- */
@@ -636,7 +809,7 @@ function recToggle(id){
     r.ondataavailable=function(e){if(e.data.size)parts.push(e.data)};
     r.onstop=function(){clearInterval(S.recTimer);st.getTracks().forEach(function(t){t.stop()});S.rec=null;
       var bl=new Blob(parts,{type:r.mimeType||mime||"audio/webm"}),x=S.visits[id],key="audio_"+id+"_"+Date.now();
-      putBlob(key,bl).then(function(){x.audios.push({key:key,zeit:hm(),dauer:Math.round((Date.now()-t0)/1000),mime:bl.type});return saveV(x)}).then(render)};
+      putBlob(key,bl).then(function(){var au={key:key,zeit:hm(),dauer:Math.round((Date.now()-t0)/1000),mime:bl.type,ts:new Date().toISOString()};x.audios.push(au);queueBlob(key,"v:"+x.id,x.bw,audioName(x,au));return saveV(x)}).then(render)};
     r.start();render();
   }).catch(function(){toast("Mikrofon nicht erlaubt.")});
 }
@@ -687,7 +860,7 @@ function buildProtokoll(x,b){
 function exportFiles(x,what){
   var b=S.bw[x.bw],jobs=[];
   if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:MIME[SET.protFormat]})}));
-  if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(getBlob(f.key).then(function(bl){return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
+  if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(ensureBlob(f.key).then(function(bl){if(!bl)throw new Error("Foto "+(i+1)+" noch nicht geladen – bitte Internet prüfen");return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
   return Promise.all(jobs);
 }
 function download(file){var a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
@@ -742,7 +915,7 @@ function importCsv(file){
   }).catch(function(e){toast("Import fehlgeschlagen: "+(e&&e.message||e),5000)});
 }
 function wipe(){
-  Promise.all(["visits","bauwerke","blobs"].map(function(s){return tx(s,"readwrite",function(st){return st.clear()})})).then(function(){S.visits={};S.bw={};SET.hgFoto=false;saveSet();applyLook();lss("seeded",false);return seed()}).then(function(){toast("Alle Daten gelöscht.");location.hash="#start";render()});
+  Promise.all(["visits","bauwerke","blobs"].map(function(s){return tx(s,"readwrite",function(st){return st.clear()})})).then(function(){S.visits={};S.bw={};S.urls={};SET.hgFoto=false;saveSet();applyLook();SY.ob={rec:{},blobs:{},trash:[],prot:{}};saveOb();lss("lastPull","");lss("initPushed",true);lss("seeded",false);return seed()}).then(function(){SY.ob.rec={};saveOb();toast(SY.on?"Lokale Daten gelöscht – Daten aus Google Drive werden neu geladen.":"Alle Daten gelöscht.");location.hash="#start";render();syncNow()});
 }
 
 /* ---------- Ereignisse ---------- */
@@ -762,8 +935,8 @@ document.addEventListener("click",function(ev){
   if(a==="delBw"){if(!confirmTap(el,"Wirklich löschen? Alle Besichtigungen und Fotos dazu gehen verloren. Nochmal tippen"))return;deleteBw(el.dataset.id).then(function(){toast("Bauwerk gelöscht");location.hash="#liste"});return}
   if(a==="setCoord"&&S.pos){var bb=S.bw[el.dataset.bw];bb.lat=S.pos.lat;bb.lon=S.pos.lon;saveB(bb);toast("Position gespeichert (± "+Math.round(S.pos.acc)+" m)");render();return}
   if(a==="viewRef"){viewRef(el.dataset.bw);return}
-  if(a==="clearRef"){var br=S.bw[el.dataset.bw];br.refKey=null;br.refHeading=null;saveB(br);closeModal();render();return}
-  if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});bs.refKey=fk;bs.refHeading=meta&&meta.heading;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
+  if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&!/^foto_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
+  if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&!/^foto_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
   if(a==="closeModal"){closeModal();return}
   if(a==="camOpen"){camOpen(id);return}
   if(a==="camClose"){camClose();return}
@@ -771,11 +944,14 @@ document.addEventListener("click",function(ev){
   if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b2){b2.setAttribute("aria-pressed",String(b2.dataset.t===S.tag))});return}
   if(a==="refToggle"){var ri=$("refimg");ri.hidden=!ri.hidden;$("opWrap").hidden=ri.hidden;return}
   if(a==="backup"){backup();return}
+  if(a==="login"){login(false);return}
+  if(a==="logout"){if(!confirmTap(el,"Wirklich abmelden? Nochmal tippen"))return;logout();render();return}
+  if(a==="syncNow"){if(!tokOk()){login(false);return}syncNow();return}
   if(a==="wipe"){if(!confirmTap(el,"Wirklich ALLES löschen? Nochmal tippen"))return;wipe();return}
   if(!x)return;
   if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
-  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var f=x.fotos.splice(+el.dataset.i,1)[0];delBlob(f.key);var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;saveB(bf)}saveV(x);closeModal();render();return}
-  if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);saveV(x);render();return}
+  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var f=x.fotos.splice(+el.dataset.i,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];saveOb();var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}saveV(x);closeModal();render();return}
+  if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);x.del=(x.del||[]).concat(au.key);queueTrash(au.driveId);delete SY.ob.blobs[au.key];saveOb();saveV(x);render();return}
   if(a==="preview"){preview(x);return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
   if(a==="sonder"){x.sonder=!x.sonder;saveV(x);render();return}
@@ -790,6 +966,7 @@ document.addEventListener("click",function(ev){
   if(a==="dlZip"){dlZip(x);return}
   if(a==="delVisit"){if(!confirmTap(el,"Wirklich löschen? Nochmal tippen"))return;
     var bv=S.bw[x.bw];if(x.status==="abgeschlossen"&&bv.letzte&&bv.letzte.datum===x.datum){bv.letzte=x.basisLetzte||null;saveB(bv)}
+    x.fotos.concat(x.audios).forEach(function(f){queueTrash(f.driveId);delete SY.ob.blobs[f.key]});queueTrash(x.protDriveId);delete SY.ob.prot[x.id];tombstone("v:"+x.id);
     Promise.all(x.fotos.map(function(f){return delBlob(f.key)}).concat(x.audios.map(function(f){return delBlob(f.key)}))).then(function(){return del("visits",x.id)}).then(function(){delete S.visits[x.id];render()});return}
 });
 document.addEventListener("change",function(ev){
@@ -802,7 +979,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
   if(el.dataset.gal&&el.files.length){var x2=S.visits[el.dataset.gal],fs=Array.from(el.files);el.value="";toast("Fotos werden übernommen …");
     fs.reduce(function(p,f){return p.then(function(){return fileToJpeg(f).then(function(bl){return addFoto(x2,bl,{quelle:"Galerie"})})})},Promise.resolve()).then(render);return}
-  if(el.dataset.ref&&el.files[0]){var bw=S.bw[el.dataset.ref],f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw.id+"_"+Date.now();return putBlob(k,bl).then(function(){bw.refKey=k;bw.refHeading=null;return saveB(bw)})}).then(function(){toast("Altes Bild gespeichert");render()});return}
+  if(el.dataset.ref&&el.files[0]){var bw=S.bw[el.dataset.ref],f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw.id+"_"+Date.now();return putBlob(k,bl).then(function(){if(bw.refKey&&!/^foto_/.test(bw.refKey)){queueTrash(bw.refDriveId);delBlob(bw.refKey)}bw.refKey=k;bw.refHeading=null;bw.refDriveId=null;queueBlob(k,"bw:"+bw.id,bw.id,bw.nr+"_Vergleichsbild.jpg");return saveB(bw)})}).then(function(){toast("Altes Bild gespeichert");render()});return}
 });
 document.addEventListener("input",function(ev){
   var el=ev.target;
@@ -817,7 +994,7 @@ window.addEventListener("hashchange",function(){if(!$("cam").hidden)camClose();c
 window.addEventListener("orientationchange",updLevel);
 
 /* ---------- Start ---------- */
-function seed(){if(ls("seeded",false))return Promise.resolve();return Promise.all(SEED.map(function(b){return S.bw[b.id]?null:saveB(JSON.parse(JSON.stringify(b)))})).then(function(){lss("seeded",true)})}
+function seed(){if(ls("seeded",false))return Promise.resolve();return Promise.all(SEED.map(function(b){return S.bw[b.id]?null:saveB(JSON.parse(JSON.stringify(b)),true)})).then(function(){lss("seeded",true)})}
 function migrateOld(){ // Daten der ersten Demo-Version übernehmen (Positionen, Vergleichsbilder, abgeschlossene Besichtigungen)
   var c=ls("coords",{}),r=ls("refs",{});Object.keys(c).forEach(function(k){if(S.bw[k]&&S.bw[k].lat==null&&c[k]){S.bw[k].lat=c[k][0];S.bw[k].lon=c[k][1];saveB(S.bw[k])}});
   Object.keys(r).forEach(function(k){if(r[k]&&S.bw[k]&&!S.bw[k].refKey){S.bw[k].refKey=r[k];saveB(S.bw[k])}});
@@ -826,7 +1003,14 @@ function migrateOld(){ // Daten der ersten Demo-Version übernehmen (Positionen,
 dbOpen().then(function(){return Promise.all([all("bauwerke"),all("visits")])}).then(function(r){
   (r[0]||[]).forEach(function(b){S.bw[b.id]=b});(r[1]||[]).forEach(function(v){S.visits[v.id]=v});
   return seed().then(function(){if(!ls("migrated3",false)){migrateOld();lss("migrated3",true)}});
-}).then(function(){applyLook();startReflex(false);render()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
+}).then(function(){applyLook();startReflex(false);render();startSync()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
+function startSync(){updSync();
+  if(SY.justIn)toast("Mit Google verbunden – Daten werden abgeglichen …",3500);
+  if(SY.on){if(tokOk())syncNow();else{SY.needLogin=true;updSync();maybeSilent()}}
+  setInterval(function(){if(document.visibilityState==="visible")syncNow()},30000);
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){if(tokOk())syncNow();else maybeSilent()}});
+  window.addEventListener("online",function(){syncNow()});
+}
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
 </script>
