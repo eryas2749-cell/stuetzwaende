@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Bauwerksbesichtigung 6622</title>
-<meta name="description" content="Besichtigung von Stützwänden nach DIN 1076 – Fotos, Prüfpunkte, Protokoll">
+<title>BauwerkCheck</title>
+<meta name="description" content="BauwerkCheck – Prüfung und Besichtigung von Ingenieurbauwerken nach DIN 1076: Fotos, Prüfpunkte, Protokoll">
 <meta name="theme-color" content="#4D6A8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Besichtigung">
+<meta name="apple-mobile-web-app-title" content="BauwerkCheck">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -152,7 +152,7 @@ nav.tabbar a[aria-current="page"]{background:rgba(var(--gbase),.55);color:var(--
 .sw[aria-pressed="true"]::after{left:23px}
 label.fld{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
 .fldrow{display:flex;gap:6px;align-items:flex-start}
-textarea,input[type=search],input[type=text],input[type=number],select{font:16px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;min-height:46px}
+textarea,input[type=search],input[type=text],input[type=number],input[type=date],select{font:16px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;min-height:46px}
 textarea{resize:vertical;min-height:70px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .mic{flex-shrink:0;width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -207,7 +207,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <body>
 <div class="bgfx" id="bgfx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <header class="top glass">
-  <div class="brand"><span class="eyebrow">-6622- · DIN 1076</span><h1 id="title">Bauwerksbesichtigung</h1></div>
+  <div class="brand"><span class="eyebrow" id="eyebrow">DIN 1076</span><h1 id="title">BauwerkCheck</h1></div>
   <a class="ibtn sync" href="#einst" id="syncBtn" aria-label="Synchronisierung" data-st="off"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.1 4.75 4.75 0 0 0 7 18.5z"/></svg><i></i></a>
   <a class="ibtn" href="#einst" aria-label="Farbwelt und Hintergrund"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.7S5.5 9.6 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.6 12 2.7 12 2.7z"/></svg></a>
   <button class="ibtn" type="button" data-act="theme" aria-label="Hell oder dunkel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
@@ -245,10 +245,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.4";
-var PP=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
-var TAGS=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
+var APPVER="0.5";
+var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
+var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
+function P(list,pos){return list.map(function(t,i){return {t:t,pos:pos.indexOf(i)>=0}})}
+var TAGS_STD=["Übersicht","Detail","Schaden","Entwässerung","Geländer","Sonstiges"];
+var DEF_TYPES=[
+  {id:"stuetzwand",name:"Stützwand",protokoll:"kassel",pp:P(PP_SW,[2]),tags:TAGS_SW},
+  {id:"bruecke",name:"Brücke",protokoll:"standard",tags:["Übersicht","Überbau","Unterbau","Lager","Übergang","Kappe","Geländer","Entwässerung","Schaden"],
+    pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Überbau (Risse, Abplatzungen, freiliegende Bewehrung)","Unterbauten / Widerlager / Pfeiler","Lager","Übergangskonstruktionen","Kappen / Gesimse","Geländer / Schutzeinrichtungen","Fahrbahnbelag","Entwässerung","Feuchtstellen / Aussinterungen","Korrosion an Stahlteilen","Bewuchs / Verunreinigung","Böschungen / Kolk / Gewässersohle","sonstige Mängel / Auffälligkeiten"],[1])},
+  {id:"laermschutz",name:"Lärmschutzwand",protokoll:"standard",tags:TAGS_STD,
+    pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Gründung / Pfosten / Fußbereich","Wandelemente (Schäden, Verschiebungen)","Verankerungen / Verbindungsmittel","Korrosion","Bewuchs / Verunreinigung / Graffiti","sonstige Mängel / Auffälligkeiten"],[1])},
+  {id:"durchlass",name:"Durchlass",protokoll:"standard",tags:TAGS_STD,
+    pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Ein- und Auslaufbauwerke","Rohr / Rahmen (Risse, Verformungen)","Fugen / Undichtigkeiten","Ablagerungen / Verklausung","Kolk / Sohle / Böschung","Geländer / Absturzsicherung","sonstige Mängel / Auffälligkeiten"],[1])},
+  {id:"vzb",name:"Verkehrszeichenbrücke",protokoll:"standard",tags:TAGS_STD,
+    pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Fundamente / Fußplatten","Stützen / Riegel","Schraub- und Schweißverbindungen","Korrosionsschutz","Schilder / Befestigungen","sonstige Mängel / Auffälligkeiten"],[1])},
+  {id:"sonstiges",name:"Sonstiges Ingenieurbauwerk",protokoll:"standard",tags:TAGS_STD,
+    pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Tragende Bauteile","Risse / Abplatzungen","Korrosion","Entwässerung","Absturzsicherung","Bewuchs / Verunreinigung","sonstige Mängel / Auffälligkeiten"],[1])}];
+var PRUEFARTEN=[["besichtigung","Besichtigung"],["ep","Einfache Prüfung"],["hp","Hauptprüfung"],["sonder","Sonderprüfung"],["beobachtung","Beobachtung"]];
+function paName(a){var r=PRUEFARTEN.filter(function(p){return p[0]===(a||"besichtigung")})[0];return r?r[1]:"Besichtigung"}
+var DEF_ORG={kommune:"Stadt Kassel",amt:"Straßenverkehrs- und Tiefbauamt",abteilung:"Brücken- und Ingenieurbauwerke",kennung:"-6622-",ort:"Kassel",gebiet:"Bezirk",
+  intervalle:{besichtigung:12,ep:36,hp:72},types:DEF_TYPES,upd:0};
 function ja(list){var a=[];for(var i=1;i<=18;i++)a.push(list.indexOf(i)>=0);return a}
 var SEED=[
   {id:"M201",nr:"M 201",bezirk:"2",name:"Georg-Stock-Platz",adresse:"Georg-Stock-Platz, Kassel",eigentum:"",lat:51.30937,lon:9.46873,
@@ -336,7 +354,7 @@ function ensureFolder(prop,val,name,parent){
   return dList("appProperties has { key='"+prop+"' and value='"+qv(val)+"' } and trashed=false").then(function(f){
     if(f.length)return f[0].id;var m={name:name,mimeType:FOLDER,appProperties:{}};m.appProperties[prop]=val;if(parent)m.parents=[parent];
     return dCreate(m).then(function(j){return j.id})}).then(function(id){SY.dm.folders[key]=id;saveDm();return id})}
-function ensureRoot(){return ensureFolder("bbApp","root","Stützwände-App")}
+function ensureRoot(){return ensureFolder("bbApp","root","BauwerkCheck")}
 function ensureData(){return ensureRoot().then(function(r){return ensureFolder("bbApp","daten","_Daten (nicht ändern)",r)})}
 function ensureBwFolder(bwId){var b=S.bw[bwId];return ensureRoot().then(function(r){return ensureFolder("bbFolder",bwId,((b?b.nr+" "+b.name:bwId)).replace(/[\/\\:*?"<>|]/g,"-"),r)})}
 
@@ -345,6 +363,7 @@ function tombstone(key){SY.tomb[key]=Date.now();lss("tomb",SY.tomb);markDirty(ke
 function queueBlob(key,owner,bw,name){SY.ob.blobs[key]={owner:owner,bw:bw,name:name};saveOb();schedSync(3000);updSync()}
 function queueTrash(id){if(id){SY.ob.trash.push(id);saveOb();schedSync(3000)}}
 function pending(){return Object.keys(SY.ob.rec).length+Object.keys(SY.ob.blobs).length+Object.keys(SY.ob.prot).length+SY.ob.trash.length}
+function recOf(key){var t=key.split(":"),id=t.slice(1).join(":");return t[0]==="cfg"?ORG:t[0]==="bw"?S.bw[id]:S.visits[id]}
 function remoteIdOf(k){var id=null;Object.keys(S.visits).some(function(v){var x=S.visits[v];return (x.fotos||[]).concat(x.audios||[]).some(function(f){if(f.key===k&&f.driveId){id=f.driveId;return true}})});
   if(!id)Object.keys(S.bw).some(function(b){if(S.bw[b].refKey===k&&S.bw[b].refDriveId){id=S.bw[b].refDriveId;return true}});return id}
 var fetching={};
@@ -355,7 +374,8 @@ function ensureBlob(k){return getBlob(k).then(function(bl){if(bl)return bl;var i
 function mergeList(a,b,del){var seen={},out=[];a.concat(b).forEach(function(f){if(del.indexOf(f.key)>=0)return;if(seen[f.key]){if(!seen[f.key].driveId&&f.driveId)seen[f.key].driveId=f.driveId;return}seen[f.key]=Object.assign({},f);out.push(seen[f.key])});
   return out.sort(function(x,y){return String(x.ts||x.zeit).localeCompare(String(y.ts||y.zeit))})}
 function applyRemote(d){
-  var t=d.k.split(":"),typ=t[0],id=t.slice(1).join(":"),loc=typ==="bw"?S.bw[id]:S.visits[id],lu=loc?(loc.upd||0):(SY.tomb[d.k]||0);
+  var t=d.k.split(":"),typ=t[0],id=t.slice(1).join(":"),loc=recOf(d.k),lu=loc?(loc.upd||0):(SY.tomb[d.k]||0);
+  if(typ==="cfg"){if(!d.d||d.upd<=lu)return false;ORG=d.d;if(!ORG.intervalle)ORG.intervalle=DEF_ORG.intervalle;lss("org",ORG);applyOrg();delete SY.ob.rec[d.k];saveOb();return true}
   if(d.deleted){if(!loc||d.upd<=lu)return false;SY.tomb[d.k]=d.upd;lss("tomb",SY.tomb);delete SY.ob.rec[d.k];saveOb();
     if(typ==="bw"){delete S.bw[id];del("bauwerke",id)}else{var xv=S.visits[id];(xv.fotos||[]).concat(xv.audios||[]).forEach(function(f){delBlob(f.key)});delete S.visits[id];del("visits",id)}return true}
   if(!loc){if((SY.tomb[d.k]||0)>=d.upd)return false;if(typ==="bw")saveB(d.d,true);else saveV(d.d,true);return true}
@@ -392,13 +412,13 @@ function pushBlobs(){
         delete SY.ob.blobs[k];saveOb()})})})},Promise.resolve())}
 function pushRecs(){
   return Object.keys(SY.ob.rec).reduce(function(p,key){return p.then(function(){
-    var t=key.split(":"),id=t.slice(1).join(":"),rec=t[0]==="bw"?S.bw[id]:S.visits[id];
+    var t=key.split(":"),id=t.slice(1).join(":"),rec=recOf(key);
     var data=rec?{k:key,upd:rec.upd||0,d:rec}:{k:key,upd:SY.tomb[key]||Date.now(),deleted:true},u=data.upd;
     var blob=new Blob([JSON.stringify(data)],{type:"application/json"}),fid=SY.dm.files[key];
     return (fid?dUpdate(fid,blob).catch(function(e){if(e.status===404){delete SY.dm.files[key];return null}throw e}):Promise.resolve(null)).then(function(r){if(r)return r;
       return ensureData().then(function(dd){return dCreate({name:key.replace(":","_")+".json",parents:[dd],appProperties:{bbKey:key}},blob)})})
     .then(function(j){SY.dm.files[key]=j.id;SY.pushed[j.id]=j.modifiedTime;saveDm();
-      var now=t[0]==="bw"?S.bw[id]:S.visits[id],cu=now?(now.upd||0):(SY.tomb[key]||0);if(cu===u){delete SY.ob.rec[key];saveOb()}})})},Promise.resolve())}
+      var now=recOf(key),cu=now?(now.upd||0):(SY.tomb[key]||0);if(cu===u){delete SY.ob.rec[key];saveOb()}})})},Promise.resolve())}
 function pushProts(){
   return Object.keys(SY.ob.prot).reduce(function(p,id){return p.then(function(){var x=S.visits[id];
     if(!x||x.status!=="abgeschlossen"||!S.bw[x.bw]){delete SY.ob.prot[id];saveOb();return}
@@ -409,6 +429,7 @@ function pushProts(){
 function pushTrash(){var l=SY.ob.trash.slice();return l.reduce(function(p,id){return p.then(function(){return dTrash(id).then(function(){SY.ob.trash=SY.ob.trash.filter(function(z){return z!==id});saveOb()})})},Promise.resolve())}
 function firstUpload(){ // nach der ersten Anmeldung: alles Lokale hochladen
   if(ls("initPushed",false))return;
+  if(ORG.upd)SY.ob.rec["cfg:org"]=1;
   Object.keys(S.bw).forEach(function(id){var b=S.bw[id];SY.ob.rec["bw:"+id]=1;if(b.refKey&&!/^foto_/.test(b.refKey)&&!b.refDriveId)SY.ob.blobs[b.refKey]={owner:"bw:"+id,bw:id,name:b.nr+"_Vergleichsbild.jpg"}});
   Object.keys(S.visits).forEach(function(id){var x=S.visits[id];SY.ob.rec["v:"+id]=1;
     (x.fotos||[]).forEach(function(f,i){if(!f.driveId)SY.ob.blobs[f.key]={owner:"v:"+id,bw:x.bw,name:fotoName(x,i)}});
@@ -454,6 +475,27 @@ function allBlobKeys(){return tx("blobs","readonly",function(s){return s.getAllK
 
 /* ---------- Zustand ---------- */
 var S={bw:{},visits:{},tag:"Übersicht",pos:null,urls:{},rec:null,dict:null,q:"",filter:"alle",bez:""};
+var ORG=ls("org",null)||JSON.parse(JSON.stringify(DEF_ORG));
+if(!ORG.types||!ORG.types.length)ORG.types=JSON.parse(JSON.stringify(DEF_TYPES));if(!ORG.intervalle)ORG.intervalle=DEF_ORG.intervalle;
+function saveOrg(remote){if(!remote){ORG.upd=Date.now();markDirty("cfg:org")}lss("org",ORG);applyOrg()}
+function applyOrg(){var e=$("eyebrow");if(e)e.textContent=(ORG.kennung?ORG.kennung+" · ":"")+"DIN 1076"}
+function typeById(id){return ORG.types.filter(function(t){return t.id===id})[0]}
+function typeOf(b){return typeById(b&&b.art||"stuetzwand")||ORG.types[0]}
+function ppOf(o){return (o&&o.pp)||DEF_TYPES[0].pp}
+function mapLast(points,l){var names=ppOf(l).map(function(p){return p.t});return points.map(function(p){var i=names.indexOf(p.t);return l&&l.ja&&i>=0?!!l.ja[i]:!!p.pos})}
+function ortSuffix(){return ORG.ort?", "+ORG.ort:""}
+function addMonths(iso,m){var d=new Date(String(iso).slice(0,10)+"T12:00:00");d.setMonth(d.getMonth()+m);return d.toISOString().slice(0,10)}
+function faellig(b){ // nächste fällige Prüfung nach den eingestellten Intervallen
+  var I=ORG.intervalle||DEF_ORG.intervalle,c=[];
+  if(I.hp)c.push(["hp",b.letzteHP?addMonths(b.letzteHP,I.hp):""]);
+  if(I.ep&&b.letzteHP){var ep=addMonths(b.letzteHP,I.ep);if(!b.letzteEP||b.letzteEP<b.letzteHP)c.push(["ep",ep])}
+  var last=[b.letzte&&b.letzte.datum,b.letzteHP,b.letzteEP].filter(Boolean).sort().pop();
+  if(I.besichtigung)c.push(["besichtigung",last?addMonths(last,I.besichtigung):""]);
+  var t=today(),od=c.filter(function(x){return !x[1]||x[1]<t}),prio={hp:0,ep:1,besichtigung:2};
+  if(od.length){od.sort(function(a,z){return prio[a[0]]-prio[z[0]]});return {art:od[0][0],datum:od[0][1]}}
+  c.sort(function(a,z){return a[1]<z[1]?-1:1});var r=c[0];return r?{art:r[0],datum:r[1]}:null}
+function faelligText(f){if(!f)return "";if(!f.datum)return paName(f.art)+": noch nie erfasst";var u=f.datum<today();return paName(f.art)+(u?" überfällig seit ":" fällig ")+deDate(f.datum)}
+function ueberfaellig(b){var f=faellig(b);return !!(f&&(!f.datum||f.datum<today()))}
 var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme",th);
 S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
 document.documentElement.setAttribute("data-glass",SET.glas);
@@ -463,8 +505,8 @@ function saveB(b,remote){S.bw[b.id]=b;if(!remote){b.upd=Date.now();markDirty("bw
 function bwList(){return Object.keys(S.bw).map(function(k){return S.bw[k]})}
 function year(){return today().slice(0,4)}
 function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())}
-function hasMangel(b){return !!(b.letzte&&b.letzte.ja&&b.letzte.ja.some(function(x,i){return x&&i!==2}))}
-function unsafe(b){return !!(b.letzte&&b.letzte.ja&&!b.letzte.ja[2])}
+function hasMangel(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return x&&pp[i]&&!pp[i].pos}))}
+function unsafe(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return !x&&pp[i]&&pp[i].pos}))}
 function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.bw===bwId}).sort(function(a,b){return b.datum.localeCompare(a.datum)})}
 
 /* ---------- Liquid-Glass-Darstellung ---------- */
@@ -503,34 +545,38 @@ function view(){var h=location.hash.replace("#","");
   if(h.indexOf("bw-")===0&&S.bw[h.slice(3)])return {name:"bw",id:h.slice(3)};
   if(h.indexOf("edit-")===0&&S.bw[h.slice(5)])return {name:"edit",id:h.slice(5)};
   if(h==="neu")return {name:"edit",id:null};
+  if(h.indexOf("art-")===0)return {name:"art",id:h.slice(4)};
   if(h==="liste"||h==="einst")return {name:h};
   return {name:"start"}}
 var rq=0;function renderSoon(){if(rq)return;rq=setTimeout(function(){rq=0;var a=document.activeElement;if(a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type!=="range"&&a.type!=="file"))){a.addEventListener("blur",renderSoon,{once:true});return}render()},40)}
 function render(){
-  var v=view(),n=v.name==="bw"||v.name==="edit"?"liste":v.name;
+  var v=view(),n=v.name==="bw"||v.name==="edit"?"liste":v.name==="art"?"einst":v.name;
   $("nStart").setAttribute("aria-current",n==="start"?"page":"false");$("nListe").setAttribute("aria-current",n==="liste"?"page":"false");$("nEinst").setAttribute("aria-current",n==="einst"?"page":"false");
-  $("app").innerHTML=v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="liste"?viewListe():v.name==="einst"?viewEinst():viewStart();
+  $("app").innerHTML=v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="liste"?viewListe():v.name==="einst"?viewEinst():v.name==="art"?viewArt(v.id):viewStart();
   hydrate();
   if(v.name==="bw"){var xv=S.visits[vid(v.id)];if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
 }
-function lastChips(j){if(!j)return '<span class="chip">Noch keine Besichtigung</span>';var h="";if(!j[2])h+='<span class="chip bad">3 Nicht verkehrssicher</span>';j.forEach(function(x,i){if(x&&i!==2)h+='<span class="chip warn">'+(i+1)+" "+esc(PP[i])+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
+function lastChips(l){if(!l||!l.ja)return '<span class="chip">Noch keine Prüfung</span>';var pp=ppOf(l),h="";
+  l.ja.forEach(function(x,i){var p=pp[i];if(!p)return;if(p.pos&&!x)h+='<span class="chip bad">'+(i+1)+" Nicht: "+esc(p.t)+"</span>";else if(!p.pos&&x)h+='<span class="chip warn">'+(i+1)+" "+esc(p.t)+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
 
 /* Übersicht / Dashboard */
 function viewStart(){
-  var list=bwList(),y=year(),done=list.filter(doneThisYear).length,offen=list.length-done,mang=list.filter(hasMangel).length,uns=list.filter(unsafe).length;
+  var list=bwList(),y=year(),done=list.filter(doneThisYear).length,offen=list.length-done,mang=list.filter(hasMangel).length,uns=list.filter(unsafe).length,ueb=list.filter(ueberfaellig).length;
   var running=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"});
   var pct=list.length?Math.round(done/list.length*100):0;
   var h='<section class="glass panel"><span class="eyebrow">'+deDate(today())+" · "+esc(SET.pruefer)+'</span><h2>Übersicht '+y+'</h2>'+
-    '<div class="row between small"><span>'+done+" von "+list.length+" Bauwerken besichtigt</span><b>"+pct+' %</b></div><div class="bar"><i style="width:'+pct+'%"></i></div></section>';
+    '<div class="row between small"><span>'+done+" von "+list.length+" Bauwerken geprüft oder besichtigt</span><b>"+pct+' %</b></div><div class="bar"><i style="width:'+pct+'%"></i></div></section>';
   h+='<div class="tiles">'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="alle"><b>'+list.length+'</b><span class="muted small">Bauwerke</span></a>'+
-    '<a class="tile glass" href="#liste" data-act="filt" data-f="offen"><b>'+offen+'</b><span class="muted small">offen '+y+'</span></a>'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="faellig"><b style="color:'+(ueb?"var(--bad)":"var(--ok)")+'">'+ueb+'</b><span class="muted small">fällig / überfällig</span></a>'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="mangel"><b style="color:var(--warn)">'+mang+'</b><span class="muted small">mit Befund</span></a>'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="unsicher"><b style="color:'+(uns?"var(--bad)":"var(--ok)")+'">'+uns+'</b><span class="muted small">nicht verkehrssicher</span></a></div>';
   if(running.length)h+='<section class="glass panel"><h3>In Arbeit</h3>'+running.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="muted small">'+deDate(v.datum)+" · "+v.fotos.length+" Fotos</span></a>"}).join("")+"</section>";
-  var bz={};list.forEach(function(b){var k=b.bezirk||"–";bz[k]=bz[k]||{n:0,d:0};bz[k].n++;if(doneThisYear(b))bz[k].d++});
+  var bz={};if(ORG.gebiet)list.forEach(function(b){var k=b.bezirk||"–";bz[k]=bz[k]||{n:0,d:0};bz[k].n++;if(doneThisYear(b))bz[k].d++});
   var keys=Object.keys(bz).sort(natCmp);
-  if(keys.length)h+='<section class="glass panel"><h3>Fortschritt nach Bezirk</h3>'+keys.map(function(k){var o=bz[k],p=Math.round(o.d/o.n*100);return '<div style="display:flex;flex-direction:column;gap:4px"><div class="row between small"><span>Bezirk '+esc(k)+'</span><span class="muted">'+o.d+" / "+o.n+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join("")+"</section>";
+  if(keys.length)h+='<section class="glass panel"><h3>Fortschritt nach '+esc(ORG.gebiet)+'</h3>'+keys.map(function(k){var o=bz[k],p=Math.round(o.d/o.n*100);return '<div style="display:flex;flex-direction:column;gap:4px"><div class="row between small"><span>'+esc(ORG.gebiet)+" "+esc(k)+'</span><span class="muted">'+o.d+" / "+o.n+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join("")+"</section>";
+  var at={};list.forEach(function(b){var t=typeOf(b).name;at[t]=(at[t]||0)+1});var atk=Object.keys(at);
+  if(atk.length>1)h+='<section class="glass panel"><h3>Bauwerksarten</h3><div class="chips">'+atk.map(function(k){return '<span class="chip">'+esc(k)+" · "+at[k]+"</span>"}).join("")+"</div></section>";
   var last=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"}).sort(function(a,b){return (b.ende||b.datum).localeCompare(a.ende||a.datum)}).slice(0,5);
   h+='<section class="glass panel"><h3>Zuletzt abgeschlossen</h3>'+(last.length?last.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="chip '+(v.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+deDate(v.datum)+"</span></a>"}).join(""):'<span class="muted small">Noch keine Besichtigung abgeschlossen.</span>')+"</section>";
   return h;
@@ -540,23 +586,27 @@ function viewStart(){
 function filtered(){
   var q=S.q.trim().toLowerCase();
   return bwList().filter(function(b){
-    if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" bezirk "+(b.bezirk||"")).toLowerCase().indexOf(q)<0)return false;
+    if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" "+(ORG.gebiet||"")+" "+(b.bezirk||"")+" "+typeOf(b).name).toLowerCase().indexOf(q)<0)return false;
+    if(S.art&&typeOf(b).id!==S.art)return false;
     if(S.bez&&String(b.bezirk)!==S.bez)return false;
     if(S.filter==="offen")return !doneThisYear(b);
     if(S.filter==="erledigt")return doneThisYear(b);
     if(S.filter==="mangel")return hasMangel(b);
     if(S.filter==="unsicher")return unsafe(b);
+    if(S.filter==="faellig")return ueberfaellig(b);
     return true;
   }).map(function(b){return {b:b,d:S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null}})
    .sort(function(a,b){return S.pos?((a.d==null)-(b.d==null)||(a.d||0)-(b.d||0)):natCmp(a.b.nr,b.b.nr)});
 }
 function viewListe(){
   var bez=Array.from(new Set(bwList().map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
-  var F=[["alle","Alle"],["offen","Offen"],["erledigt","Besichtigt"],["mangel","Mit Befund"],["unsicher","Nicht sicher"]];
+  var F=[["alle","Alle"],["faellig","Fällig"],["offen","Offen "+year()],["mangel","Mit Befund"],["unsicher","Nicht sicher"]];
+  var arten=ORG.types.filter(function(t){return bwList().some(function(b){return typeOf(b).id===t.id})});
   var h='<section class="glass panel"><div class="row between"><h2>Bauwerke</h2><a class="btn sm" href="#neu">+ Neues Bauwerk</a></div>'+
-    '<input type="search" id="q" placeholder="Suchen: Nr., Straße, Bezirk" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">'+
+    '<input type="search" id="q" placeholder="Suchen: Nr., Straße, Art'+(ORG.gebiet?", "+esc(ORG.gebiet):"")+'" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">'+
     '<div class="seg" role="group" aria-label="Filter">'+F.map(function(f){return '<button type="button" data-act="filt" data-f="'+f[0]+'" aria-pressed="'+(S.filter===f[0])+'">'+f[1]+"</button>"}).join("")+"</div>"+
-    (bez.length>1?'<select id="bez" aria-label="Bezirk"><option value="">Alle Bezirke</option>'+bez.map(function(z){return '<option value="'+esc(z)+'" '+(S.bez===z?"selected":"")+">Bezirk "+esc(z)+"</option>"}).join("")+"</select>":"")+
+    (arten.length>1?'<select id="artF" aria-label="Bauwerksart"><option value="">Alle Bauwerksarten</option>'+arten.map(function(t){return '<option value="'+esc(t.id)+'" '+(S.art===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+"</select>":"")+
+    (ORG.gebiet&&bez.length>1?'<select id="bez" aria-label="'+esc(ORG.gebiet)+'"><option value="">Alle: '+esc(ORG.gebiet)+'</option>'+bez.map(function(z){return '<option value="'+esc(z)+'" '+(S.bez===z?"selected":"")+">"+esc(ORG.gebiet)+" "+esc(z)+"</option>"}).join("")+"</select>":"")+
     '<div class="row between"><span class="muted small">'+(S.pos?"Sortiert nach Entfernung (± "+Math.round(S.pos.acc)+" m)":S.gpsErr||"Sortiert nach Nummer")+'</span>'+(S.pos?"":'<button type="button" class="btn soft sm" data-act="gps">Nach Entfernung</button>')+"</div></section>";
   h+='<div id="results">'+resultsHtml()+"</div>";
   return h;
@@ -565,29 +615,31 @@ function resultsHtml(){
   var list=filtered();
   if(!list.length)return '<div class="glass empty">Keine Bauwerke gefunden.</div>';
   return list.map(function(o){var b=o.b,x=S.visits[vid(b.id)];
-    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+(b.bezirk?" · BEZIRK "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte&&b.letzte.ja)+'</div><span class="muted small">'+(b.letzte?"Zuletzt "+deDate(b.letzte.datum):"Noch nicht besichtigt")+(x?" · heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+'</span></div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
+    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+" · "+esc(typeOf(b).name.toUpperCase())+(b.bezirk&&ORG.gebiet?" · "+esc(ORG.gebiet.toUpperCase())+" "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte)+'</div><span class="muted small">'+(b.letzte?"Zuletzt "+deDate(b.letzte.datum):"Noch nicht erfasst")+" · "+esc(faelligText(faellig(b)))+(x?" · heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+'</span></div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
 }
 
 /* Bauwerk anlegen / bearbeiten */
 function viewEdit(b){
-  var n=!b;b=b||{nr:"",name:"",bezirk:"",adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:[]};
-  function f(id,label,val,ph){return '<label class="fld">'+label+'<input type="text" id="e_'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  var n=!b;b=b||{nr:"",name:"",bezirk:"",adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:[],art:S.art||"stuetzwand"};
+  function f(id,label,val,ph,type){return '<label class="fld">'+label+'<input type="'+(type||"text")+'" id="e_'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  var art='<label class="fld">Bauwerksart<select id="e_art">'+ORG.types.map(function(t){return '<option value="'+esc(t.id)+'" '+(typeOf(b).id===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+"</select></label>";
   return '<a class="btn soft sm" href="'+(n?"#liste":"#bw-"+esc(b.id))+'" style="align-self:flex-start">‹ Zurück</a>'+
     '<section class="glass panel"><h2>'+(n?"Neues Bauwerk":"Bauwerk bearbeiten")+'</h2>'+
-    '<div class="grid2">'+f("nr","Bauwerksnummer *",b.nr,"z. B. M 301")+f("bezirk","Bezirk",b.bezirk,"z. B. 3")+"</div>"+
-    f("name","Bezeichnung *",b.name,"z. B. Am Hange 56")+f("adresse","Adresse für Navigation",b.adresse,"Straße Nr., Kassel")+f("eigentum","Eigentümer",b.eigentum,"Stadt Kassel / Privat / Fremd")+
+    art+'<div class="grid2">'+f("nr","Bauwerksnummer *",b.nr,"z. B. M 301")+(ORG.gebiet?f("bezirk",esc(ORG.gebiet),b.bezirk,"z. B. 3"):"")+"</div>"+
+    f("name","Bezeichnung *",b.name,"z. B. Am Hange 56")+f("adresse","Adresse für Navigation",b.adresse,"Straße Nr."+ortSuffix())+f("eigentum","Eigentümer",b.eigentum,"Kommune / Privat / Fremd")+
+    '<div class="grid2">'+f("hp","Letzte Hauptprüfung",b.letzteHP,"","date")+f("ep","Letzte Einfache Prüfung",b.letzteEP,"","date")+"</div>"+
     '<div class="grid2">'+f("laenge","Länge",b.laenge,"m")+f("hoehe","Ansichtshöhe",b.hoehe,"m")+"</div>"+f("flaeche","Fläche",b.flaeche,"m²")+
     '<label class="fld">Hinweise (eine Zeile je Hinweis)<textarea id="e_hinweise" rows="3">'+esc((b.hinweise||[]).join("\n"))+"</textarea></label>"+
-    (n?'<span class="muted small">Prüfpunkte starten bei der ersten Besichtigung leer (nur Nr. 3 „Verkehrssicherheit gegeben“ = Ja).</span>':"")+
+    (n?'<span class="muted small">Die Prüfpunkte kommen aus der gewählten Bauwerksart (Einstellungen → Bauwerksarten).</span>':"")+
     '<button type="button" class="btn block" data-act="saveBw" data-id="'+esc(b.id||"")+'">Speichern</button>'+
     (n?"":'<button type="button" class="btn danger block" data-act="delBw" data-id="'+esc(b.id)+'">Bauwerk löschen</button>')+"</section>";
 }
 function readEdit(old){
-  var g=function(k){return ($("e_"+k).value||"").trim()};
+  var g=function(k){var e=$("e_"+k);return e?(e.value||"").trim():""};
   var nr=g("nr"),name=g("name");if(!nr||!name){toast("Bitte Nummer und Bezeichnung angeben.");return null}
   var b=old?Object.assign({},old):{id:nr.replace(/[^A-Za-z0-9]/g,"")||("bw"+Date.now()),letzte:null,lat:null,lon:null};
   if(!old&&S.bw[b.id])b.id=b.id+"_"+Date.now().toString(36);
-  Object.assign(b,{nr:nr,name:name,bezirk:g("bezirk"),adresse:g("adresse")||name+", Kassel",eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),
+  Object.assign(b,{nr:nr,name:name,art:g("art")||"stuetzwand",letzteHP:g("hp"),letzteEP:g("ep"),bezirk:ORG.gebiet?g("bezirk"):(b.bezirk||""),adresse:g("adresse")||name+ortSuffix(),eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),
     hinweise:g("hinweise").split("\n").map(function(s){return s.trim()}).filter(Boolean)});
   return b;
 }
@@ -603,12 +655,13 @@ function viewBw(b){
   var x=S.visits[vid(b.id)],l=b.letzte;
   var h='<a class="btn soft sm" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>';
   var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche]].filter(function(p){return p[1]});
-  h+='<section class="glass panel"><span class="eyebrow">'+(b.bezirk?"Bezirk "+esc(b.bezirk)+" · ":"")+"Stützwand"+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
+  h+='<section class="glass panel"><span class="eyebrow">'+(b.bezirk&&ORG.gebiet?esc(ORG.gebiet)+" "+esc(b.bezirk)+" · ":"")+esc(typeOf(b).name)+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
     (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
-    '<div class="row"><a class="btn sm" href="'+esc(maps(b.adresse||b.name+", Kassel",SET.mode))+'" target="_blank" rel="noopener">Navigation</a><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bearbeiten</a>'+
+    '<div class="row"><a class="btn sm" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation</a><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bearbeiten</a>'+
     (S.pos?'<button type="button" class="btn soft sm" data-act="setCoord" data-bw="'+esc(b.id)+'">Standort speichern</button>':'<button type="button" class="btn soft sm" data-act="gps">GPS</button>')+"</div>"+
     (b.lat==null?'<span class="muted small">Noch keine Position hinterlegt. Vor Ort „GPS“ und dann „Standort speichern“ tippen.</span>':"")+"</section>";
-  h+='<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+(l?deDate(l.datum)+" · "+esc(l.pruefer):"–")+'</span></div><div class="chips">'+lastChips(l&&l.ja)+"</div>"+
+  h+='<section class="glass panel"><div class="row between"><h3>Letzte Prüfung</h3><span class="muted small">'+(l?paName(l.art)+" "+deDate(l.datum)+" · "+esc(l.pruefer):"–")+'</span></div>'+
+    '<div class="kv"><div><span>Nächste</span><span>'+esc(faelligText(faellig(b))||"–")+'</span></div><div><span>Letzte HP</span><span>'+deDate(b.letzteHP)+'</span></div><div><span>Letzte EP</span><span>'+deDate(b.letzteEP)+"</span></div></div>"+'<div class="chips">'+lastChips(l)+"</div>"+
     (l&&l.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(l.verunreinigungen)+"</div>":"")+
     (l&&l.schaden?'<div class="small"><span class="muted">Schäden: </span>'+esc(l.schaden)+"</div>":"")+
     (l&&l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>";
@@ -617,9 +670,11 @@ function viewBw(b){
     (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:220px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Wird in der Kamera halbtransparent über das Live-Bild gelegt, damit das neue Foto vom gleichen Standpunkt entsteht. Danach neues Foto antippen: alt und neu mit Schieberegler vergleichen.</span>':
       '<span class="muted small">Noch kein altes Bild. Foto aus der Galerie wählen oder später ein Foto antippen und „Als Vergleichsbild“ wählen.</span>')+
     '<label class="btn soft sm">Altes Bild aus Galerie wählen<input type="file" accept="image/*" data-ref="'+esc(b.id)+'"></label></section>';
-  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+esc(b.id)+'" style="min-height:58px;font-size:17px">Besichtigung heute starten</button>'+historyHtml(b);
+  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+esc(b.id)+'" style="min-height:58px;font-size:17px">Prüfung / Besichtigung heute starten</button>'+historyHtml(b);
   var done=x.status==="abgeschlossen",id=esc(x.id);
-  if(!x.ja[2])h+='<div class="alert bad"><b>Verkehrssicherheit nicht gegeben.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
+  var pts=ppOf(x),bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
+  if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
+  h+='<section class="glass panel"><h3>Art der Prüfung</h3><div class="seg" role="group">'+PRUEFARTEN.map(function(p){return '<button type="button" data-act="setArt" data-visit="'+id+'" data-v="'+p[0]+'" aria-pressed="'+((x.art||"besichtigung")===p[0])+'" '+(done?"disabled":"")+">"+p[1]+"</button>"}).join("")+"</div></section>";
   h+='<section class="glass panel"><div class="row between"><h3>Fotos heute</h3><span class="muted small">'+x.fotos.length+"</span></div>";
   if(!done)h+='<button type="button" class="btn block" data-act="camOpen" data-visit="'+id+'">Kamera öffnen'+(b.refKey?" (mit altem Bild)":"")+'</button><label class="btn soft sm">Fotos aus Galerie hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'"></label>';
   if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
@@ -629,23 +684,23 @@ function viewBw(b){
   if(!done)h+='<button type="button" class="btn '+(S.rec?"":"soft ")+'block" data-act="rec" data-visit="'+id+'" style="'+(S.rec?"background:var(--bad);color:#fff":"")+'">'+(S.rec?"Aufnahme beenden ("+S.recSec+" s)":"Sprachnotiz aufnehmen")+"</button>";
   x.audios.forEach(function(a,i){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted" style="flex:1">'+esc(a.zeit)+" · "+a.dauer+' s</span>'+(done?"":'<button type="button" class="btn danger sm" data-act="delAudio" data-visit="'+id+'" data-i="'+i+'">Löschen</button>')+'<audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
   h+="</section>";
-  var diff=0;for(var i=0;i<18;i++)if(x.ja[i]!==x.ref[i])diff++;
+  var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
   h+='<section class="glass panel"><div class="row between"><h3>Prüfpunkte</h3><span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" Änderung"+(diff>1?"en":""):"wie zuletzt")+"</span></div>";
   if(!done)h+='<button type="button" class="btn soft block" data-act="reset" data-visit="'+id+'">Alles wie zuletzt – keine Schadenserweiterung</button>';
   h+='<div class="pp">';
-  PP.forEach(function(t,i){var on=x.ja[i],ch=on!==x.ref[i],hint=i===2?"Ja = in Ordnung":ch?(on?"neu gegenüber letzter Besichtigung":"entfällt gegenüber letzter Besichtigung"):"";
-    h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t"><span>'+esc(t)+"</span>"+(hint?'<span class="pp-h'+(ch?" chg":"")+'">'+hint+"</span>":"")+'</span><button type="button" class="sw'+(i===2?" vs":"")+'" aria-pressed="'+on+'" aria-label="'+(i+1)+" "+esc(t)+'" data-act="pp" data-i="'+i+'" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div>"});
+  pts.forEach(function(pt,i){var t=pt.t,on=x.ja[i],ch=on!==x.ref[i],hint=pt.pos?"Ja = in Ordnung":ch?(on?"neu gegenüber letzter Besichtigung":"entfällt gegenüber letzter Besichtigung"):"";
+    h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t"><span>'+esc(t)+"</span>"+(hint?'<span class="pp-h'+(ch?" chg":"")+'">'+hint+"</span>":"")+'</span><button type="button" class="sw'+(pt.pos?" vs":"")+'" aria-pressed="'+on+'" aria-label="'+(i+1)+" "+esc(t)+'" data-act="pp" data-i="'+i+'" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div>"});
   h+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung nach DIN 1076 veranlasst</span><button type="button" class="sw sp" aria-pressed="'+x.sonder+'" aria-label="Sonderprüfung veranlasst" data-act="sonder" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div></div></section>";
   h+='<section class="glass panel"><h3>Beschreibung</h3>'+fld(x,"verunreinigungen","Verunreinigungen",done)+fld(x,"schaden","Schadensbeschreibung(en)",done)+fld(x,"sonstige","Sonstige Mängel / Auffälligkeiten",done)+
     '<span class="muted small">'+(S.speech?"Mikrofon-Taste: direkt ins Feld diktieren.":"Zum Diktieren die Mikrofon-Taste der Tastatur nutzen.")+"</span></section>";
-  if(!done)h+='<button type="button" class="btn block" data-act="finish" data-visit="'+id+'" style="min-height:58px;font-size:17px">Besichtigung abschließen</button>';
+  if(!done)h+='<button type="button" class="btn block" data-act="finish" data-visit="'+id+'" style="min-height:58px;font-size:17px">'+esc(paName(x.art))+' abschließen</button>';
   else h+=exportPanel(x);
   return h+historyHtml(b);
 }
 function historyHtml(b){
   var vs=visitsOf(b.id).filter(function(v){return v.datum!==today()});
   if(!vs.length)return "";
-  return '<section class="glass panel"><h3>Frühere Besichtigungen in der App</h3>'+vs.map(function(v){return '<div class="row between" style="border-top:1px solid var(--line);padding-top:8px"><span>'+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll ansehen</button></div>'}).join("")+"</section>";
+  return '<section class="glass panel"><h3>Frühere Prüfungen in der App</h3>'+vs.map(function(v){return '<div class="row between" style="border-top:1px solid var(--line);padding-top:8px"><span>'+esc(paName(v.art))+" "+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll ansehen</button></div>'}).join("")+"</section>";
 }
 function fld(x,k,label,done){
   var on=S.dict&&S.dict.visit===x.id&&S.dict.k===k;
@@ -657,7 +712,7 @@ function exportPanel(x){
   return '<section class="glass panel"><div class="row between"><h3>Protokoll und Fotos</h3><span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span></div>"+
     '<button type="button" class="btn block" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
     '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Teilen (Outlook / Mail)</button>'+
-    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.'+SET.protFormat+')</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.'+protExt(x)+')</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
     '<button type="button" class="btn soft sm" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button>'+
     '<span class="muted small mono">'+esc(protName(x,b))+"<br>"+esc(fotoName(x,0))+(n>1?" … "+pad(n):"")+"</span>"+
     '<span class="muted small">Die Excel-Datei ist für den Büro-PC gedacht. Am Handy „Protokoll ansehen“ nutzen – sonst bietet das Handy evtl. eine unpassende App (z. B. PayPal) zum Öffnen an.</span>'+
@@ -672,13 +727,22 @@ function viewEinst(){
     '<label class="fld">Name des Prüfers (erscheint im Protokoll bei „von“)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label></section>';
   h+='<section class="glass panel" id="sync"><h3>Synchronisierung (Google Drive)</h3><span class="small" id="syncStat">'+esc(syncText())+'</span>'+
     (!SY.on||SY.needLogin?'<button type="button" class="btn block" data-act="login">Mit Google anmelden</button>':'<button type="button" class="btn soft block" data-act="syncNow">Jetzt synchronisieren</button>')+
-    '<span class="muted small">Handy und Büro-PC mit <b>demselben</b> Google-Konto anmelden (6622brueckenbau@gmail.com). Daten, Fotos und Protokolle liegen dann im Drive-Ordner „Stützwände-App“ und sind auf allen Geräten gleich. Ohne Internet wird lokal gespeichert und später übertragen.</span>'+
+    '<span class="muted small">Handy und Büro-PC mit <b>demselben</b> Google-Konto anmelden (6622brueckenbau@gmail.com). Daten, Fotos und Protokolle liegen dann im Drive-Ordner „BauwerkCheck“ und sind auf allen Geräten gleich. Ohne Internet wird lokal gespeichert und später übertragen.</span>'+
     (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
+  function oi(k,label,ph){return '<label class="fld">'+label+'<input type="text" data-org="'+k+'" value="'+esc(ORG[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  h+='<section class="glass panel"><h3>Organisation</h3>'+oi("kommune","Kommune","z. B. Stadt Musterstadt")+oi("amt","Amt / Dienststelle","z. B. Tiefbauamt")+
+    '<div class="grid2">'+oi("abteilung","Abteilung","z. B. Ingenieurbauwerke")+oi("kennung","Kennung","z. B. 66.2")+"</div>"+
+    '<div class="grid2">'+oi("ort","Ort (für Protokoll und Navigation)","z. B. Musterstadt")+'<label class="fld">Gebietseinteilung<select data-org="gebiet">'+["Bezirk","Ortsteil","Stadtteil","Gebiet","Los",""].map(function(g){return '<option value="'+g+'" '+((ORG.gebiet||"")===g?"selected":"")+">"+(g||"keine")+"</option>"}).join("")+"</select></label></div>"+
+    '<span class="muted small">Prüfintervalle in Monaten (Vorgabe nach DIN 1076 – bitte mit der eigenen Dienstanweisung abgleichen)</span>'+
+    '<div class="grid2"><label class="fld">Besichtigung<input type="number" min="0" data-int="besichtigung" value="'+(ORG.intervalle.besichtigung||"")+'"></label><label class="fld">Einfache Prüfung (nach HP)<input type="number" min="0" data-int="ep" value="'+(ORG.intervalle.ep||"")+'"></label></div>'+
+    '<label class="fld">Hauptprüfung<input type="number" min="0" data-int="hp" value="'+(ORG.intervalle.hp||"")+'"></label></section>';
+  h+='<section class="glass panel"><div class="row between"><h3>Bauwerksarten und Prüfpunkte</h3><a class="btn soft sm" href="#art-neu">+ Neu</a></div>'+ORG.types.map(function(t){var n=bwList().filter(function(b){return typeOf(b).id===t.id}).length;
+    return '<a class="row between" href="#art-'+esc(t.id)+'" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px"><span><b>'+esc(t.name)+'</b><br><span class="muted small">'+t.pp.length+" Prüfpunkte · Protokoll "+(t.protokoll==="kassel"?"Kassel-Vorlage":"Standard")+'</span></span><span class="muted small">'+n+" BW ›</span></a>"}).join("")+"</section>";
   h+='<section class="glass panel" id="darstellung"><h3>Darstellung</h3>'+
     '<span class="muted small">Hintergrund</span><div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbwelt</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
     (SET.hgFoto?'<div class="row"><label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label><span class="muted small">Ein farbiges Foto mit Kontrasten (Himmel, Grün, Menschen) lässt das Glas am lebendigsten wirken.</span></div>':"")+
     '<span class="muted small">Farbwelt'+(SET.hgFoto?" (bestimmt die Akzentfarbe)":"")+'</span><div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
-    '<span class="muted small">Glas</span>'+seg("glas",[["klar","Klar (wie iPhone)"],["milchig","Milchig (besser lesbar)"]])+
+    '<span class="muted small">Glas</span>'+seg("glas",[["klar","Klar"],["milchig","Milchig (besser lesbar)"]])+
     '<div class="setrow"><span>Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>'+
     '<span class="muted small">Hell / Dunkel</span><div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Automatisch"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div></section>";
   h+='<section class="glass panel"><h3>Fotos und Protokoll</h3>'+
@@ -688,7 +752,7 @@ function viewEinst(){
     '<span class="muted small">Navigation</span>'+seg("mode",[["driving","Auto"],["transit","ÖPNV"],["walking","zu Fuß"]])+"</section>";
   h+='<section class="glass panel"><h3>Bauwerke</h3><a class="btn soft block" href="#neu">+ Neues Bauwerk anlegen</a>'+
     '<label class="btn soft block">Bauwerksliste importieren (CSV)<input type="file" accept=".csv,text/csv,text/plain" id="csvIn"></label>'+
-    '<span class="muted small">CSV mit Kopfzeile, z. B. <span class="mono">Nr;Bezeichnung;Bezirk;Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span></section>';
+    '<span class="muted small">CSV mit Kopfzeile, z. B. <span class="mono">Nr;Bezeichnung;Art;'+esc(ORG.gebiet||"Gebiet")+';Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span></section>';
   h+='<section class="glass panel"><h3>Datensicherung</h3><span class="muted small">'+(SY.on?"Zusätzlich zur Synchronisierung kann eine Sicherung als ZIP heruntergeladen werden.":"Ohne Synchronisierung liegen alle Daten nur auf diesem Gerät. Regelmäßig sichern – z. B. vor einem Handywechsel.")+'</span>'+
     '<button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
     '<label class="btn soft block">Sicherung wiederherstellen<input type="file" accept=".zip,application/zip" id="restoreIn"></label>'+
@@ -697,6 +761,30 @@ function viewEinst(){
   h+='<p class="muted small" style="text-align:center">Version '+APPVER+" · Demo</p>";
   setTimeout(function(){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var u=$("usage");if(u)u.textContent="Belegter Speicher: "+(e.usage/1048576).toFixed(1).replace(".",",")+" MB"})},0);
   return h;
+}
+
+function viewArt(id){
+  var n=id==="neu",t=n?{id:"",name:"",protokoll:"standard",pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","sonstige Mängel / Auffälligkeiten"],[1]),tags:TAGS_STD}:typeById(id);
+  if(!t)return '<div class="glass empty">Bauwerksart nicht gefunden.</div>';
+  var used=n?0:bwList().filter(function(b){return typeOf(b).id===t.id}).length;
+  return '<a class="btn soft sm" href="#einst" style="align-self:flex-start">‹ Einstellungen</a><section class="glass panel"><h2>'+(n?"Neue Bauwerksart":esc(t.name))+'</h2>'+
+    '<label class="fld">Name *<input type="text" id="a_name" value="'+esc(t.name)+'" placeholder="z. B. Treppenanlage"></label>'+
+    '<label class="fld">Prüfpunkte – eine Zeile je Punkt<textarea id="a_pp" rows="12">'+esc(t.pp.map(function(p){return (p.pos?"+ ":"")+p.t}).join("\n"))+'</textarea></label>'+
+    '<span class="muted small">„+“ am Zeilenanfang: Ja bedeutet „in Ordnung“ (z. B. „+ Verkehrssicherheit gegeben“). Bei allen anderen Punkten bedeutet Ja „Befund vorhanden“. Änderungen gelten für neue Prüfungen; abgeschlossene Protokolle bleiben unverändert.</span>'+
+    '<label class="fld">Protokoll<select id="a_prot"><option value="standard" '+(t.protokoll!=="kassel"?"selected":"")+'>Standard-Protokoll (Excel)</option><option value="kassel" '+(t.protokoll==="kassel"?"selected":"")+'>Kassel-Vorlage Stützwand (nur mit genau 18 Punkten)</option></select></label>'+
+    '<label class="fld">Foto-Stichworte – eine Zeile je Stichwort<textarea id="a_tags" rows="4">'+esc((t.tags||TAGS_STD).join("\n"))+'</textarea></label>'+
+    '<button type="button" class="btn block" data-act="saveArt" data-id="'+esc(t.id)+'">Speichern</button>'+
+    (!n&&ORG.types.length>1?(used?'<span class="muted small">Löschen nicht möglich: '+used+" Bauwerk(e) dieser Art vorhanden.</span>":'<button type="button" class="btn danger block" data-act="delArt" data-id="'+esc(t.id)+'">Bauwerksart löschen</button>'):"")+"</section>";
+}
+function saveArt(id){
+  var name=$("a_name").value.trim(),lines=$("a_pp").value.split("\n").map(function(l){return l.trim()}).filter(Boolean);
+  if(!name||!lines.length){toast("Bitte Name und mindestens einen Prüfpunkt angeben.");return}
+  var pp=lines.map(function(l){var pos=/^\+/.test(l);return {t:l.replace(/^\+\s*/,""),pos:pos}}),prot=$("a_prot").value;
+  if(prot==="kassel"&&pp.length!==18){toast("Kassel-Vorlage braucht genau 18 Prüfpunkte – Standard-Protokoll wird verwendet.",4000);prot="standard"}
+  var tags=$("a_tags").value.split("\n").map(function(l){return l.trim()}).filter(Boolean);
+  var t=id?typeById(id):null;
+  if(!t){var base=name.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"art",nid=base,k=2;while(typeById(nid))nid=base+"-"+(k++);t={id:nid};ORG.types.push(t)}
+  Object.assign(t,{name:name,pp:pp,protokoll:prot,tags:tags.length?tags:TAGS_STD});saveOrg();toast("Gespeichert");location.hash="#einst";
 }
 
 /* Bilder/Audio aus IndexedDB nachladen */
@@ -709,18 +797,20 @@ function hydrate(){
 function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return ensureBlob(k).then(function(bl){if(!bl)return null;S.urls[k]=URL.createObjectURL(bl);return S.urls[k]})}
 
 /* ---------- Besichtigung ---------- */
-function startVisit(bwId){var b=S.bw[bwId],l=b.letzte||{ja:ja([3]),verunreinigungen:"",schaden:"",sonstige:"",datum:""};
-  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:l.ja.slice(),ja:l.ja.slice(),sonder:false,
+function startVisit(bwId){var b=S.bw[bwId],t=typeOf(b),l=b.letzte||{verunreinigungen:"",schaden:"",sonstige:"",datum:""};
+  var pts=JSON.parse(JSON.stringify(t.pp)),ref=mapLast(pts,b.letzte);
+  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:ref.slice(),ja:ref.slice(),sonder:false,pp:pts,typ:t.id,protokoll:t.protokoll,art:"besichtigung",basisHP:b.letzteHP||"",basisEP:b.letzteEP||"",
     verunreinigungen:l.verunreinigungen||"",schaden:l.schaden||"",sonstige:l.sonstige||"",fotos:[],audios:[],basis:l.datum||"",basisLetzte:b.letzte||null,seq:0};
   saveV(v).then(render)}
 function finishVisit(x){
   var same=x.ja.every(function(v,i){return v===x.ref[i]})&&!x.sonder;
   x.status="abgeschlossen";x.befund=same?"keine Schadenserweiterung":"Veränderung festgestellt";x.ende=new Date().toISOString();x.pruefer=SET.pruefer;
-  var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
+  var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),pp:ppOf(x),art:x.art||"besichtigung",verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
+  if(x.art==="hp")b.letzteHP=x.datum;if(x.art==="ep")b.letzteEP=x.datum;
   SY.ob.prot[x.id]=1;saveOb();
   return Promise.all([saveV(x),saveB(b)]);
 }
-function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;return Promise.all([saveV(x),saveB(b)])}
+function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;if(x.art==="hp")b.letzteHP=x.basisHP||"";if(x.art==="ep")b.letzteEP=x.basisEP||"";return Promise.all([saveV(x),saveB(b)])}
 
 /* ---------- Bilder ---------- */
 function toJpeg(src,w,h,max,q){var s=Math.min(1,max/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
@@ -751,24 +841,27 @@ function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openM
 /* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
 function preview(x){
   var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x);
-  var rows=PP.map(function(t,i){return "<tr><td>"+(i+1)+". "+esc(t)+'</td><td class="x">'+(x.ja[i]?"X":"")+'</td><td class="x">'+(x.ja[i]?"":"X")+"</td></tr>"}).join("");
+  var rows=ppOf(x).map(function(p,i){var t=p.t;return "<tr><td>"+(i+1)+". "+esc(t)+'</td><td class="x">'+(x.ja[i]?"X":"")+'</td><td class="x">'+(x.ja[i]?"":"X")+"</td></tr>"}).join("");
   openModal('<div class="mbar"><b>Protokoll-Vorschau</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
-    '<div class="paper"><div style="font-size:11px;color:#555">Stadt Kassel · Straßenverkehrs- u. Tiefbauamt · Brücken- und Ingenieurbauwerke · -6622-</div>'+
-    '<h4 style="margin-top:8px">Besichtigung Stützwand nach DIN 1076 (Abschnitt 6.2)</h4>'+
-    "<table><tr><th>BW-Nr.</th><td>"+esc(b.nr)+"</td><th>BW-Name</th><td>"+esc(b.name)+"</td></tr><tr><th>Eigentümer</th><td>"+esc(b.eigentum||"–")+"</td><th>Jahr</th><td>"+x.datum.slice(0,4)+"</td></tr><tr><th>Besichtigt am</th><td>"+deDate(x.datum)+"</td><th>von</th><td>"+esc(x.pruefer)+"</td></tr></table>"+
+    '<div class="paper"><div style="font-size:11px;color:#555">'+esc(orgLine())+'</div>'+
+    '<h4 style="margin-top:8px">'+esc(protTitle(x,b))+'</h4>'+
+    "<table><tr><th>BW-Nr.</th><td>"+esc(b.nr)+"</td><th>BW-Name</th><td>"+esc(b.name)+"</td></tr><tr><th>Eigentümer</th><td>"+esc(b.eigentum||"–")+"</td><th>Jahr</th><td>"+x.datum.slice(0,4)+"</td></tr><tr><th>Datum</th><td>"+deDate(x.datum)+"</td><th>von</th><td>"+esc(x.pruefer)+"</td></tr></table>"+
     '<table style="margin-top:10px"><tr><th>Prüfpunkt</th><th class="x">Ja</th><th class="x">Nein</th></tr>'+rows+'<tr><td>Sonderprüfung nach DIN 1076 veranlasst</td><td class="x">'+(x.sonder?"X":"")+'</td><td class="x">'+(x.sonder?"":"X")+"</td></tr></table>"+
     '<p style="margin:10px 0 4px"><b>Verunreinigungen</b></p><div class="box">'+esc(x.verunreinigungen||"")+'</div><p style="margin:0 0 4px"><b>Schadensbeschreibung(en)</b></p><div class="box">'+esc(sch)+'</div><p style="margin:0 0 4px"><b>Sonstige Mängel / Auffälligkeiten</b></p><div class="box">'+esc(x.sonstige||"")+"</div>"+
-    '<div style="display:flex;justify-content:space-between;margin-top:10px"><span>Kassel, '+deDate(today())+"</span><span>Gesehen, Kassel</span></div>"+
+    '<div style="display:flex;justify-content:space-between;margin-top:10px"><span>'+esc(ORG.ort||"")+(ORG.ort?", ":"")+deDate(today())+"</span><span>Gesehen"+esc(ortSuffix())+"</span></div>"+
     (x.fotos.length?'<p style="margin:12px 0 6px"><b>Fotos ('+x.fotos.length+')</b></p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px">'}).join("")+"</div>":"")+"</div>");
   hydrate();
 }
-function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Besichtigung vom "+deDate(x.basis);return sch}
+function orgLine(){return [ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).join(" · ")}
+function protTitle(x,b){var t=typeById(x.typ)||typeOf(b);return paName(x.art)+" "+t.name+" nach DIN 1076"+(isKassel(x)?" (Abschnitt 6.2)":"")}
+function isKassel(x){return (x.protokoll||"kassel")==="kassel"&&ppOf(x).length===18}
+function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Prüfung vom "+deDate(x.basis);return sch}
 
 /* ---------- Kamera ---------- */
 var CAM={stream:null,visit:null,ori:null,heading:null};
 function camOpen(id){
   CAM.visit=id;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;document.body.style.overflow="hidden";
-  $("ctags").innerHTML=TAGS.map(function(t){return '<button type="button" data-act="ctag" data-t="'+esc(t)+'" aria-pressed="'+(S.tag===t)+'">'+esc(t)+"</button>"}).join("");
+  var tags=(typeById(x.typ)||typeOf(b)).tags||TAGS_STD;if(tags.indexOf(S.tag)<0)S.tag=tags[0];$("ctags").innerHTML=tags.map(function(t){return '<button type="button" data-act="ctag" data-t="'+esc(t)+'" aria-pressed="'+(S.tag===t)+'">'+esc(t)+"</button>"}).join("");
   $("camCount").textContent=x.fotos.length+" Fotos";
   $("refBtn").hidden=!b.refKey;$("refimg").hidden=true;$("opWrap").hidden=true;
   if(b.refKey)blobUrl(b.refKey).then(function(u){if(!u)return;$("refimg").src=u;$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
@@ -827,8 +920,10 @@ function dictToggle(id,k){
 }
 
 /* ---------- Protokoll (.xlsx / .xlsm) aus Vorlage ---------- */
-function fotoName(x,i){var b=S.bw[x.bw];return (SET.fotoName==="bw"&&b?b.nr+"_":"")+x.datum+"_Besichtigung_"+pad(i+1)+".jpg"}
-function protName(x,b){return (b?b.nr:x.bw)+" Besichtigungsprotokoll "+x.datum.slice(0,4)+"."+SET.protFormat}
+function fotoName(x,i){var b=S.bw[x.bw],a=x.art&&x.art!=="besichtigung"?fsafe(paName(x.art)).replace(/ /g,""):"Besichtigung";return fsafe((SET.fotoName==="bw"&&b?b.nr+"_":"")+x.datum+"_"+a+"_"+pad(i+1)+".jpg")}
+function protExt(x){return isKassel(x)?SET.protFormat:"xlsx"}
+function fsafe(n){return String(n).replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss").replace(/[\/\\:*?"<>|]/g,"-")}
+function protName(x,b){var nr=b?b.nr:x.bw;return fsafe(((x.art||"besichtigung")==="besichtigung"?nr+" Besichtigungsprotokoll "+x.datum.slice(0,4):nr+" Protokoll "+paName(x.art)+" "+x.datum)+"."+protExt(x))}
 function xe(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function serial(iso){var p=String(iso).slice(0,10).split("-");return Math.round((Date.UTC(+p[0],p[1]-1,+p[2])-Date.UTC(1899,11,30))/86400000)}
 function setCell(xml,ref,kind,val){var re=new RegExp('<c r="'+ref+'"([^>]*?)(/>|>[\\s\\S]*?</c>)'),m=xml.match(re);if(!m)return xml;var at=m[1].replace(/\s*t="[^"]*"/,""),c;
@@ -841,6 +936,7 @@ function setBox(d,name,text){var parts=d.split("</xdr:twoCellAnchor>");for(var k
 var VORLAGE=null;
 var MIME={xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",xlsm:"application/vnd.ms-excel.sheet.macroEnabled.12"};
 function buildProtokoll(x,b){
+  if(!isKassel(x))return buildStandard(x,b);
   return (VORLAGE?Promise.resolve(VORLAGE):fetch("vorlage.xlsm").then(function(r){if(!r.ok)throw new Error("Vorlage fehlt");return r.arrayBuffer()}).then(function(a){VORLAGE=a;return a})).then(function(buf){return JSZip.loadAsync(buf.slice(0))}).then(function(z){
     return Promise.all(["xl/worksheets/sheet1.xml","xl/drawings/drawing1.xml","xl/workbook.xml","xl/worksheets/sheet2.xml","[Content_Types].xml","xl/_rels/workbook.xml.rels"].map(function(p){return z.file(p).async("string")})).then(function(a){
       var s=a[0],d=a[1],w=a[2],s2=a[3],ct=a[4],rels=a[5],nr=parseInt(String(b.nr).replace(/\D/g,""),10)||0;
@@ -857,9 +953,31 @@ function buildProtokoll(x,b){
       return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:MIME[SET.protFormat]});
     })});
 }
+function buildStandard(x,b){ // allgemeines Excel-Protokoll für alle Bauwerksarten
+  var r=0,rows=[],pts=ppOf(x),t=typeById(x.typ)||typeOf(b);
+  function cell(ref,v,st){if(v==null||v==="")return "";var s=st?' s="'+st+'"':"";return typeof v==="number"?'<c r="'+ref+'"'+s+"><v>"+v+"</v></c>":'<c r="'+ref+'"'+s+' t="inlineStr"><is><t xml:space="preserve">'+xe(v)+"</t></is></c>"}
+  function row(cs,st){r++;rows.push('<row r="'+r+'">'+cs.map(function(v,i){return cell("ABCD"[i]+r,v,Array.isArray(st)?st[i]:st)}).join("")+"</row>")}
+  row([orgLine()]);row([protTitle(x,b)],1);row([]);
+  row(["BW-Nr.",b.nr,"Bauwerksart",t.name],[1,0,1,0]);row(["Bezeichnung",b.name,"Eigentümer",b.eigentum||"–"],[1,0,1,0]);
+  row(["Datum",deDate(x.datum),"Prüfer",x.pruefer],[1,0,1,0]);if(ORG.gebiet&&b.bezirk)row([ORG.gebiet,b.bezirk],[1,0]);row([]);
+  row(["Prüfpunkt","Ja","Nein"],1);pts.forEach(function(p,i){row([(i+1)+". "+p.t+(p.pos?" (Ja = in Ordnung)":""),x.ja[i]?"X":"",x.ja[i]?"":"X"],[0,3,3])});
+  row(["Sonderprüfung nach DIN 1076 veranlasst",x.sonder?"X":"",x.sonder?"":"X"],[0,3,3]);row([]);
+  [["Verunreinigungen",x.verunreinigungen],["Schadensbeschreibung(en)",schadenText(x)],["Sonstige Mängel / Auffälligkeiten",x.sonstige]].forEach(function(p){row([p[0]],1);row([p[1]||"–"],2)});
+  row([]);row([(ORG.ort?ORG.ort+", ":"")+deDate(today()),"","Gesehen"+ortSuffix()]);
+  if(x.fotos.length){row([]);row(["Fotos"],1);x.fotos.forEach(function(f,i){row([fotoName(x,i)+" – "+f.tag+" ("+f.zeit+")"])})}
+  var sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><cols><col min="1" max="1" width="58" customWidth="1"/><col min="2" max="2" width="18" customWidth="1"/><col min="3" max="3" width="16" customWidth="1"/><col min="4" max="4" width="28" customWidth="1"/></cols><sheetData>'+rows.join("")+'</sheetData><pageMargins left="0.6" right="0.6" top="0.7" bottom="0.7" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" fitToWidth="1" fitToHeight="0"/></worksheet>';
+  var z=new JSZip();
+  z.file("[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>');
+  z.file("_rels/.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+  z.file("xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Protokoll" sheetId="1" r:id="rId1"/></sheets></workbook>');
+  z.file("xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+  z.file("xl/styles.xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
+  z.file("xl/worksheets/sheet1.xml",sheet);
+  return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:MIME.xlsx});
+}
 function exportFiles(x,what){
   var b=S.bw[x.bw],jobs=[];
-  if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:MIME[SET.protFormat]})}));
+  if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:MIME[protExt(x)]})}));
   if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(ensureBlob(f.key).then(function(bl){if(!bl)throw new Error("Foto "+(i+1)+" noch nicht geladen – bitte Internet prüfen");return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
   return Promise.all(jobs);
 }
@@ -904,12 +1022,12 @@ function importCsv(file){
     function cells(l){var out=[],cur="",q=false;for(var i=0;i<l.length;i++){var c=l[i];if(c==='"'){if(q&&l[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===sep&&!q){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(function(s){return s.trim()})}
     var head=cells(lines[0]).map(function(h){return h.toLowerCase()});
     function col(re){for(var i=0;i<head.length;i++)if(re.test(head[i]))return i;return -1}
-    var cNr=col(/^(nr|bw|bauwerk|nummer)/),cName=col(/bezeich|name/),cBez=col(/bezirk/),cAdr=col(/adress|straße|strasse/),cEig=col(/eigent/);
+    var cNr=col(/^(nr|bw|bauwerk|nummer)/),cName=col(/bezeich|name/),cBez=col(new RegExp("bezirk|gebiet|ortsteil|stadtteil"+(ORG.gebiet?"|"+ORG.gebiet.toLowerCase():""))),cAdr=col(/adress|straße|strasse/),cEig=col(/eigent/),cArt=col(/^art|bauwerksart|typ/);
     if(cNr<0||cName<0)throw new Error("Spalten „Nr“ und „Bezeichnung“ nicht gefunden");
     var n=0,u=0,jobs=[];
     lines.slice(1).forEach(function(l){var c=cells(l),nr=c[cNr],name=c[cName];if(!nr||!name)return;
       var id=nr.replace(/[^A-Za-z0-9]/g,""),old=S.bw[id],b=old?Object.assign({},old):{id:id,letzte:null,lat:null,lon:null,hinweise:[]};
-      b.nr=nr;b.name=name;if(cBez>=0)b.bezirk=c[cBez];if(cAdr>=0&&c[cAdr])b.adresse=c[cAdr];else if(!b.adresse)b.adresse=name+", Kassel";if(cEig>=0)b.eigentum=c[cEig];
+      b.nr=nr;b.name=name;if(cBez>=0)b.bezirk=c[cBez];if(cAdr>=0&&c[cAdr])b.adresse=c[cAdr];else if(!b.adresse)b.adresse=name+ortSuffix();if(cEig>=0)b.eigentum=c[cEig];if(cArt>=0&&c[cArt]){var ta=ORG.types.filter(function(t){return t.id===c[cArt].toLowerCase()||t.name.toLowerCase()===c[cArt].toLowerCase()})[0];if(ta)b.art=ta.id}
       old?u++:n++;jobs.push(saveB(b))});
     return Promise.all(jobs).then(function(){toast(n+" neu, "+u+" aktualisiert.",4000);render()});
   }).catch(function(e){toast("Import fehlgeschlagen: "+(e&&e.message||e),5000)});
@@ -944,6 +1062,8 @@ document.addEventListener("click",function(ev){
   if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b2){b2.setAttribute("aria-pressed",String(b2.dataset.t===S.tag))});return}
   if(a==="refToggle"){var ri=$("refimg");ri.hidden=!ri.hidden;$("opWrap").hidden=ri.hidden;return}
   if(a==="backup"){backup();return}
+  if(a==="saveArt"){saveArt(el.dataset.id);return}
+  if(a==="delArt"){if(!confirmTap(el,"Wirklich löschen? Nochmal tippen"))return;ORG.types=ORG.types.filter(function(t){return t.id!==el.dataset.id});saveOrg();location.hash="#einst";return}
   if(a==="login"){login(false);return}
   if(a==="logout"){if(!confirmTap(el,"Wirklich abmelden? Nochmal tippen"))return;logout();render();return}
   if(a==="syncNow"){if(!tokOk()){login(false);return}syncNow();return}
@@ -955,6 +1075,7 @@ document.addEventListener("click",function(ev){
   if(a==="preview"){preview(x);return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
   if(a==="sonder"){x.sonder=!x.sonder;saveV(x);render();return}
+  if(a==="setArt"){x.art=el.dataset.v;saveV(x);render();return}
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
@@ -974,6 +1095,9 @@ document.addEventListener("change",function(ev){
   if(el.matches("textarea[data-k]")){var x=S.visits[el.dataset.visit];if(x){x[el.dataset.k]=el.value;saveV(x)}return}
   if(el.id==="s_pruefer"){SET.pruefer=el.value.trim()||"Dogan";saveSet();toast("Gespeichert");return}
   if(el.id==="bez"){S.bez=el.value;$("results").innerHTML=resultsHtml();return}
+  if(el.id==="artF"){S.art=el.value;$("results").innerHTML=resultsHtml();return}
+  if(el.dataset.org!=null){ORG[el.dataset.org]=el.value.trim();saveOrg();toast("Gespeichert");if(el.dataset.org==="gebiet")render();return}
+  if(el.dataset.int!=null){ORG.intervalle[el.dataset.int]=Math.max(0,parseInt(el.value,10)||0);saveOrg();toast("Gespeichert");return}
   if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
@@ -1003,7 +1127,7 @@ function migrateOld(){ // Daten der ersten Demo-Version übernehmen (Positionen,
 dbOpen().then(function(){return Promise.all([all("bauwerke"),all("visits")])}).then(function(r){
   (r[0]||[]).forEach(function(b){S.bw[b.id]=b});(r[1]||[]).forEach(function(v){S.visits[v.id]=v});
   return seed().then(function(){if(!ls("migrated3",false)){migrateOld();lss("migrated3",true)}});
-}).then(function(){applyLook();startReflex(false);render();startSync()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
+}).then(function(){applyLook();applyOrg();startReflex(false);render();startSync()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
 function startSync(){updSync();
   if(SY.justIn)toast("Mit Google verbunden – Daten werden abgeglichen …",3500);
   if(SY.on){if(tokOk())syncNow();else{SY.needLogin=true;updSync();maybeSilent()}}
