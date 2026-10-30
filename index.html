@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-bg="nebel">
+<html lang="de" data-bg="nebel" data-glass="klar">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -8,82 +8,91 @@
 <meta name="theme-color" content="#4D6A8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Besichtigung">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-/* Layout: eine Spalte aus Glasflächen über ruhig fließenden Farbfeldern. Systemschrift (SF auf dem iPhone), damit alles offline läuft. */
+/* Layout: eine Spalte aus Glasflächen über einem lebendigen Hintergrund (Farbfelder oder eigenes Foto); Systemschrift, läuft offline. */
 :root{
-  --bg:#EEF2F9; --glass:rgba(255,255,255,.50); --line:rgba(255,255,255,.75); --sheen:rgba(255,255,255,.45); --hi:rgba(255,255,255,.95);
-  --fg:#0C1422; --muted:#3A475D; --field:rgba(255,255,255,.62); --shadow:0 10px 28px rgba(40,50,70,.10);
-  --ok:#11703F; --warn:#8A4E00; --bad:#B8242B; --okbg:rgba(17,112,63,.12); --warnbg:rgba(138,78,0,.12); --badbg:rgba(184,36,43,.12);
-  --b1:#C9D6E8; --b2:#DCD3EC; --b3:#BFD9DC; --b4:#E8E1D6; --accent:#4D6A8C; --on-accent:#FFFFFF; --bgfx-op:.7;
+  --bg:#E9EEF7; --gbase:255,255,255; --galpha:.30; --blur:14px; --sat:210%;
+  --spec:rgba(255,255,255,.60); --rim:rgba(255,255,255,.95); --rim2:rgba(255,255,255,.35); --scrim:rgba(255,255,255,.04);
+  --fg:#0C1422; --muted:#33405A; --field:rgba(255,255,255,.45); --line:rgba(255,255,255,.55); --shadow:0 10px 30px rgba(20,30,50,.16);
+  --ok:#11703F; --warn:#8A4E00; --bad:#B8242B; --okbg:rgba(17,112,63,.14); --warnbg:rgba(138,78,0,.14); --badbg:rgba(184,36,43,.14);
+  --b1:#7FA3D9; --b2:#B9A2E3; --b3:#6FC2C4; --b4:#F2C38E; --accent:#3F6390; --on-accent:#FFFFFF; --bgfx-op:.95;
   --f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --lx:25%; --ly:0%;
   color-scheme:light;
 }
-:root[data-bg="salbei"]{--b1:#CFE0CF;--b2:#E9E2CC;--b3:#BFD8D2;--b4:#DDE7C6;--accent:#4E7560}
-:root[data-bg="sand"]{--b1:#F1DCC6;--b2:#EBCFCB;--b3:#E6E0CF;--b4:#F3E6C8;--accent:#9A5B43}
-:root[data-bg="lavendel"]{--b1:#DCD3F0;--b2:#F0D6E3;--b3:#CFDDF2;--b4:#E7E0F5;--accent:#67589E}
-:root[data-bg="graphit"]{--b1:#D9DDE3;--b2:#E4E2DE;--b3:#CDD5DD;--b4:#EBEBEB;--accent:#3F4C5C}
+:root[data-glass="milchig"]{--galpha:.58;--blur:30px}
+:root[data-bg="salbei"]{--b1:#7DBF8E;--b2:#E3D27F;--b3:#5DB8A8;--b4:#A9CF72;--accent:#3E6A52}
+:root[data-bg="sand"]{--b1:#F0A877;--b2:#E8938F;--b3:#E9C98A;--b4:#F7D27A;--accent:#8E4F37}
+:root[data-bg="lavendel"]{--b1:#A894EE;--b2:#EE9CC6;--b3:#8FB2EE;--b4:#C7B5F5;--accent:#5A4B93}
+:root[data-bg="graphit"]{--b1:#9AA6B6;--b2:#C4BDB2;--b3:#8FA3B8;--b4:#D2D2D2;--accent:#36424F}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0B0E14; --glass:rgba(28,32,44,.48); --line:rgba(255,255,255,.12); --sheen:rgba(255,255,255,.06); --hi:rgba(255,255,255,.14);
-  --fg:#EEF1F6; --muted:#B4BCCA; --field:rgba(255,255,255,.06); --shadow:0 14px 36px rgba(0,0,0,.35);
-  --ok:#86CFA6; --warn:#E3B872; --bad:#EE9090; --okbg:rgba(134,207,166,.14); --warnbg:rgba(227,184,114,.14); --badbg:rgba(238,144,144,.16);
-  --bgfx-op:.6; color-scheme:dark;
+  --bg:#080A10; --gbase:22,26,36; --spec:rgba(255,255,255,.16); --rim:rgba(255,255,255,.32); --rim2:rgba(255,255,255,.08); --scrim:rgba(0,0,0,.28);
+  --fg:#EEF1F6; --muted:#B9C1CF; --field:rgba(255,255,255,.08); --line:rgba(255,255,255,.14); --shadow:0 14px 36px rgba(0,0,0,.40);
+  --ok:#86CFA6; --warn:#E3B872; --bad:#EE9090; --okbg:rgba(134,207,166,.16); --warnbg:rgba(227,184,114,.16); --badbg:rgba(238,144,144,.18);
+  --bgfx-op:.9; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0B0E14; --glass:rgba(28,32,44,.48); --line:rgba(255,255,255,.12); --sheen:rgba(255,255,255,.06); --hi:rgba(255,255,255,.14);
-  --fg:#EEF1F6; --muted:#B4BCCA; --field:rgba(255,255,255,.06); --shadow:0 14px 36px rgba(0,0,0,.35);
-  --ok:#86CFA6; --warn:#E3B872; --bad:#EE9090; --okbg:rgba(134,207,166,.14); --warnbg:rgba(227,184,114,.14); --badbg:rgba(238,144,144,.16);
-  --bgfx-op:.6; color-scheme:dark;
+  --bg:#080A10; --gbase:22,26,36; --spec:rgba(255,255,255,.16); --rim:rgba(255,255,255,.32); --rim2:rgba(255,255,255,.08); --scrim:rgba(0,0,0,.28);
+  --fg:#EEF1F6; --muted:#B9C1CF; --field:rgba(255,255,255,.08); --line:rgba(255,255,255,.14); --shadow:0 14px 36px rgba(0,0,0,.40);
+  --ok:#86CFA6; --warn:#E3B872; --bad:#EE9090; --okbg:rgba(134,207,166,.16); --warnbg:rgba(227,184,114,.16); --badbg:rgba(238,144,144,.18);
+  --bgfx-op:.9; color-scheme:dark;
 }
 @media (prefers-color-scheme: dark){
-  :root[data-bg="nebel"]:not([data-theme="light"]){--b1:#2B3A52;--b2:#3A3354;--b3:#24474A;--b4:#4A4236;--accent:#A9BDD6;--on-accent:#10151E}
-  :root[data-bg="salbei"]:not([data-theme="light"]){--b1:#23402F;--b2:#4A4430;--b3:#1F4542;--b4:#3C4A27;--accent:#A9C9B4;--on-accent:#0F1712}
-  :root[data-bg="sand"]:not([data-theme="light"]){--b1:#4A3527;--b2:#4A2E31;--b3:#3E3A2C;--b4:#4D4226;--accent:#E2B9A2;--on-accent:#1A120E}
-  :root[data-bg="lavendel"]:not([data-theme="light"]){--b1:#352C55;--b2:#4D2D41;--b3:#263A57;--b4:#3B3352;--accent:#C6B9EA;--on-accent:#15111F}
-  :root[data-bg="graphit"]:not([data-theme="light"]){--b1:#2A2F37;--b2:#34322E;--b3:#26303A;--b4:#2E2E2E;--accent:#C3CBD6;--on-accent:#12151A}
+  :root[data-bg="nebel"]:not([data-theme="light"]){--b1:#2C4F8C;--b2:#5A3F96;--b3:#1E6E73;--b4:#7A5A2E;--accent:#A9C1E2;--on-accent:#10151E}
+  :root[data-bg="salbei"]:not([data-theme="light"]){--b1:#21704A;--b2:#7A6E26;--b3:#17706A;--b4:#4F7426;--accent:#A9D2B6;--on-accent:#0F1712}
+  :root[data-bg="sand"]:not([data-theme="light"]){--b1:#8A4A22;--b2:#86323C;--b3:#6E5726;--b4:#8C6A1C;--accent:#ECC0A6;--on-accent:#1A120E}
+  :root[data-bg="lavendel"]:not([data-theme="light"]){--b1:#53389A;--b2:#8C3570;--b3:#2D4F9A;--b4:#5E449A;--accent:#CDBFF0;--on-accent:#15111F}
+  :root[data-bg="graphit"]:not([data-theme="light"]){--b1:#3C4656;--b2:#4D473F;--b3:#36495C;--b4:#454545;--accent:#C3CBD6;--on-accent:#12151A}
 }
-:root[data-theme="dark"][data-bg="nebel"]{--b1:#2B3A52;--b2:#3A3354;--b3:#24474A;--b4:#4A4236;--accent:#A9BDD6;--on-accent:#10151E}
-:root[data-theme="dark"][data-bg="salbei"]{--b1:#23402F;--b2:#4A4430;--b3:#1F4542;--b4:#3C4A27;--accent:#A9C9B4;--on-accent:#0F1712}
-:root[data-theme="dark"][data-bg="sand"]{--b1:#4A3527;--b2:#4A2E31;--b3:#3E3A2C;--b4:#4D4226;--accent:#E2B9A2;--on-accent:#1A120E}
-:root[data-theme="dark"][data-bg="lavendel"]{--b1:#352C55;--b2:#4D2D41;--b3:#263A57;--b4:#3B3352;--accent:#C6B9EA;--on-accent:#15111F}
-:root[data-theme="dark"][data-bg="graphit"]{--b1:#2A2F37;--b2:#34322E;--b3:#26303A;--b4:#2E2E2E;--accent:#C3CBD6;--on-accent:#12151A}
+:root[data-theme="dark"][data-bg="nebel"]{--b1:#2C4F8C;--b2:#5A3F96;--b3:#1E6E73;--b4:#7A5A2E;--accent:#A9C1E2;--on-accent:#10151E}
+:root[data-theme="dark"][data-bg="salbei"]{--b1:#21704A;--b2:#7A6E26;--b3:#17706A;--b4:#4F7426;--accent:#A9D2B6;--on-accent:#0F1712}
+:root[data-theme="dark"][data-bg="sand"]{--b1:#8A4A22;--b2:#86323C;--b3:#6E5726;--b4:#8C6A1C;--accent:#ECC0A6;--on-accent:#1A120E}
+:root[data-theme="dark"][data-bg="lavendel"]{--b1:#53389A;--b2:#8C3570;--b3:#2D4F9A;--b4:#5E449A;--accent:#CDBFF0;--on-accent:#15111F}
+:root[data-theme="dark"][data-bg="graphit"]{--b1:#3C4656;--b2:#4D473F;--b3:#36495C;--b4:#454545;--accent:#C3CBD6;--on-accent:#12151A}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--fg);font:16px/1.45 var(--f);-webkit-font-smoothing:antialiased;
-  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
-.bgfx i{position:absolute;width:70vmax;height:70vmax;border-radius:50%;filter:blur(70px);opacity:var(--bgfx-op);will-change:transform}
-.bgfx i:nth-child(1){background:var(--b1);left:-20vmax;top:-25vmax;animation:d1 26s ease-in-out infinite alternate}
-.bgfx i:nth-child(2){background:var(--b2);right:-25vmax;top:10vmax;animation:d2 32s ease-in-out infinite alternate}
-.bgfx i:nth-child(3){background:var(--b3);left:-10vmax;bottom:-30vmax;animation:d3 29s ease-in-out infinite alternate}
-.bgfx i:nth-child(4){background:var(--b4);right:-20vmax;bottom:-35vmax;width:50vmax;height:50vmax;animation:d1 37s ease-in-out infinite alternate-reverse}
+  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(100px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+/* Hintergrund: Farbfelder (scharf genug, damit das Glas etwas zu brechen hat) oder eigenes Foto */
+.bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg) center/cover no-repeat}
+.bgfx i{position:absolute;width:62vmax;height:62vmax;border-radius:50%;filter:blur(36px);opacity:var(--bgfx-op);will-change:transform}
+.bgfx i:nth-child(1){background:var(--b1);left:-18vmax;top:-22vmax;animation:d1 24s ease-in-out infinite alternate}
+.bgfx i:nth-child(2){background:var(--b2);right:-22vmax;top:12vmax;animation:d2 30s ease-in-out infinite alternate}
+.bgfx i:nth-child(3){background:var(--b3);left:-8vmax;bottom:-26vmax;animation:d3 27s ease-in-out infinite alternate}
+.bgfx i:nth-child(4){background:var(--b4);right:-14vmax;bottom:-30vmax;width:44vmax;height:44vmax;animation:d1 35s ease-in-out infinite alternate-reverse}
+.bgfx i:nth-child(5){background:var(--b2);left:30vw;top:38vh;width:26vmax;height:26vmax;filter:blur(22px);animation:d2 21s ease-in-out infinite alternate-reverse}
+.bgfx::after{content:"";position:absolute;inset:0;background:var(--scrim)}
+.bgfx.foto i{display:none}
 @keyframes d1{to{transform:translate(18vmax,14vmax) scale(1.2)}}
 @keyframes d2{to{transform:translate(-16vmax,18vmax) scale(.9)}}
 @keyframes d3{to{transform:translate(14vmax,-16vmax) scale(1.15)}}
 a{color:var(--accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-.glass{background-color:var(--glass);background-image:linear-gradient(135deg,var(--sheen),transparent 45%);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hi),var(--shadow);border-radius:26px}
-header.top{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:5;margin:10px auto 0;max-width:600px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 10px 10px 16px}
-.brand{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+/* Liquid Glass: wenig Unschärfe, starke Sättigung, helle Kante, Lichtreflex (folgt optional der Neigung) */
+.glass{position:relative;background-color:rgba(var(--gbase),var(--galpha));
+  background-image:radial-gradient(140% 90% at var(--lx) var(--ly),var(--spec),transparent 55%);
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.04);backdrop-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.04);
+  border:0;border-radius:26px;
+  box-shadow:inset 0 1px 0 var(--rim),inset 1px 0 0 var(--rim2),inset -1px 0 0 var(--rim2),inset 0 -1px 0 var(--rim2),inset 0 0 22px rgba(255,255,255,.07),var(--shadow)}
+.glass.panel,.glass.card,.glass.empty{background-color:rgba(var(--gbase),calc(var(--galpha) + .16))}
+header.top{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:5;margin:10px auto 0;max-width:640px;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 16px}
+.brand{flex:1;min-width:0;display:flex;flex-direction:column}
 .eyebrow{font:600 11px/1.3 var(--f);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.01em;text-wrap:balance}
 h1{font-size:19px} h2{font-size:22px} h3{font-size:16px}
-.tools{display:flex;align-items:center;gap:6px;margin-left:auto}
-.tab,.ibtn{font:600 14px var(--f);color:var(--muted);text-decoration:none;border:1px solid transparent;border-radius:18px;min-height:40px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;background:none;cursor:pointer;gap:6px}
-.tab[aria-current="page"]{color:var(--fg);background:var(--field);border-color:var(--line)}
-.ibtn{width:40px;padding:0;border-color:var(--line);color:var(--fg)}
-.pal{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;margin:8px auto 0;max-width:600px}
-.pal button{display:flex;align-items:center;gap:8px;font:500 14px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:18px;min-height:40px;padding:0 12px 0 6px;cursor:pointer}
-.pal button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--accent)}
-.pal .sw4{width:28px;height:28px;border-radius:14px}
+.ibtn{flex-shrink:0;width:44px;height:44px;border-radius:22px;border:0;background:rgba(var(--gbase),.35);box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim2);color:var(--fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+nav.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:6;width:min(420px,calc(100vw - 32px));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:6px;border-radius:34px}
+nav.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:54px;border-radius:28px;text-decoration:none;color:var(--muted);font:600 12px var(--f)}
+nav.tabbar a[aria-current="page"]{background:rgba(var(--gbase),.55);color:var(--fg);box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim2)}
 .panel{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .between{justify-content:space-between}
@@ -93,26 +102,33 @@ h1{font-size:19px} h2{font-size:22px} h3{font-size:16px}
 .chip.warn{color:var(--warn);background:var(--warnbg);border-color:transparent}
 .chip.bad{color:var(--bad);background:var(--badbg);border-color:transparent}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.btn{font:600 16px var(--f);min-height:50px;padding:0 18px;border-radius:25px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.btn.ghost{background:transparent;color:var(--accent)}
-.btn.soft{background:var(--field);color:var(--fg);border-color:var(--line)}
-.btn.block{width:100%} .btn.sm{min-height:40px;font-size:14px;padding:0 14px}
+.btn{font:600 16px var(--f);min-height:50px;padding:0 18px;border-radius:25px;border:0;background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.12),0 4px 14px rgba(0,0,0,.12);position:relative;overflow:hidden}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.btn.soft{background:rgba(var(--gbase),.42);color:var(--fg);box-shadow:inset 0 1px 0 var(--rim),inset 0 -1px 0 var(--rim2),0 2px 8px rgba(0,0,0,.06)}
+.btn.danger{background:transparent;color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad)}
+.btn.block{width:100%} .btn.sm{min-height:42px;font-size:14px;padding:0 14px}
 .btn[disabled]{opacity:.45;cursor:default}
+.btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .card{display:flex;gap:12px;padding:14px;align-items:flex-start;text-decoration:none;color:inherit}
 .card .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
 .card .nr{font:600 12px var(--f);color:var(--muted);letter-spacing:.04em}
 .card .name{font-weight:650;font-size:17px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{padding:14px;display:flex;flex-direction:column;gap:2px;text-decoration:none;color:inherit}
+.tile b{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.bar{height:8px;border-radius:4px;background:var(--field);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
 .kv div{background:var(--field);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .kv span:first-child{font-size:12px;color:var(--muted)} .kv span:last-child{font-weight:600}
-.alert{border-radius:18px;padding:12px 14px;font-size:14px}
+.alert{border-radius:18px;padding:12px 14px;font-size:14px;-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur))}
 .alert.warn{background:var(--warnbg)} .alert.bad{background:var(--badbg)} .alert.info{background:var(--field);border:1px solid var(--line)}
 .photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.ph{position:relative;display:flex;flex-direction:column;gap:3px;min-width:0}
+.ph{display:flex;flex-direction:column;gap:3px;min-width:0;border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
 .ph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:var(--field);display:block}
 .ph .cap{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
-.ph .star{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:16px;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:15px;cursor:pointer}
-.ph .star[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.ph.ref img{box-shadow:0 0 0 2px var(--accent)}
 .pp{display:flex;flex-direction:column}
 .pp-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
 .pp-row:first-child{border-top:0}
@@ -124,28 +140,50 @@ h1{font-size:19px} h2{font-size:22px} h3{font-size:16px}
 .sw{width:52px;height:32px;border-radius:16px;border:1px solid var(--line);background:var(--field);position:relative;flex-shrink:0;cursor:pointer;padding:0}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .sw[aria-pressed="true"]{background:var(--warn);border-color:transparent}
-.sw.vs[aria-pressed="true"]{background:var(--ok)}
+.sw.vs[aria-pressed="true"],.sw.on[aria-pressed="true"]{background:var(--ok)}
 .sw.sp[aria-pressed="true"]{background:var(--bad)}
 .sw[aria-pressed="true"]::after{left:23px}
 label.fld{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
 .fldrow{display:flex;gap:6px;align-items:flex-start}
-textarea,input[type=search]{font:16px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
+textarea,input[type=search],input[type=text],input[type=number],select{font:16px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;min-height:46px}
 textarea{resize:vertical;min-height:70px}
-.mic{flex-shrink:0;width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mic{flex-shrink:0;width:46px;height:46px;border-radius:23px;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .mic[aria-pressed="true"]{background:var(--bad);color:#fff;border-color:transparent}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:20px;padding:3px;gap:3px;background:var(--field)}
-.seg button{font:600 14px var(--f);border:0;border-radius:16px;min-height:36px;padding:0 14px;background:none;color:var(--muted);cursor:pointer}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:20px;padding:3px;gap:3px;background:var(--field);flex-wrap:wrap}
+.seg button{font:600 14px var(--f);border:0;border-radius:16px;min-height:38px;padding:0 14px;background:none;color:var(--muted);cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.swatches button{display:flex;align-items:center;gap:8px;font:500 14px var(--f);color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:18px;min-height:46px;padding:0 10px 0 6px;cursor:pointer}
+.swatches button[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent)}
+.swatches .dot{width:30px;height:30px;border-radius:15px;flex-shrink:0}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .empty{padding:22px 16px;text-align:center;color:var(--muted)}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:22px;font-size:14px;max-width:90vw}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;padding:12px 18px;border-radius:22px;font-size:14px;max-width:90vw}
+/* Modal (Foto, Protokoll-Vorschau) */
+.modal{position:fixed;inset:0;z-index:30;background:rgba(5,8,14,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.modal .mbar{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#fff;margin-bottom:10px}
+.cmp{position:relative;width:100%;max-width:900px;margin:0 auto;border-radius:14px;overflow:hidden;background:#000;flex-shrink:0}
+.cmp img{display:block;width:100%;height:auto}
+.cmp .over{position:absolute;inset:0;clip-path:inset(0 0 0 50%)}
+.cmp .over img{width:100%;height:100%;object-fit:cover}
+.cmp .line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.cmp .lbl{position:absolute;top:8px;font:600 12px var(--f);color:#fff;background:rgba(0,0,0,.5);padding:4px 8px;border-radius:8px}
+.paper{background:#fff;color:#111;border-radius:12px;max-width:820px;margin:0 auto;width:100%;padding:18px;font:13px/1.4 Arial,Helvetica,sans-serif;flex-shrink:0}
+.paper h4{margin:0 0 8px;font-size:15px}
+.paper table{width:100%;border-collapse:collapse}
+.paper td,.paper th{border:1px solid #bbb;padding:4px 6px;text-align:left;vertical-align:top}
+.paper th{background:#f1f1f1}
+.paper .x{text-align:center;width:44px;font-weight:700}
+.paper .box{border:1px solid #bbb;padding:6px 8px;min-height:34px;white-space:pre-line;margin-bottom:8px}
 /* Kamera */
-#cam{position:fixed;inset:0;z-index:20;background:#000;color:#fff;display:flex;flex-direction:column}
+#cam{position:fixed;inset:0;z-index:20;background:#000;color:#fff}
 #cam video,#cam .ref{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #cam .ref{pointer-events:none}
-#cam .bar{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px}
+#cam .bar2{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px}
 #cam .top{top:env(safe-area-inset-top,0px)}
 #cam .bot{bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-direction:column;align-items:stretch;gap:10px}
-.cglass{background:rgba(20,22,28,.45);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.18);border-radius:22px;color:#fff}
+.cglass{background:rgba(20,22,28,.40);-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);border:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.08);border-radius:22px;color:#fff}
 .cbtn{min-width:44px;height:44px;border-radius:22px;padding:0 14px;font:600 14px var(--f);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .hud{font:600 12px var(--f-mono);padding:8px 12px;display:flex;gap:12px;flex-wrap:wrap}
 .shutter{width:78px;height:78px;border-radius:39px;border:4px solid #fff;background:rgba(255,255,255,.2);padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -155,40 +193,36 @@ textarea{resize:vertical;min-height:70px}
 .ctags{display:flex;gap:6px;overflow-x:auto;padding:0 2px 2px}
 .ctags button{font:500 13px var(--f);white-space:nowrap;min-height:36px;padding:0 12px;border-radius:18px;border:1px solid rgba(255,255,255,.25);background:rgba(20,22,28,.45);color:#fff;cursor:pointer}
 .ctags button[aria-pressed="true"]{background:#fff;color:#111}
-input[type=range]{width:100%;accent-color:#fff}
+input[type=range]{width:100%;accent-color:var(--accent)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}.bgfx i{animation:none!important}}
 </style>
 </head>
 <body>
-<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="bgfx" id="bgfx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <header class="top glass">
-  <div class="brand"><span class="eyebrow">-6622- · DIN 1076 · Demo</span><h1>Bauwerksbesichtigung</h1></div>
-  <div class="tools">
-    <nav class="row" style="gap:4px" aria-label="Bereiche"><a class="tab" id="tL" href="#liste">Bauwerke</a><a class="tab" id="tE" href="#erledigt">Erledigt</a></nav>
-    <button class="ibtn" type="button" data-act="palette" aria-label="Farbwelt wählen" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c3.5 4 6 7.2 6 10.2a6 6 0 0 1-12 0c0-3 2.5-6.2 6-10.2z"/></svg></button>
-    <button class="ibtn" type="button" data-act="theme" aria-label="Hell oder dunkel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
-  </div>
+  <div class="brand"><span class="eyebrow">-6622- · DIN 1076</span><h1 id="title">Bauwerksbesichtigung</h1></div>
+  <a class="ibtn" href="#einst" aria-label="Farbwelt und Hintergrund"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.7S5.5 9.6 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.6 12 2.7 12 2.7z"/></svg></a>
+  <button class="ibtn" type="button" data-act="theme" aria-label="Hell oder dunkel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
 </header>
-<div class="pal glass" id="pal" hidden role="group" aria-label="Farbwelt">
-  <button type="button" data-act="setbg" data-v="nebel"><span class="sw4" style="background:linear-gradient(135deg,#C9D6E8,#DCD3EC 50%,#4D6A8C)"></span>Nebel</button>
-  <button type="button" data-act="setbg" data-v="salbei"><span class="sw4" style="background:linear-gradient(135deg,#CFE0CF,#E9E2CC 50%,#4E7560)"></span>Salbei</button>
-  <button type="button" data-act="setbg" data-v="sand"><span class="sw4" style="background:linear-gradient(135deg,#F1DCC6,#EBCFCB 50%,#9A5B43)"></span>Sand</button>
-  <button type="button" data-act="setbg" data-v="lavendel"><span class="sw4" style="background:linear-gradient(135deg,#DCD3F0,#F0D6E3 50%,#67589E)"></span>Lavendel</button>
-  <button type="button" data-act="setbg" data-v="graphit"><span class="sw4" style="background:linear-gradient(135deg,#D9DDE3,#E4E2DE 50%,#3F4C5C)"></span>Graphit</button>
-</div>
 <main id="app" class="wrap" style="margin-top:12px"><div class="glass empty">Wird geladen …</div></main>
+
+<nav class="tabbar glass" aria-label="Bereiche">
+  <a href="#start" id="nStart"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Übersicht</a>
+  <a href="#liste" id="nListe"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M5 20V9h4v11M10 20V5h4v15M15 20v-8h4v8"/></svg>Bauwerke</a>
+  <a href="#einst" id="nEinst"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Einstellungen</a>
+</nav>
 
 <div id="cam" hidden>
   <video id="vid" playsinline muted autoplay></video>
   <img class="ref" id="refimg" alt="" hidden>
   <div class="level" id="lvl" hidden></div>
-  <div class="bar top">
+  <div class="bar2 top">
     <button class="cglass cbtn" type="button" data-act="camClose" aria-label="Kamera schließen">✕</button>
     <div class="cglass hud" id="hud">GPS …</div>
-    <button class="cglass cbtn" type="button" data-act="refToggle" id="refBtn">Vergleich</button>
+    <button class="cglass cbtn" type="button" data-act="refToggle" id="refBtn">Altes Bild</button>
   </div>
-  <div class="bar bot">
-    <div class="cglass" id="opWrap" style="padding:8px 14px" hidden><label class="small" style="display:flex;align-items:center;gap:10px">Deckkraft<input type="range" id="op" min="0" max="90" value="40"></label></div>
+  <div class="bar2 bot">
+    <div class="cglass" id="opWrap" style="padding:8px 14px" hidden><label class="small" style="display:flex;align-items:center;gap:10px">Altes Bild<input type="range" id="op" min="0" max="90" value="40"></label></div>
     <div class="ctags" id="ctags"></div>
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div class="cglass cbtn" id="camCount" style="min-width:64px">0 Fotos</div>
@@ -197,25 +231,26 @@ input[type=range]{width:100%;accent-color:#fff}
     </div>
   </div>
 </div>
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true"></div>
 <div class="toast glass" id="toast" hidden></div>
 
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-/* ---------- Stammdaten Demo ---------- */
+var APPVER="0.3";
 var PP=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
+var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
 function ja(list){var a=[];for(var i=1;i<=18;i++)a.push(list.indexOf(i)>=0);return a}
-var BW={
-  M201:{id:"M201",nr:"M 201",bezirk:2,name:"Georg-Stock-Platz",adresse:"Georg-Stock-Platz, Kassel",eigentum:"",lat:51.30937,lon:9.46873,
-    hinweise:["Zuständigkeit liegt bei -23-, nur EP"],
-    letzte:{datum:"2026-09-11",pruefer:"Dogan",ja:ja([3,5,8,9,15]),verunreinigungen:"",schaden:"",sonstige:""}},
-  M202:{id:"M202",nr:"M 202",bezirk:2,name:"Bosestraße",adresse:"Bosestraße, Kassel",eigentum:"Fremd",lat:null,lon:null,
+var SEED=[
+  {id:"M201",nr:"M 201",bezirk:"2",name:"Georg-Stock-Platz",adresse:"Georg-Stock-Platz, Kassel",eigentum:"",lat:51.30937,lon:9.46873,
+    hinweise:["Zuständigkeit liegt bei -23-, nur EP"],letzte:{datum:"2026-09-11",pruefer:"Dogan",ja:ja([3,5,8,9,15]),verunreinigungen:"",schaden:"",sonstige:""}},
+  {id:"M202",nr:"M 202",bezirk:"2",name:"Bosestraße",adresse:"Bosestraße, Kassel",eigentum:"Fremd",lat:null,lon:null,
     hinweise:["Nr. 2 Verschiebungen: 2026 nicht bestätigt – vor Ort prüfen","Teil abgeschnitten (Baustelleneinfahrt): Länge prüfen","Sandstein: Fotobefund unsicher"],
     letzte:{datum:"2026-09-11",pruefer:"Dogan",ja:ja([1,2,3,4,8,9,18]),verunreinigungen:"Graffiti, geringfügig, an Wandansicht",
       schaden:"Bewuchs auf der Mauerkrone (Efeu/Gehölz); Fugenmörtel bereichsweise geschädigt; Kleinere Steinschäden, bereichsweise; Verschiebungen am Mauerwerk (siehe Protokoll 2025)",
       sonstige:"Ein Teil des Bauwerks wurde abgeschnitten; die Lücke wird als Baustelleneinfahrt genutzt (angrenzende Neubaumaßnahme, Bauzaun). Pfeiler am Wandende: Klinkerverblendung ausgebrochen."}}
-};
+];
 
 /* ---------- Hilfen ---------- */
 function $(id){return document.getElementById(id)}
@@ -230,96 +265,202 @@ function toast(t,ms){var el=$("toast");el.textContent=t;el.hidden=false;clearTim
 function maps(dest,mode){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest)+"&travelmode="+(mode||"driving")}
 function dist(a,b,c,d){var R=6371000,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h))}
 function fmtDist(m){return m<1000?Math.round(m/10)*10+" m":(m/1000).toFixed(1).replace(".",",")+" km"}
+function natCmp(a,b){return String(a).localeCompare(String(b),"de",{numeric:true})}
+
+/* ---------- Einstellungen ---------- */
+var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true},ls("settings",{}));
+function saveSet(){lss("settings",SET)}
 
 /* ---------- Speicher (IndexedDB, nur auf diesem Gerät) ---------- */
 var DB=null;
-function dbOpen(){return new Promise(function(res,rej){var r=indexedDB.open("besichtigung-demo",1);
-  r.onupgradeneeded=function(){var d=r.result;d.createObjectStore("visits",{keyPath:"id"});d.createObjectStore("blobs")};
+function dbOpen(){return new Promise(function(res,rej){var r=indexedDB.open("besichtigung-demo",2);
+  r.onupgradeneeded=function(){var d=r.result;["visits","bauwerke"].forEach(function(n){if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:"id"})});if(!d.objectStoreNames.contains("blobs"))d.createObjectStore("blobs")};
   r.onsuccess=function(){DB=r.result;res()};r.onerror=function(){rej(r.error)}})}
 function tx(store,mode,fn){return new Promise(function(res,rej){var t=DB.transaction(store,mode),s=t.objectStore(store),out=fn(s);t.oncomplete=function(){res(out&&out.result!==undefined?out.result:out)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error)}})}
-function putVisit(v){return tx("visits","readwrite",function(s){return s.put(v)})}
-function allVisits(){return tx("visits","readonly",function(s){return s.getAll()})}
-function delVisit(id){return tx("visits","readwrite",function(s){return s.delete(id)})}
+function put(store,v){return tx(store,"readwrite",function(s){return s.put(v)})}
+function all(store){return tx(store,"readonly",function(s){return s.getAll()})}
+function del(store,id){return tx(store,"readwrite",function(s){return s.delete(id)})}
 function putBlob(k,b){return tx("blobs","readwrite",function(s){return s.put(b,k)})}
 function getBlob(k){return tx("blobs","readonly",function(s){return s.get(k)})}
 function delBlob(k){return tx("blobs","readwrite",function(s){return s.delete(k)})}
+function allBlobKeys(){return tx("blobs","readonly",function(s){return s.getAllKeys()})}
 
 /* ---------- Zustand ---------- */
-var S={visits:{},tag:"Übersicht",pos:null,urls:{},mode:"driving",pruefer:ls("pruefer","Dogan"),coords:ls("coords",{}),refs:ls("refs",{}),rec:null,dict:null};
-Object.keys(S.coords).forEach(function(k){if(BW[k]){BW[k].lat=S.coords[k][0];BW[k].lon=S.coords[k][1]}});
+var S={bw:{},visits:{},tag:"Übersicht",pos:null,urls:{},rec:null,dict:null,q:"",filter:"alle",bez:""};
 var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme",th);
-var BGS=["nebel","salbei","sand","lavendel","graphit"];S.bg=ls("bg","nebel");if(BGS.indexOf(S.bg)<0)S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
-function markPal(){document.querySelectorAll("#pal button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.v===S.bg))})}
-markPal();
+S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
+document.documentElement.setAttribute("data-glass",SET.glas);
 function vid(bw){return bw+"_"+today()}
-function save(v){S.visits[v.id]=v;if(S.files)delete S.files[v.id];return putVisit(v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
+function saveV(v){S.visits[v.id]=v;if(S.files)delete S.files[v.id];return put("visits",v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
+function saveB(b){S.bw[b.id]=b;return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
+function bwList(){return Object.keys(S.bw).map(function(k){return S.bw[k]})}
+function year(){return today().slice(0,4)}
+function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())}
+function hasMangel(b){return !!(b.letzte&&b.letzte.ja&&b.letzte.ja.some(function(x,i){return x&&i!==2}))}
+function unsafe(b){return !!(b.letzte&&b.letzte.ja&&!b.letzte.ja[2])}
+function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.bw===bwId}).sort(function(a,b){return b.datum.localeCompare(a.datum)})}
+
+/* ---------- Liquid-Glass-Darstellung ---------- */
+function applyLook(){
+  var r=document.documentElement;r.setAttribute("data-glass",SET.glas);
+  var fx=$("bgfx");
+  if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl){fx.classList.remove("foto");fx.style.backgroundImage="";return}
+    if(S.hgUrl)URL.revokeObjectURL(S.hgUrl);S.hgUrl=URL.createObjectURL(bl);fx.style.backgroundImage="url("+S.hgUrl+")";fx.classList.add("foto")}).catch(function(){});
+  else{fx.classList.remove("foto");fx.style.backgroundImage=""}
+}
+/* Lichtreflex: wandert mit der Neigung des Handys (oder mit der Maus am PC) */
+var LX={raf:0,x:25,y:0,on:false};
+function setLight(x,y){LX.x=x;LX.y=y;if(LX.raf)return;LX.raf=requestAnimationFrame(function(){LX.raf=0;var s=document.documentElement.style;s.setProperty("--lx",LX.x.toFixed(1)+"%");s.setProperty("--ly",LX.y.toFixed(1)+"%")})}
+function onTilt(e){if(!SET.reflex||e.gamma==null)return;var g=Math.max(-40,Math.min(40,e.gamma)),b=Math.max(0,Math.min(90,e.beta||45));setLight(50+g*1.5,(b-45)*-1.2)}
+function onPointer(e){if(!SET.reflex||e.pointerType==="touch")return;setLight(e.clientX/innerWidth*100,e.clientY/innerHeight*100-20)}
+function startReflex(fromTap){
+  if(!SET.reflex)return;
+  window.addEventListener("pointermove",onPointer,{passive:true});
+  if(!window.DeviceOrientationEvent||LX.on)return;
+  if(typeof DeviceOrientationEvent.requestPermission==="function"){
+    if(!fromTap)return; // iOS: Erlaubnis nur nach Antippen
+    DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted"){LX.on=true;window.addEventListener("deviceorientation",onTilt,{passive:true})}}).catch(function(){});
+  }else{LX.on=true;window.addEventListener("deviceorientation",onTilt,{passive:true})}
+}
+document.addEventListener("click",function once(){startReflex(true);document.removeEventListener("click",once,true)},true);
 
 /* ---------- GPS ---------- */
 function startGps(){
   if(!navigator.geolocation||S.gpsOn)return;S.gpsOn=true;
-  navigator.geolocation.watchPosition(function(p){S.pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,t:Date.now()};updHud();if(view().name==="liste")renderSoon()},
+  navigator.geolocation.watchPosition(function(p){S.pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};updHud();if(view().name==="liste"&&!S.typing)renderSoon()},
     function(e){S.gpsErr=e.code===1?"Standort nicht erlaubt":"Kein GPS-Signal";S.gpsOn=false;updHud();renderSoon()},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
 }
 
 /* ---------- Ansichten ---------- */
-function view(){var h=location.hash.replace("#","");if(h.indexOf("bw-")===0&&BW[h.slice(3)])return {name:"bw",id:h.slice(3)};if(h==="erledigt")return {name:"erledigt"};return {name:"liste"}}
-var rq=0;function renderSoon(){if(rq)return;rq=setTimeout(function(){rq=0;var a=document.activeElement;if(a&&a.tagName==="TEXTAREA"){a.addEventListener("blur",renderSoon,{once:true});return}render()},40)}
+function view(){var h=location.hash.replace("#","");
+  if(h.indexOf("bw-")===0&&S.bw[h.slice(3)])return {name:"bw",id:h.slice(3)};
+  if(h.indexOf("edit-")===0&&S.bw[h.slice(5)])return {name:"edit",id:h.slice(5)};
+  if(h==="neu")return {name:"edit",id:null};
+  if(h==="liste"||h==="einst")return {name:h};
+  return {name:"start"}}
+var rq=0;function renderSoon(){if(rq)return;rq=setTimeout(function(){rq=0;var a=document.activeElement;if(a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type!=="range"&&a.type!=="file"))){a.addEventListener("blur",renderSoon,{once:true});return}render()},40)}
 function render(){
-  var v=view();$("tL").setAttribute("aria-current",v.name==="erledigt"?"false":"page");$("tE").setAttribute("aria-current",v.name==="erledigt"?"page":"false");
-  $("app").innerHTML=v.name==="bw"?viewBw(BW[v.id]):v.name==="erledigt"?viewDone():viewListe();
+  var v=view(),n=v.name==="bw"||v.name==="edit"?"liste":v.name;
+  $("nStart").setAttribute("aria-current",n==="start"?"page":"false");$("nListe").setAttribute("aria-current",n==="liste"?"page":"false");$("nEinst").setAttribute("aria-current",n==="einst"?"page":"false");
+  $("app").innerHTML=v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="liste"?viewListe():v.name==="einst"?viewEinst():viewStart();
   hydrate();
   if(v.name==="bw"){var xv=S.visits[vid(v.id)];if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
 }
-function lastChips(j){var h="";if(!j[2])h+='<span class="chip bad">3 NICHT VERKEHRSSICHER</span>';j.forEach(function(x,i){if(x&&i!==2)h+='<span class="chip warn">'+(i+1)+" "+esc(PP[i])+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
+function lastChips(j){if(!j)return '<span class="chip">Noch keine Besichtigung</span>';var h="";if(!j[2])h+='<span class="chip bad">3 Nicht verkehrssicher</span>';j.forEach(function(x,i){if(x&&i!==2)h+='<span class="chip warn">'+(i+1)+" "+esc(PP[i])+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
 
-function viewListe(){
-  var list=Object.keys(BW).map(function(k){var b=BW[k];var d=S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null;return {b:b,d:d}});
-  list.sort(function(a,b){return (a.d==null)-(b.d==null)||(a.d||0)-(b.d||0)});
-  var near=list[0]&&list[0].d!=null&&list[0].d<300?list[0]:null;
-  var h='<section class="glass panel"><div class="row between"><div><span class="eyebrow">'+deDate(today())+" · "+esc(S.pruefer)+'</span><h2>Bauwerke</h2></div>'+
-    '<div class="seg" role="group" aria-label="Verkehrsmittel"><button type="button" data-act="mode" data-m="driving" aria-pressed="'+(S.mode==="driving")+'">Auto</button><button type="button" data-act="mode" data-m="transit" aria-pressed="'+(S.mode==="transit")+'">ÖPNV</button></div></div>';
-  if(!S.gpsOn&&!S.pos)h+='<button type="button" class="btn soft block" data-act="gps">Standort verwenden (nächstes Bauwerk)</button>';
-  else h+='<span class="muted small">'+(S.pos?"Standort genau auf ± "+Math.round(S.pos.acc)+" m":S.gpsErr||"Standort wird ermittelt …")+"</span>";
-  if(near)h+='<div class="alert info"><b>In der Nähe:</b> '+esc(near.b.nr+" · "+near.b.name)+" ("+fmtDist(near.d)+')<br><a class="btn sm" style="margin-top:8px" href="#bw-'+near.b.id+'">Öffnen</a></div>';
-  h+="</section>";
-  list.forEach(function(o){var b=o.b,x=S.visits[vid(b.id)];
-    h+='<a class="card glass" href="#bw-'+b.id+'"><div class="main"><span class="nr">'+esc(b.nr)+" · BEZIRK "+b.bezirk+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte.ja)+'</div><span class="muted small">Zuletzt '+deDate(b.letzte.datum)+(x?" · heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+'</span></div><span aria-hidden="true" class="muted">›</span></a>';
-  });
-  h+='<p class="muted small" style="text-align:center">Demo mit 2 Bauwerken. Alle Daten bleiben auf diesem Gerät.</p>';
+/* Übersicht / Dashboard */
+function viewStart(){
+  var list=bwList(),y=year(),done=list.filter(doneThisYear).length,offen=list.length-done,mang=list.filter(hasMangel).length,uns=list.filter(unsafe).length;
+  var running=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"});
+  var pct=list.length?Math.round(done/list.length*100):0;
+  var h='<section class="glass panel"><span class="eyebrow">'+deDate(today())+" · "+esc(SET.pruefer)+'</span><h2>Übersicht '+y+'</h2>'+
+    '<div class="row between small"><span>'+done+" von "+list.length+" Bauwerken besichtigt</span><b>"+pct+' %</b></div><div class="bar"><i style="width:'+pct+'%"></i></div></section>';
+  h+='<div class="tiles">'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="alle"><b>'+list.length+'</b><span class="muted small">Bauwerke</span></a>'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="offen"><b>'+offen+'</b><span class="muted small">offen '+y+'</span></a>'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="mangel"><b style="color:var(--warn)">'+mang+'</b><span class="muted small">mit Befund</span></a>'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="unsicher"><b style="color:'+(uns?"var(--bad)":"var(--ok)")+'">'+uns+'</b><span class="muted small">nicht verkehrssicher</span></a></div>';
+  if(running.length)h+='<section class="glass panel"><h3>In Arbeit</h3>'+running.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="muted small">'+deDate(v.datum)+" · "+v.fotos.length+" Fotos</span></a>"}).join("")+"</section>";
+  var bz={};list.forEach(function(b){var k=b.bezirk||"–";bz[k]=bz[k]||{n:0,d:0};bz[k].n++;if(doneThisYear(b))bz[k].d++});
+  var keys=Object.keys(bz).sort(natCmp);
+  if(keys.length)h+='<section class="glass panel"><h3>Fortschritt nach Bezirk</h3>'+keys.map(function(k){var o=bz[k],p=Math.round(o.d/o.n*100);return '<div style="display:flex;flex-direction:column;gap:4px"><div class="row between small"><span>Bezirk '+esc(k)+'</span><span class="muted">'+o.d+" / "+o.n+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join("")+"</section>";
+  var last=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"}).sort(function(a,b){return (b.ende||b.datum).localeCompare(a.ende||a.datum)}).slice(0,5);
+  h+='<section class="glass panel"><h3>Zuletzt abgeschlossen</h3>'+(last.length?last.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="chip '+(v.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+deDate(v.datum)+"</span></a>"}).join(""):'<span class="muted small">Noch keine Besichtigung abgeschlossen.</span>')+"</section>";
   return h;
 }
 
+/* Bauwerksliste mit Suche */
+function filtered(){
+  var q=S.q.trim().toLowerCase();
+  return bwList().filter(function(b){
+    if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" bezirk "+(b.bezirk||"")).toLowerCase().indexOf(q)<0)return false;
+    if(S.bez&&String(b.bezirk)!==S.bez)return false;
+    if(S.filter==="offen")return !doneThisYear(b);
+    if(S.filter==="erledigt")return doneThisYear(b);
+    if(S.filter==="mangel")return hasMangel(b);
+    if(S.filter==="unsicher")return unsafe(b);
+    return true;
+  }).map(function(b){return {b:b,d:S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null}})
+   .sort(function(a,b){return S.pos?((a.d==null)-(b.d==null)||(a.d||0)-(b.d||0)):natCmp(a.b.nr,b.b.nr)});
+}
+function viewListe(){
+  var bez=Array.from(new Set(bwList().map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
+  var F=[["alle","Alle"],["offen","Offen"],["erledigt","Besichtigt"],["mangel","Mit Befund"],["unsicher","Nicht sicher"]];
+  var h='<section class="glass panel"><div class="row between"><h2>Bauwerke</h2><a class="btn sm" href="#neu">+ Neues Bauwerk</a></div>'+
+    '<input type="search" id="q" placeholder="Suchen: Nr., Straße, Bezirk" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">'+
+    '<div class="seg" role="group" aria-label="Filter">'+F.map(function(f){return '<button type="button" data-act="filt" data-f="'+f[0]+'" aria-pressed="'+(S.filter===f[0])+'">'+f[1]+"</button>"}).join("")+"</div>"+
+    (bez.length>1?'<select id="bez" aria-label="Bezirk"><option value="">Alle Bezirke</option>'+bez.map(function(z){return '<option value="'+esc(z)+'" '+(S.bez===z?"selected":"")+">Bezirk "+esc(z)+"</option>"}).join("")+"</select>":"")+
+    '<div class="row between"><span class="muted small">'+(S.pos?"Sortiert nach Entfernung (± "+Math.round(S.pos.acc)+" m)":S.gpsErr||"Sortiert nach Nummer")+'</span>'+(S.pos?"":'<button type="button" class="btn soft sm" data-act="gps">Nach Entfernung</button>')+"</div></section>";
+  h+='<div id="results">'+resultsHtml()+"</div>";
+  return h;
+}
+function resultsHtml(){
+  var list=filtered();
+  if(!list.length)return '<div class="glass empty">Keine Bauwerke gefunden.</div>';
+  return list.map(function(o){var b=o.b,x=S.visits[vid(b.id)];
+    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+(b.bezirk?" · BEZIRK "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte&&b.letzte.ja)+'</div><span class="muted small">'+(b.letzte?"Zuletzt "+deDate(b.letzte.datum):"Noch nicht besichtigt")+(x?" · heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+'</span></div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
+}
+
+/* Bauwerk anlegen / bearbeiten */
+function viewEdit(b){
+  var n=!b;b=b||{nr:"",name:"",bezirk:"",adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:[]};
+  function f(id,label,val,ph){return '<label class="fld">'+label+'<input type="text" id="e_'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  return '<a class="btn soft sm" href="'+(n?"#liste":"#bw-"+esc(b.id))+'" style="align-self:flex-start">‹ Zurück</a>'+
+    '<section class="glass panel"><h2>'+(n?"Neues Bauwerk":"Bauwerk bearbeiten")+'</h2>'+
+    '<div class="grid2">'+f("nr","Bauwerksnummer *",b.nr,"z. B. M 301")+f("bezirk","Bezirk",b.bezirk,"z. B. 3")+"</div>"+
+    f("name","Bezeichnung *",b.name,"z. B. Am Hange 56")+f("adresse","Adresse für Navigation",b.adresse,"Straße Nr., Kassel")+f("eigentum","Eigentümer",b.eigentum,"Stadt Kassel / Privat / Fremd")+
+    '<div class="grid2">'+f("laenge","Länge",b.laenge,"m")+f("hoehe","Ansichtshöhe",b.hoehe,"m")+"</div>"+f("flaeche","Fläche",b.flaeche,"m²")+
+    '<label class="fld">Hinweise (eine Zeile je Hinweis)<textarea id="e_hinweise" rows="3">'+esc((b.hinweise||[]).join("\n"))+"</textarea></label>"+
+    (n?'<span class="muted small">Prüfpunkte starten bei der ersten Besichtigung leer (nur Nr. 3 „Verkehrssicherheit gegeben“ = Ja).</span>':"")+
+    '<button type="button" class="btn block" data-act="saveBw" data-id="'+esc(b.id||"")+'">Speichern</button>'+
+    (n?"":'<button type="button" class="btn danger block" data-act="delBw" data-id="'+esc(b.id)+'">Bauwerk löschen</button>')+"</section>";
+}
+function readEdit(old){
+  var g=function(k){return ($("e_"+k).value||"").trim()};
+  var nr=g("nr"),name=g("name");if(!nr||!name){toast("Bitte Nummer und Bezeichnung angeben.");return null}
+  var b=old?Object.assign({},old):{id:nr.replace(/[^A-Za-z0-9]/g,"")||("bw"+Date.now()),letzte:null,lat:null,lon:null};
+  if(!old&&S.bw[b.id])b.id=b.id+"_"+Date.now().toString(36);
+  Object.assign(b,{nr:nr,name:name,bezirk:g("bezirk"),adresse:g("adresse")||name+", Kassel",eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),
+    hinweise:g("hinweise").split("\n").map(function(s){return s.trim()}).filter(Boolean)});
+  return b;
+}
+function deleteBw(id){
+  var vs=visitsOf(id),keys=[];vs.forEach(function(v){v.fotos.forEach(function(f){keys.push(f.key)});v.audios.forEach(function(a){keys.push(a.key)})});
+  if(S.bw[id].refKey&&!/^foto_/.test(S.bw[id].refKey))keys.push(S.bw[id].refKey);
+  return Promise.all(keys.map(delBlob).concat(vs.map(function(v){delete S.visits[v.id];return del("visits",v.id)}))).then(function(){delete S.bw[id];return del("bauwerke",id)});
+}
+
+/* Bauwerk-Detail */
 function viewBw(b){
   var x=S.visits[vid(b.id)],l=b.letzte;
-  var h='<a class="tab" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>';
-  h+='<section class="glass panel"><span class="eyebrow">Bezirk '+b.bezirk+" · Stützwand"+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
-    '<div class="row"><a class="btn sm" href="'+esc(maps(b.adresse,S.mode))+'" target="_blank" rel="noopener">Navigation</a>'+
-    (S.pos?'<button type="button" class="btn sm soft" data-act="setCoord" data-bw="'+b.id+'">Standort als BW-Position speichern</button>':"")+"</div>"+
-    (b.lat==null?'<span class="muted small">Für dieses Bauwerk ist noch keine Position hinterlegt.</span>':"")+"</section>";
-  h+='<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+deDate(l.datum)+" · "+esc(l.pruefer)+'</span></div><div class="chips">'+lastChips(l.ja)+"</div>"+
-    (l.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(l.verunreinigungen)+"</div>":"")+
-    (l.schaden?'<div class="small"><span class="muted">Schäden: </span>'+esc(l.schaden)+"</div>":"")+
-    (l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>";
-  if(b.hinweise.length)h+='<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>";
-  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+b.id+'" style="min-height:58px;font-size:17px">Besichtigung heute starten</button>';
+  var h='<a class="btn soft sm" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>';
+  var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche]].filter(function(p){return p[1]});
+  h+='<section class="glass panel"><span class="eyebrow">'+(b.bezirk?"Bezirk "+esc(b.bezirk)+" · ":"")+"Stützwand"+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
+    (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
+    '<div class="row"><a class="btn sm" href="'+esc(maps(b.adresse||b.name+", Kassel",SET.mode))+'" target="_blank" rel="noopener">Navigation</a><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bearbeiten</a>'+
+    (S.pos?'<button type="button" class="btn soft sm" data-act="setCoord" data-bw="'+esc(b.id)+'">Standort speichern</button>':'<button type="button" class="btn soft sm" data-act="gps">GPS</button>')+"</div>"+
+    (b.lat==null?'<span class="muted small">Noch keine Position hinterlegt. Vor Ort „GPS“ und dann „Standort speichern“ tippen.</span>':"")+"</section>";
+  h+='<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+(l?deDate(l.datum)+" · "+esc(l.pruefer):"–")+'</span></div><div class="chips">'+lastChips(l&&l.ja)+"</div>"+
+    (l&&l.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(l.verunreinigungen)+"</div>":"")+
+    (l&&l.schaden?'<div class="small"><span class="muted">Schäden: </span>'+esc(l.schaden)+"</div>":"")+
+    (l&&l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>";
+  if(b.hinweise&&b.hinweise.length)h+='<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>";
+  h+='<section class="glass panel"><div class="row between"><h3>Vergleichsbild (altes Bild)</h3>'+(b.refKey?'<button type="button" class="btn soft sm" data-act="viewRef" data-bw="'+esc(b.id)+'">Ansehen</button>':"")+"</div>"+
+    (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:220px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Wird in der Kamera halbtransparent über das Live-Bild gelegt, damit das neue Foto vom gleichen Standpunkt entsteht. Danach neues Foto antippen: alt und neu mit Schieberegler vergleichen.</span>':
+      '<span class="muted small">Noch kein altes Bild. Foto aus der Galerie wählen oder später ein Foto antippen und „Als Vergleichsbild“ wählen.</span>')+
+    '<label class="btn soft sm">Altes Bild aus Galerie wählen<input type="file" accept="image/*" data-ref="'+esc(b.id)+'"></label></section>';
+  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+esc(b.id)+'" style="min-height:58px;font-size:17px">Besichtigung heute starten</button>'+historyHtml(b);
   var done=x.status==="abgeschlossen",id=esc(x.id);
   if(!x.ja[2])h+='<div class="alert bad"><b>Verkehrssicherheit nicht gegeben.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
-  /* Fotos */
-  var ref=S.refs[b.id];
-  h+='<section class="glass panel"><div class="row between"><h3>Fotos</h3><span class="muted small">'+x.fotos.length+"</span></div>";
-  if(!done)h+='<button type="button" class="btn block" data-act="camOpen" data-visit="'+id+'">Kamera öffnen</button>'+
-    '<div class="row"><label class="btn soft sm" style="position:relative;overflow:hidden;flex:1">Aus Galerie<input type="file" accept="image/*" multiple data-gal="'+id+'" style="position:absolute;inset:0;opacity:0"></label>'+
-    '<label class="btn soft sm" style="position:relative;overflow:hidden;flex:1">Vergleichsbild wählen<input type="file" accept="image/*" data-ref="'+b.id+'" style="position:absolute;inset:0;opacity:0"></label></div>'+
-    '<span class="muted small">'+(ref?"Vergleichsbild ist hinterlegt und wird in der Kamera eingeblendet.":"Tipp: ein Foto der letzten Besichtigung als Vergleichsbild wählen, oder ein Foto unten mit ★ markieren.")+"</span>";
+  h+='<section class="glass panel"><div class="row between"><h3>Fotos heute</h3><span class="muted small">'+x.fotos.length+"</span></div>";
+  if(!done)h+='<button type="button" class="btn block" data-act="camOpen" data-visit="'+id+'">Kamera öffnen'+(b.refKey?" (mit altem Bild)":"")+'</button><label class="btn soft sm">Fotos aus Galerie hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'"></label>';
   if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
-    h+='<div class="ph"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><button type="button" class="star" data-act="star" data-bw="'+b.id+'" data-key="'+esc(f.key)+'" aria-pressed="'+(ref===f.key)+'" aria-label="Als Vergleichsbild für das nächste Mal">★</button><span class="cap">'+esc(f.tag)+" · "+esc(f.zeit)+(f.lat?" · GPS":"")+"</span></div>"});h+="</div>"}
+    h+='<button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+" · "+esc(f.zeit)+(f.lat?" · GPS":"")+"</span></button>"});h+='</div><span class="muted small">Foto antippen: vergrößern, mit altem Bild vergleichen, als Vergleichsbild setzen oder löschen.</span>'}
   h+="</section>";
-  /* Sprachnotizen */
   h+='<section class="glass panel"><div class="row between"><h3>Sprachnotizen</h3><span class="muted small">'+x.audios.length+"</span></div>";
-  if(!done)h+='<button type="button" class="btn '+(S.rec?"":"soft ")+'block" data-act="rec" data-visit="'+id+'" style="'+(S.rec?"background:var(--bad);border-color:var(--bad);color:#fff":"")+'">'+(S.rec?"Aufnahme beenden ("+S.recSec+" s)":"Sprachnotiz aufnehmen")+"</button>";
-  x.audios.forEach(function(a){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted">'+esc(a.zeit)+" · "+a.dauer+' s</span><audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
+  if(!done)h+='<button type="button" class="btn '+(S.rec?"":"soft ")+'block" data-act="rec" data-visit="'+id+'" style="'+(S.rec?"background:var(--bad);color:#fff":"")+'">'+(S.rec?"Aufnahme beenden ("+S.recSec+" s)":"Sprachnotiz aufnehmen")+"</button>";
+  x.audios.forEach(function(a,i){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted" style="flex:1">'+esc(a.zeit)+" · "+a.dauer+' s</span>'+(done?"":'<button type="button" class="btn danger sm" data-act="delAudio" data-visit="'+id+'" data-i="'+i+'">Löschen</button>')+'<audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
   h+="</section>";
-  /* Prüfpunkte */
   var diff=0;for(var i=0;i<18;i++)if(x.ja[i]!==x.ref[i])diff++;
   h+='<section class="glass panel"><div class="row between"><h3>Prüfpunkte</h3><span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" Änderung"+(diff>1?"en":""):"wie zuletzt")+"</span></div>";
   if(!done)h+='<button type="button" class="btn soft block" data-act="reset" data-visit="'+id+'">Alles wie zuletzt – keine Schadenserweiterung</button>';
@@ -327,12 +468,16 @@ function viewBw(b){
   PP.forEach(function(t,i){var on=x.ja[i],ch=on!==x.ref[i],hint=i===2?"Ja = in Ordnung":ch?(on?"neu gegenüber letzter Besichtigung":"entfällt gegenüber letzter Besichtigung"):"";
     h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t"><span>'+esc(t)+"</span>"+(hint?'<span class="pp-h'+(ch?" chg":"")+'">'+hint+"</span>":"")+'</span><button type="button" class="sw'+(i===2?" vs":"")+'" aria-pressed="'+on+'" aria-label="'+(i+1)+" "+esc(t)+'" data-act="pp" data-i="'+i+'" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div>"});
   h+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung nach DIN 1076 veranlasst</span><button type="button" class="sw sp" aria-pressed="'+x.sonder+'" aria-label="Sonderprüfung veranlasst" data-act="sonder" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div></div></section>";
-  /* Texte */
   h+='<section class="glass panel"><h3>Beschreibung</h3>'+fld(x,"verunreinigungen","Verunreinigungen",done)+fld(x,"schaden","Schadensbeschreibung(en)",done)+fld(x,"sonstige","Sonstige Mängel / Auffälligkeiten",done)+
-    (S.speech?'<span class="muted small">Mikrofon-Taste: diktieren direkt ins Feld.</span>':'<span class="muted small">Zum Diktieren die Mikrofon-Taste der Tastatur nutzen.</span>')+"</section>";
+    '<span class="muted small">'+(S.speech?"Mikrofon-Taste: direkt ins Feld diktieren.":"Zum Diktieren die Mikrofon-Taste der Tastatur nutzen.")+"</span></section>";
   if(!done)h+='<button type="button" class="btn block" data-act="finish" data-visit="'+id+'" style="min-height:58px;font-size:17px">Besichtigung abschließen</button>';
   else h+=exportPanel(x);
-  return h;
+  return h+historyHtml(b);
+}
+function historyHtml(b){
+  var vs=visitsOf(b.id).filter(function(v){return v.datum!==today()});
+  if(!vs.length)return "";
+  return '<section class="glass panel"><h3>Frühere Besichtigungen in der App</h3>'+vs.map(function(v){return '<div class="row between" style="border-top:1px solid var(--line);padding-top:8px"><span>'+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll ansehen</button></div>'}).join("")+"</section>";
 }
 function fld(x,k,label,done){
   var on=S.dict&&S.dict.visit===x.id&&S.dict.k===k;
@@ -340,19 +485,48 @@ function fld(x,k,label,done){
     (S.speech&&!done?'<button type="button" class="mic" data-act="dict" data-visit="'+esc(x.id)+'" data-k="'+k+'" aria-pressed="'+!!on+'" aria-label="'+label+' diktieren"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>':"")+"</span></label>";
 }
 function exportPanel(x){
-  var b=BW[x.bw],n=x.fotos.length;
+  var b=S.bw[x.bw],n=x.fotos.length;
   return '<section class="glass panel"><div class="row between"><h3>Protokoll und Fotos</h3><span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span></div>"+
-    '<button type="button" class="btn block" data-act="share" data-visit="'+esc(x.id)+'">Teilen (z. B. Outlook / Mail)</button>'+
-    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.xlsm)</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
-    '<button type="button" class="tab" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button>'+
-    '<span class="muted small mono">'+esc(protName(x,b))+"<br>"+esc(fotoName(x,0))+(n>1?" … _"+pad(n)+".jpg":"")+"</span>"+
-    '<div class="row between"><button type="button" class="tab" data-act="reopen" data-visit="'+esc(x.id)+'">Wieder öffnen</button><button type="button" class="tab" data-act="delVisit" data-visit="'+esc(x.id)+'" style="color:var(--bad)">Besichtigung löschen</button></div></section>';
+    '<button type="button" class="btn block" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
+    '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Teilen (Outlook / Mail)</button>'+
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.'+SET.protFormat+')</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
+    '<button type="button" class="btn soft sm" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button>'+
+    '<span class="muted small mono">'+esc(protName(x,b))+"<br>"+esc(fotoName(x,0))+(n>1?" … "+pad(n):"")+"</span>"+
+    '<span class="muted small">Die Excel-Datei ist für den Büro-PC gedacht. Am Handy „Protokoll ansehen“ nutzen – sonst bietet das Handy evtl. eine unpassende App (z. B. PayPal) zum Öffnen an.</span>'+
+    '<div class="row between"><button type="button" class="btn soft sm" data-act="reopen" data-visit="'+esc(x.id)+'">Wieder öffnen</button><button type="button" class="btn danger sm" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung löschen</button></div></section>';
 }
-function viewDone(){
-  var vs=Object.keys(S.visits).map(function(k){return S.visits[k]}).sort(function(a,b){return b.datum.localeCompare(a.datum)});
-  if(!vs.length)return '<div class="glass empty">Noch keine Besichtigung. Unter „Bauwerke“ ein Bauwerk öffnen und starten.</div>';
-  return vs.map(function(x){var b=BW[x.bw];return '<a class="card glass" href="#bw-'+b.id+'"><div class="main"><span class="nr">'+deDate(x.datum)+" · "+esc(b.nr)+'</span><span class="name">'+esc(b.name)+'</span><span class="muted small">'+x.fotos.length+" Fotos · "+x.audios.length+" Sprachnotizen · "+(x.status==="abgeschlossen"?esc(x.befund):"in Arbeit")+'</span></div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
+
+/* Einstellungen */
+function seg(k,opts,small){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" data-act="setOpt" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(SET[k])===String(o[0]))+'"'+(small?' style="font-size:12px"':"")+">"+esc(o[1])+"</button>"}).join("")+"</div>"}
+function viewEinst(){
+  var t=document.documentElement.getAttribute("data-theme")||"auto";
+  var h='<section class="glass panel"><h2>Einstellungen</h2>'+
+    '<label class="fld">Name des Prüfers (erscheint im Protokoll bei „von“)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label></section>';
+  h+='<section class="glass panel" id="darstellung"><h3>Darstellung</h3>'+
+    '<span class="muted small">Hintergrund</span><div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbwelt</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
+    (SET.hgFoto?'<div class="row"><label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label><span class="muted small">Ein farbiges Foto mit Kontrasten (Himmel, Grün, Menschen) lässt das Glas am lebendigsten wirken.</span></div>':"")+
+    '<span class="muted small">Farbwelt'+(SET.hgFoto?" (bestimmt die Akzentfarbe)":"")+'</span><div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
+    '<span class="muted small">Glas</span>'+seg("glas",[["klar","Klar (wie iPhone)"],["milchig","Milchig (besser lesbar)"]])+
+    '<div class="setrow"><span>Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>'+
+    '<span class="muted small">Hell / Dunkel</span><div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Automatisch"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div></section>";
+  h+='<section class="glass panel"><h3>Fotos und Protokoll</h3>'+
+    '<span class="muted small">Dateiname der Fotos</span>'+seg("fotoName",[["datum",today()+"_Besichtigung_01.jpg"],["bw","M 201_"+today()+"_Besichtigung_01.jpg"]],true)+
+    '<span class="muted small">Fotoqualität</span>'+seg("fotoMax",[[1600,"Klein (~0,4 MB)"],[1920,"Standard (~0,6 MB)"],[2560,"Hoch (~1 MB)"]])+
+    '<span class="muted small">Protokoll-Format</span>'+seg("protFormat",[["xlsx","Excel .xlsx (empfohlen)"],["xlsm","Excel .xlsm (mit Makros)"]])+
+    '<span class="muted small">Navigation</span>'+seg("mode",[["driving","Auto"],["transit","ÖPNV"],["walking","zu Fuß"]])+"</section>";
+  h+='<section class="glass panel"><h3>Bauwerke</h3><a class="btn soft block" href="#neu">+ Neues Bauwerk anlegen</a>'+
+    '<label class="btn soft block">Bauwerksliste importieren (CSV)<input type="file" accept=".csv,text/csv,text/plain" id="csvIn"></label>'+
+    '<span class="muted small">CSV mit Kopfzeile, z. B. <span class="mono">Nr;Bezeichnung;Bezirk;Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span></section>';
+  h+='<section class="glass panel"><h3>Datensicherung</h3><span class="muted small">Alle Daten liegen nur auf diesem Gerät. Regelmäßig sichern – z. B. vor einem Handywechsel.</span>'+
+    '<button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
+    '<label class="btn soft block">Sicherung wiederherstellen<input type="file" accept=".zip,application/zip" id="restoreIn"></label>'+
+    '<span class="muted small" id="usage"></span>'+
+    '<button type="button" class="btn danger block" data-act="wipe">Alle Daten auf diesem Gerät löschen</button></section>';
+  h+='<p class="muted small" style="text-align:center">Version '+APPVER+" · Demo</p>";
+  setTimeout(function(){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var u=$("usage");if(u)u.textContent="Belegter Speicher: "+(e.usage/1048576).toFixed(1).replace(".",",")+" MB"})},0);
+  return h;
 }
+
 /* Bilder/Audio aus IndexedDB nachladen */
 function hydrate(){
   document.querySelectorAll("img[data-key],audio[data-key]").forEach(function(el){
@@ -360,34 +534,76 @@ function hydrate(){
     getBlob(k).then(function(bl){if(!bl)return;S.urls[k]=URL.createObjectURL(bl);el.src=S.urls[k]});
   });
 }
+function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return getBlob(k).then(function(bl){if(!bl)return null;S.urls[k]=URL.createObjectURL(bl);return S.urls[k]})}
 
 /* ---------- Besichtigung ---------- */
-function startVisit(bw){var l=BW[bw].letzte;var v={id:vid(bw),bw:bw,datum:today(),pruefer:S.pruefer,status:"in Arbeit",ref:l.ja.slice(),ja:l.ja.slice(),sonder:false,
-  verunreinigungen:l.verunreinigungen,schaden:l.schaden,sonstige:l.sonstige,fotos:[],audios:[],basis:l.datum,seq:0};save(v).then(render)}
+function startVisit(bwId){var b=S.bw[bwId],l=b.letzte||{ja:ja([3]),verunreinigungen:"",schaden:"",sonstige:"",datum:""};
+  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:l.ja.slice(),ja:l.ja.slice(),sonder:false,
+    verunreinigungen:l.verunreinigungen||"",schaden:l.schaden||"",sonstige:l.sonstige||"",fotos:[],audios:[],basis:l.datum||"",basisLetzte:b.letzte||null,seq:0};
+  saveV(v).then(render)}
+function finishVisit(x){
+  var same=x.ja.every(function(v,i){return v===x.ref[i]})&&!x.sonder;
+  x.status="abgeschlossen";x.befund=same?"keine Schadenserweiterung":"Veränderung festgestellt";x.ende=new Date().toISOString();x.pruefer=SET.pruefer;
+  var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
+  return Promise.all([saveV(x),saveB(b)]);
+}
+function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;return Promise.all([saveV(x),saveB(b)])}
 
 /* ---------- Bilder ---------- */
 function toJpeg(src,w,h,max,q){var s=Math.min(1,max/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
   c.getContext("2d").drawImage(src,0,0,c.width,c.height);return new Promise(function(r){c.toBlob(r,"image/jpeg",q)})}
-function fileToJpeg(file){return createImageBitmap(file,{imageOrientation:"from-image"}).catch(function(){return createImageBitmap(file)}).then(function(bm){return toJpeg(bm,bm.width,bm.height,1920,0.8)})}
+function fileToJpeg(file,max){return createImageBitmap(file,{imageOrientation:"from-image"}).catch(function(){return createImageBitmap(file)}).then(function(bm){return toJpeg(bm,bm.width,bm.height,max||SET.fotoMax,0.8)})}
 function addFoto(x,blob,meta){
   x.seq=(x.seq||0)+1;var key="foto_"+x.id+"_"+x.seq+"_"+Date.now();
-  return putBlob(key,blob).then(function(){x.fotos.push(Object.assign({key:key,tag:S.tag,zeit:hm(),ts:new Date().toISOString()},meta||{}));return save(x)});
+  return putBlob(key,blob).then(function(){x.fotos.push(Object.assign({key:key,tag:S.tag,zeit:hm(),ts:new Date().toISOString()},meta||{}));return saveV(x)});
 }
+
+/* ---------- Foto-Ansicht mit Vergleich alt / neu ---------- */
+function openModal(html){var m=$("modal");m.innerHTML=html;m.hidden=false;document.body.style.overflow="hidden"}
+function closeModal(){var m=$("modal");m.hidden=true;m.innerHTML="";document.body.style.overflow=""}
+function viewFoto(id,i){
+  var x=S.visits[id],f=x.fotos[i],b=S.bw[x.bw],done=x.status==="abgeschlossen";
+  Promise.all([blobUrl(f.key),b.refKey&&b.refKey!==f.key?blobUrl(b.refKey):Promise.resolve(null)]).then(function(u){
+    var cmp=u[1]?'<div class="cmp"><img src="'+u[0]+'" alt="Neues Foto"><div class="over" id="cmpOver"><img src="'+u[1]+'" alt="Altes Foto"></div><div class="line" id="cmpLine"></div><span class="lbl" style="left:8px">Neu</span><span class="lbl" style="right:8px">Alt</span></div><input type="range" id="cmpR" min="0" max="100" value="50" aria-label="Vergleich alt / neu" style="max-width:900px;margin:10px auto 0">':
+      '<div class="cmp"><img src="'+u[0]+'" alt="Foto"></div>';
+    openModal('<div class="mbar"><b>'+esc(f.tag)+" · "+esc(f.zeit)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+cmp+
+      '<div class="row" style="justify-content:center;margin-top:12px">'+
+      '<button type="button" class="btn soft sm" data-act="setRef" data-bw="'+esc(b.id)+'" data-key="'+esc(f.key)+'">'+(b.refKey===f.key?"Ist Vergleichsbild ✓":"Als Vergleichsbild für nächstes Mal")+"</button>"+
+      (done?"":'<button type="button" class="btn danger sm" data-act="delFoto" data-visit="'+esc(id)+'" data-i="'+i+'">Foto löschen</button>')+"</div>"+
+      (u[1]?'<p class="small" style="color:#ddd;text-align:center">Regler ziehen: links neues, rechts altes Bild.</p>':""));
+  });
+}
+function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openModal('<div class="mbar"><b>Vergleichsbild '+esc(b.nr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="cmp"><img src="'+u+'" alt="Vergleichsbild"></div><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn danger sm" data-act="clearRef" data-bw="'+esc(bwId)+'">Vergleichsbild entfernen</button></div>')})}
+
+/* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
+function preview(x){
+  var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x);
+  var rows=PP.map(function(t,i){return "<tr><td>"+(i+1)+". "+esc(t)+'</td><td class="x">'+(x.ja[i]?"X":"")+'</td><td class="x">'+(x.ja[i]?"":"X")+"</td></tr>"}).join("");
+  openModal('<div class="mbar"><b>Protokoll-Vorschau</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+    '<div class="paper"><div style="font-size:11px;color:#555">Stadt Kassel · Straßenverkehrs- u. Tiefbauamt · Brücken- und Ingenieurbauwerke · -6622-</div>'+
+    '<h4 style="margin-top:8px">Besichtigung Stützwand nach DIN 1076 (Abschnitt 6.2)</h4>'+
+    "<table><tr><th>BW-Nr.</th><td>"+esc(b.nr)+"</td><th>BW-Name</th><td>"+esc(b.name)+"</td></tr><tr><th>Eigentümer</th><td>"+esc(b.eigentum||"–")+"</td><th>Jahr</th><td>"+x.datum.slice(0,4)+"</td></tr><tr><th>Besichtigt am</th><td>"+deDate(x.datum)+"</td><th>von</th><td>"+esc(x.pruefer)+"</td></tr></table>"+
+    '<table style="margin-top:10px"><tr><th>Prüfpunkt</th><th class="x">Ja</th><th class="x">Nein</th></tr>'+rows+'<tr><td>Sonderprüfung nach DIN 1076 veranlasst</td><td class="x">'+(x.sonder?"X":"")+'</td><td class="x">'+(x.sonder?"":"X")+"</td></tr></table>"+
+    '<p style="margin:10px 0 4px"><b>Verunreinigungen</b></p><div class="box">'+esc(x.verunreinigungen||"")+'</div><p style="margin:0 0 4px"><b>Schadensbeschreibung(en)</b></p><div class="box">'+esc(sch)+'</div><p style="margin:0 0 4px"><b>Sonstige Mängel / Auffälligkeiten</b></p><div class="box">'+esc(x.sonstige||"")+"</div>"+
+    '<div style="display:flex;justify-content:space-between;margin-top:10px"><span>Kassel, '+deDate(today())+"</span><span>Gesehen, Kassel</span></div>"+
+    (x.fotos.length?'<p style="margin:12px 0 6px"><b>Fotos ('+x.fotos.length+')</b></p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px">'}).join("")+"</div>":"")+"</div>");
+  hydrate();
+}
+function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Besichtigung vom "+deDate(x.basis);return sch}
 
 /* ---------- Kamera ---------- */
 var CAM={stream:null,visit:null,ori:null,heading:null};
 function camOpen(id){
-  CAM.visit=id;var x=S.visits[id];$("cam").hidden=false;document.body.style.overflow="hidden";
+  CAM.visit=id;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;document.body.style.overflow="hidden";
   $("ctags").innerHTML=TAGS.map(function(t){return '<button type="button" data-act="ctag" data-t="'+esc(t)+'" aria-pressed="'+(S.tag===t)+'">'+esc(t)+"</button>"}).join("");
   $("camCount").textContent=x.fotos.length+" Fotos";
-  var rk=S.refs[x.bw];$("refBtn").hidden=!rk;$("refimg").hidden=true;$("opWrap").hidden=true;
-  if(rk)getBlob(rk).then(function(bl){if(!bl)return;$("refimg").src=URL.createObjectURL(bl);$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
+  $("refBtn").hidden=!b.refKey;$("refimg").hidden=true;$("opWrap").hidden=true;
+  if(b.refKey)blobUrl(b.refKey).then(function(u){if(!u)return;$("refimg").src=u;$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
   startGps();
-  // Neigung/Kompass (iOS fragt nach Erlaubnis)
   try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==="function")DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted")listenOri()}).catch(function(){});else listenOri()}catch(e){}
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast("Kamera nicht verfügbar – bitte „Aus Galerie“ nutzen.");return}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast("Kamera nicht verfügbar – bitte „Fotos aus Galerie“ nutzen.");return}
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(st){CAM.stream=st;$("vid").srcObject=st;updHud()})
-    .catch(function(){toast("Kamera nicht erlaubt. In den Einstellungen freigeben oder „Aus Galerie“ nutzen.",4000);camClose()});
+    .catch(function(){toast("Kamera nicht erlaubt. In den Einstellungen des Handys freigeben oder „Fotos aus Galerie“ nutzen.",4000);camClose()});
 }
 function camClose(){if(CAM.stream)CAM.stream.getTracks().forEach(function(t){t.stop()});CAM.stream=null;$("cam").hidden=true;document.body.style.overflow="";render()}
 function setOp(){$("refimg").style.opacity=$("op").value/100}
@@ -400,13 +616,13 @@ function updLevel(){var r=roll(),el=$("lvl");if(r==null||$("cam").hidden){el.hid
 function updHud(){if($("cam").hidden)return;var p=[];
   p.push(S.pos?"GPS ±"+Math.round(S.pos.acc)+" m":(S.gpsErr||"GPS …"));
   var r=roll();if(r!=null)p.push("Neigung "+Math.abs(r).toFixed(1).replace(".",",")+"°");
-  if(CAM.heading!=null){var rf=S.refMeta&&S.refMeta[CAM.visit&&S.visits[CAM.visit]&&S.visits[CAM.visit].bw];p.push("Richtung "+Math.round(CAM.heading)+"°"+(rf&&rf.heading!=null?" (Vgl. "+Math.round(rf.heading)+"°)":""))}
+  if(CAM.heading!=null){var x=S.visits[CAM.visit],b=x&&S.bw[x.bw];p.push("Richtung "+Math.round(CAM.heading)+"°"+(b&&b.refHeading!=null?" (alt "+Math.round(b.refHeading)+"°)":""))}
   $("hud").textContent=p.join(" · ")}
 function shoot(){
   var v=$("vid"),x=S.visits[CAM.visit];if(!CAM.stream||!v.videoWidth){toast("Kamera startet noch …");return}
   var meta={lat:S.pos&&S.pos.lat||null,lon:S.pos&&S.pos.lon||null,acc:S.pos&&Math.round(S.pos.acc)||null,heading:CAM.heading!=null?Math.round(CAM.heading):null,neigung:roll()!=null?+roll().toFixed(1):null};
   $("cam").style.opacity=.4;setTimeout(function(){$("cam").style.opacity=1},90);
-  toJpeg(v,v.videoWidth,v.videoHeight,1920,0.8).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=x.fotos.length+" Fotos"});
+  toJpeg(v,v.videoWidth,v.videoHeight,SET.fotoMax,0.8).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=x.fotos.length+" Fotos"});
 }
 
 /* ---------- Sprachaufnahme ---------- */
@@ -416,30 +632,30 @@ function recToggle(id){
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
     var mime=["audio/mp4","audio/webm;codecs=opus","audio/webm"].filter(function(m){return MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m)})[0]||"";
     var r=new MediaRecorder(st,mime?{mimeType:mime}:{}),parts=[],t0=Date.now();S.rec=r;S.recSec=0;
-    S.recTimer=setInterval(function(){S.recSec=Math.round((Date.now()-t0)/1000);var b=document.querySelector('[data-act="rec"]');if(b)b.textContent="Aufnahme beenden ("+S.recSec+" s)"},1000);
+    S.recTimer=setInterval(function(){S.recSec=Math.round((Date.now()-t0)/1000);var bt=document.querySelector('[data-act="rec"]');if(bt)bt.textContent="Aufnahme beenden ("+S.recSec+" s)"},1000);
     r.ondataavailable=function(e){if(e.data.size)parts.push(e.data)};
     r.onstop=function(){clearInterval(S.recTimer);st.getTracks().forEach(function(t){t.stop()});S.rec=null;
       var bl=new Blob(parts,{type:r.mimeType||mime||"audio/webm"}),x=S.visits[id],key="audio_"+id+"_"+Date.now();
-      putBlob(key,bl).then(function(){x.audios.push({key:key,zeit:hm(),dauer:Math.round((Date.now()-t0)/1000),mime:bl.type});return save(x)}).then(render)};
+      putBlob(key,bl).then(function(){x.audios.push({key:key,zeit:hm(),dauer:Math.round((Date.now()-t0)/1000),mime:bl.type});return saveV(x)}).then(render)};
     r.start();render();
   }).catch(function(){toast("Mikrofon nicht erlaubt.")});
 }
 
-/* ---------- Diktat (Spracherkennung des Browsers) ---------- */
+/* ---------- Diktat ---------- */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition;S.speech=!!SR;
 function dictToggle(id,k){
   if(S.dict){var same=S.dict.visit===id&&S.dict.k===k;S.dict.rec.stop();S.dict=null;render();if(same)return}
   var x=S.visits[id],r=new SR();r.lang="de-DE";r.continuous=true;r.interimResults=false;
   r.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal){var t=e.results[i][0].transcript.trim();if(!t)continue;
-    t=t.charAt(0).toUpperCase()+t.slice(1);x[k]=(x[k]?x[k].replace(/\s+$/,"")+(/[.;:!?]$/.test(x[k].trim())?" ":"; "):"")+t;save(x);var ta=$("t_"+k);if(ta)ta.value=x[k]}};
+    t=t.charAt(0).toUpperCase()+t.slice(1);x[k]=(x[k]?x[k].replace(/\s+$/,"")+(/[.;:!?]$/.test(x[k].trim())?" ":"; "):"")+t;saveV(x);var ta=$("t_"+k);if(ta)ta.value=x[k]}};
   r.onend=function(){if(S.dict&&S.dict.rec===r){S.dict=null;render()}};
-  r.onerror=function(e){toast(e.error==="not-allowed"?"Mikrofon nicht erlaubt.":"Diktat beendet.");};
+  r.onerror=function(e){toast(e.error==="not-allowed"?"Mikrofon nicht erlaubt.":"Diktat beendet.")};
   S.dict={visit:id,k:k,rec:r};r.start();render();
 }
 
-/* ---------- Protokoll (.xlsm) aus Vorlage ---------- */
-function fotoName(x,i){return x.datum+"_Besichtigung_"+pad(i+1)+".jpg"}
-function protName(x,b){return b.nr+" Besichtigungsprotokoll "+x.datum.slice(0,4)+".xlsm"}
+/* ---------- Protokoll (.xlsx / .xlsm) aus Vorlage ---------- */
+function fotoName(x,i){var b=S.bw[x.bw];return (SET.fotoName==="bw"&&b?b.nr+"_":"")+x.datum+"_Besichtigung_"+pad(i+1)+".jpg"}
+function protName(x,b){return (b?b.nr:x.bw)+" Besichtigungsprotokoll "+x.datum.slice(0,4)+"."+SET.protFormat}
 function xe(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function serial(iso){var p=String(iso).slice(0,10).split("-");return Math.round((Date.UTC(+p[0],p[1]-1,+p[2])-Date.UTC(1899,11,30))/86400000)}
 function setCell(xml,ref,kind,val){var re=new RegExp('<c r="'+ref+'"([^>]*?)(/>|>[\\s\\S]*?</c>)'),m=xml.match(re);if(!m)return xml;var at=m[1].replace(/\s*t="[^"]*"/,""),c;
@@ -450,25 +666,27 @@ function setBox(d,name,text){var parts=d.split("</xdr:twoCellAnchor>");for(var k
     var lines=String(text||"").split(/\n|;\s*/).map(function(s){return s.trim()}).filter(Boolean);
     return head+(lines.length?lines.map(function(l){return "<a:p>"+pPr+"<a:r>"+rPr+"<a:t>"+xe(l)+"</a:t></a:r></a:p>"}).join(""):"<a:p>"+pPr+'<a:endParaRPr lang="de-DE" sz="1100"/></a:p>')+tail})}return parts.join("</xdr:twoCellAnchor>")}
 var VORLAGE=null;
+var MIME={xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",xlsm:"application/vnd.ms-excel.sheet.macroEnabled.12"};
 function buildProtokoll(x,b){
   return (VORLAGE?Promise.resolve(VORLAGE):fetch("vorlage.xlsm").then(function(r){if(!r.ok)throw new Error("Vorlage fehlt");return r.arrayBuffer()}).then(function(a){VORLAGE=a;return a})).then(function(buf){return JSZip.loadAsync(buf.slice(0))}).then(function(z){
-    return Promise.all(["xl/worksheets/sheet1.xml","xl/drawings/drawing1.xml","xl/workbook.xml","xl/worksheets/sheet2.xml"].map(function(p){return z.file(p).async("string")})).then(function(a){
-      var s=a[0],d=a[1],w=a[2],s2=a[3],nr=parseInt(b.nr.replace(/\D/g,""),10);
+    return Promise.all(["xl/worksheets/sheet1.xml","xl/drawings/drawing1.xml","xl/workbook.xml","xl/worksheets/sheet2.xml","[Content_Types].xml","xl/_rels/workbook.xml.rels"].map(function(p){return z.file(p).async("string")})).then(function(a){
+      var s=a[0],d=a[1],w=a[2],s2=a[3],ct=a[4],rels=a[5],nr=parseInt(String(b.nr).replace(/\D/g,""),10)||0;
       s=setCell(s,"C11","n",nr);s=setCell(s,"F11","str",b.name);s=setCell(s,"K11","n",+x.datum.slice(0,4));s=setCell(s,"F12","str",b.eigentum||"");
       s=setCell(s,"E16","n",serial(x.datum));s=setCell(s,"H16","str",x.pruefer);
       for(var n=0;n<18;n++){var r=18+2*n;s=setCell(s,"J"+r,"s",x.ja[n]?62:30);s=setCell(s,"L"+r,"s",x.ja[n]?30:62)}
       s=setCell(s,"J61","s",x.sonder?62:30);s=setCell(s,"L61","s",x.sonder?30:62);s=setCell(s,"B66","n",serial(today()));
-      var sch=x.schaden||"";if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Besichtigung vom "+deDate(x.basis);
-      d=setBox(d,"Textfeld 1",x.verunreinigungen);d=setBox(d,"Textfeld 4",sch);d=setBox(d,"Textfeld 3",x.sonstige);
+      d=setBox(d,"Textfeld 1",x.verunreinigungen);d=setBox(d,"Textfeld 4",schadenText(x));d=setBox(d,"Textfeld 3",x.sonstige);
       if(!/fullCalcOnLoad/.test(w))w=w.replace(/<calcPr\b/,'<calcPr fullCalcOnLoad="1"');
       s2=s2.replace(/(<c r="A(?:48|97|146|195|244|293|342|391|440)"[^>]*>(?:<f[^>]*\/>|<f[^>]*>[^<]*<\/f>))<v>[^<]*<\/v>/g,"$1<v>"+serial(today())+"</v>").replace(/(<c r="C(?:48|97|146|195|244|293|342|391|440)"[^>]*>(?:<f[^>]*\/>|<f[^>]*>[^<]*<\/f>))<v>[^<]*<\/v>/g,"$1<v>"+nr+"</v>");
       z.file("xl/worksheets/sheet1.xml",s);z.file("xl/drawings/drawing1.xml",d);z.file("xl/workbook.xml",w);z.file("xl/worksheets/sheet2.xml",s2);
-      return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:"application/vnd.ms-excel.sheet.macroEnabled.12"});
+      if(SET.protFormat==="xlsx"){z.file("[Content_Types].xml",ct.replace("application/vnd.ms-excel.sheet.macroEnabled.main+xml","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml").replace(/<Override PartName="\/xl\/vbaProject\.bin"[^>]*\/>/,""));
+        z.file("xl/_rels/workbook.xml.rels",rels.replace(/<Relationship [^>]*vbaProject[^>]*\/>/,""));z.remove("xl/vbaProject.bin")}
+      return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:MIME[SET.protFormat]});
     })});
 }
 function exportFiles(x,what){
-  var b=BW[x.bw],jobs=[];
-  if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:"application/vnd.ms-excel.sheet.macroEnabled.12"})}));
+  var b=S.bw[x.bw],jobs=[];
+  if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:MIME[SET.protFormat]})}));
   if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(getBlob(f.key).then(function(bl){return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
   return Promise.all(jobs);
 }
@@ -477,60 +695,138 @@ function dlAll(files){files.forEach(function(f,i){setTimeout(function(){download
 function prep(x){S.files=S.files||{};if(!S.files[x.id])S.files[x.id]=exportFiles(x,"alles");return S.files[x.id]}
 function share(x){
   prep(x).then(function(files){
-    if(navigator.canShare&&navigator.canShare({files:files}))return navigator.share({files:files,title:BW[x.bw].nr+" Besichtigung "+deDate(x.datum)}).catch(function(e){if(e&&e.name!=="AbortError")throw e});
-    // .xlsm wird von manchen Geräten nicht geteilt: dann Fotos teilen und Protokoll laden
+    if(navigator.canShare&&navigator.canShare({files:files}))return navigator.share({files:files,title:S.bw[x.bw].nr+" Besichtigung "+deDate(x.datum)}).catch(function(e){if(e&&e.name!=="AbortError")throw e});
     var fotos=files.filter(function(f){return /\.jpg$/.test(f.name)});
     if(fotos.length&&navigator.canShare&&navigator.canShare({files:fotos})){download(files[0]);return navigator.share({files:fotos}).catch(function(){})}
     dlAll(files);toast("Teilen nicht möglich – Dateien werden heruntergeladen.");
   }).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
 }
-function dlZip(x){var b=BW[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"})}).then(function(bl){download(new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip"))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
+function dlZip(x){var b=S.bw[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"})}).then(function(bl){download(new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip",{type:"application/zip"}))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
+
+/* ---------- Datensicherung, Import ---------- */
+function backup(){
+  toast("Sicherung wird erstellt …",8000);
+  var z=new JSZip();
+  allBlobKeys().then(function(keys){
+    return Promise.all(keys.map(function(k){return getBlob(k).then(function(bl){if(bl){z.file("blobs/"+encodeURIComponent(k),bl);return [k,bl.type]}})}));
+  }).then(function(types){
+    var t={};types.forEach(function(p){if(p)t[p[0]]=p[1]});
+    z.file("daten.json",JSON.stringify({app:"besichtigung",version:APPVER,datum:new Date().toISOString(),settings:SET,bauwerke:bwList(),visits:Object.keys(S.visits).map(function(k){return S.visits[k]}),blobTypes:t}));
+    return z.generateAsync({type:"blob"});
+  }).then(function(bl){download(new File([bl],"Besichtigung_Sicherung_"+today()+".zip",{type:"application/zip"}));toast("Sicherung erstellt.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
+}
+function restore(file){
+  JSZip.loadAsync(file).then(function(z){var j=z.file("daten.json");if(!j)throw new Error("Keine gültige Sicherung");
+    return j.async("string").then(function(s){var d=JSON.parse(s);
+      var jobs=[];z.folder("blobs").forEach(function(rel,f){if(f.dir)return;var k=decodeURIComponent(rel);jobs.push(f.async("blob").then(function(bl){return putBlob(k,new Blob([bl],{type:(d.blobTypes||{})[k]||""}))}))});
+      (d.bauwerke||[]).forEach(function(b){jobs.push(saveB(b))});(d.visits||[]).forEach(function(v){jobs.push(saveV(v))});
+      return Promise.all(jobs).then(function(){return d})})})
+  .then(function(d){toast("Wiederhergestellt: "+(d.bauwerke||[]).length+" Bauwerke, "+(d.visits||[]).length+" Besichtigungen.",4000);applyLook();render()})
+  .catch(function(e){toast("Wiederherstellen fehlgeschlagen: "+(e&&e.message||e),5000)});
+}
+function importCsv(file){
+  file.text().then(function(t){
+    t=t.replace(/^﻿/,"");var lines=t.split(/\r?\n/).filter(function(l){return l.trim()});if(lines.length<2)throw new Error("Datei ist leer");
+    var sep=(lines[0].match(/;/g)||[]).length>=(lines[0].match(/,/g)||[]).length?";":",";
+    function cells(l){var out=[],cur="",q=false;for(var i=0;i<l.length;i++){var c=l[i];if(c==='"'){if(q&&l[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===sep&&!q){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(function(s){return s.trim()})}
+    var head=cells(lines[0]).map(function(h){return h.toLowerCase()});
+    function col(re){for(var i=0;i<head.length;i++)if(re.test(head[i]))return i;return -1}
+    var cNr=col(/^(nr|bw|bauwerk|nummer)/),cName=col(/bezeich|name/),cBez=col(/bezirk/),cAdr=col(/adress|straße|strasse/),cEig=col(/eigent/);
+    if(cNr<0||cName<0)throw new Error("Spalten „Nr“ und „Bezeichnung“ nicht gefunden");
+    var n=0,u=0,jobs=[];
+    lines.slice(1).forEach(function(l){var c=cells(l),nr=c[cNr],name=c[cName];if(!nr||!name)return;
+      var id=nr.replace(/[^A-Za-z0-9]/g,""),old=S.bw[id],b=old?Object.assign({},old):{id:id,letzte:null,lat:null,lon:null,hinweise:[]};
+      b.nr=nr;b.name=name;if(cBez>=0)b.bezirk=c[cBez];if(cAdr>=0&&c[cAdr])b.adresse=c[cAdr];else if(!b.adresse)b.adresse=name+", Kassel";if(cEig>=0)b.eigentum=c[cEig];
+      old?u++:n++;jobs.push(saveB(b))});
+    return Promise.all(jobs).then(function(){toast(n+" neu, "+u+" aktualisiert.",4000);render()});
+  }).catch(function(e){toast("Import fehlgeschlagen: "+(e&&e.message||e),5000)});
+}
+function wipe(){
+  Promise.all(["visits","bauwerke","blobs"].map(function(s){return tx(s,"readwrite",function(st){return st.clear()})})).then(function(){S.visits={};S.bw={};SET.hgFoto=false;saveSet();applyLook();lss("seeded",false);return seed()}).then(function(){toast("Alle Daten gelöscht.");location.hash="#start";render()});
+}
 
 /* ---------- Ereignisse ---------- */
+function confirmTap(el,text){if(el.dataset.sure==="1")return true;el.dataset.sure="1";var old=el.textContent;el.textContent=text;setTimeout(function(){if(el.isConnected){el.dataset.sure="";el.textContent=old}},4000);return false}
 document.addEventListener("click",function(ev){
   var el=ev.target.closest("[data-act]");if(!el)return;var a=el.dataset.act,id=el.dataset.visit,x=id&&S.visits[id];
-  if(a==="palette"){var p=$("pal");p.hidden=!p.hidden;el.setAttribute("aria-expanded",String(!p.hidden));return}
-  if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);markPal();return}
-  if(a==="theme"){var cur=document.documentElement.getAttribute("data-theme"),dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches,nt=dark?"light":"dark";document.documentElement.setAttribute("data-theme",nt);lss("theme",nt);return}
-  if(a==="mode"){S.mode=el.dataset.m;render();return}
-  if(a==="gps"){startGps();render();return}
+  if(a==="theme"){var cur=document.documentElement.getAttribute("data-theme"),dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches,nt=dark?"light":"dark";document.documentElement.setAttribute("data-theme",nt);lss("theme",nt);if(view().name==="einst")render();return}
+  if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}render();return}
+  if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);render();return}
+  if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();render();return}
+  if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();render();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
+  if(a==="reflex"){SET.reflex=!SET.reflex;saveSet();if(SET.reflex)startReflex(true);else setLight(25,0);render();return}
+  if(a==="filt"){S.filter=el.dataset.f;if(view().name==="liste"){ev.preventDefault();render()}return}
+  if(a==="gps"){startGps();toast("Standort wird ermittelt …");render();return}
   if(a==="start"){startVisit(el.dataset.bw);return}
-  if(a==="setCoord"&&S.pos){var b=BW[el.dataset.bw];b.lat=S.pos.lat;b.lon=S.pos.lon;S.coords[b.id]=[b.lat,b.lon];lss("coords",S.coords);toast("Position gespeichert (± "+Math.round(S.pos.acc)+" m)");render();return}
-  if(a==="star"){var bw=el.dataset.bw,k=el.dataset.key;S.refs[bw]=S.refs[bw]===k?null:k;lss("refs",S.refs);var f=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===k)f=ff})});S.refMeta=S.refMeta||{};S.refMeta[bw]=f;lss("refMeta",S.refMeta);toast(S.refs[bw]?"Als Vergleichsbild gespeichert":"Vergleichsbild entfernt");render();return}
+  if(a==="saveBw"){var old=el.dataset.id?S.bw[el.dataset.id]:null,b=readEdit(old);if(!b)return;saveB(b).then(function(){toast("Gespeichert");location.hash="#bw-"+b.id});return}
+  if(a==="delBw"){if(!confirmTap(el,"Wirklich löschen? Alle Besichtigungen und Fotos dazu gehen verloren. Nochmal tippen"))return;deleteBw(el.dataset.id).then(function(){toast("Bauwerk gelöscht");location.hash="#liste"});return}
+  if(a==="setCoord"&&S.pos){var bb=S.bw[el.dataset.bw];bb.lat=S.pos.lat;bb.lon=S.pos.lon;saveB(bb);toast("Position gespeichert (± "+Math.round(S.pos.acc)+" m)");render();return}
+  if(a==="viewRef"){viewRef(el.dataset.bw);return}
+  if(a==="clearRef"){var br=S.bw[el.dataset.bw];br.refKey=null;br.refHeading=null;saveB(br);closeModal();render();return}
+  if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});bs.refKey=fk;bs.refHeading=meta&&meta.heading;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
+  if(a==="closeModal"){closeModal();return}
   if(a==="camOpen"){camOpen(id);return}
   if(a==="camClose"){camClose();return}
   if(a==="shoot"){shoot();return}
-  if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.t===S.tag))});return}
+  if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b2){b2.setAttribute("aria-pressed",String(b2.dataset.t===S.tag))});return}
   if(a==="refToggle"){var ri=$("refimg");ri.hidden=!ri.hidden;$("opWrap").hidden=ri.hidden;return}
+  if(a==="backup"){backup();return}
+  if(a==="wipe"){if(!confirmTap(el,"Wirklich ALLES löschen? Nochmal tippen"))return;wipe();return}
   if(!x)return;
-  if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];save(x);render();return}
-  if(a==="sonder"){x.sonder=!x.sonder;save(x);render();return}
-  if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;save(x);render();return}
+  if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
+  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var f=x.fotos.splice(+el.dataset.i,1)[0];delBlob(f.key);var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;saveB(bf)}saveV(x);closeModal();render();return}
+  if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);saveV(x);render();return}
+  if(a==="preview"){preview(x);return}
+  if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
+  if(a==="sonder"){x.sonder=!x.sonder;saveV(x);render();return}
+  if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
-  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}var same=x.ja.every(function(v,i){return v===x.ref[i]})&&!x.sonder;x.status="abgeschlossen";x.befund=same?"keine Schadenserweiterung":"Veränderung festgestellt";save(x).then(function(){render();scrollTo({top:document.body.scrollHeight,behavior:"smooth"})});return}
-  if(a==="reopen"){x.status="in Arbeit";save(x);render();return}
+  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();scrollTo({top:document.body.scrollHeight,behavior:"smooth"})});return}
+  if(a==="reopen"){reopenVisit(x).then(render);return}
   if(a==="share"){share(x);return}
   if(a==="dlProt"){exportFiles(x,"prot").then(dlAll).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlFotos"){exportFiles(x,"fotos").then(dlAll);return}
   if(a==="dlZip"){dlZip(x);return}
-  if(a==="delVisit"){if(el.dataset.sure!=="1"){el.dataset.sure="1";el.textContent="Wirklich löschen? Nochmal tippen";return}
-    Promise.all(x.fotos.map(function(f){return delBlob(f.key)}).concat(x.audios.map(function(f){return delBlob(f.key)}))).then(function(){return delVisit(x.id)}).then(function(){delete S.visits[x.id];render()});return}
+  if(a==="delVisit"){if(!confirmTap(el,"Wirklich löschen? Nochmal tippen"))return;
+    var bv=S.bw[x.bw];if(x.status==="abgeschlossen"&&bv.letzte&&bv.letzte.datum===x.datum){bv.letzte=x.basisLetzte||null;saveB(bv)}
+    Promise.all(x.fotos.map(function(f){return delBlob(f.key)}).concat(x.audios.map(function(f){return delBlob(f.key)}))).then(function(){return del("visits",x.id)}).then(function(){delete S.visits[x.id];render()});return}
 });
 document.addEventListener("change",function(ev){
   var el=ev.target;
-  if(el.matches("textarea[data-k]")){var x=S.visits[el.dataset.visit];if(x){x[el.dataset.k]=el.value;save(x)}return}
-  if(el.dataset.gal&&el.files.length){var x2=S.visits[el.dataset.gal],fs=Array.from(el.files);el.value="";
+  if(el.matches("textarea[data-k]")){var x=S.visits[el.dataset.visit];if(x){x[el.dataset.k]=el.value;saveV(x)}return}
+  if(el.id==="s_pruefer"){SET.pruefer=el.value.trim()||"Dogan";saveSet();toast("Gespeichert");return}
+  if(el.id==="bez"){S.bez=el.value;$("results").innerHTML=resultsHtml();return}
+  if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
+  if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
+  if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
+  if(el.dataset.gal&&el.files.length){var x2=S.visits[el.dataset.gal],fs=Array.from(el.files);el.value="";toast("Fotos werden übernommen …");
     fs.reduce(function(p,f){return p.then(function(){return fileToJpeg(f).then(function(bl){return addFoto(x2,bl,{quelle:"Galerie"})})})},Promise.resolve()).then(render);return}
-  if(el.dataset.ref&&el.files[0]){var bw=el.dataset.ref,f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw;return putBlob(k,bl).then(function(){S.refs[bw]=k;lss("refs",S.refs);delete S.urls[k];toast("Vergleichsbild gespeichert");render()})});return}
+  if(el.dataset.ref&&el.files[0]){var bw=S.bw[el.dataset.ref],f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw.id+"_"+Date.now();return putBlob(k,bl).then(function(){bw.refKey=k;bw.refHeading=null;return saveB(bw)})}).then(function(){toast("Altes Bild gespeichert");render()});return}
 });
-document.addEventListener("input",function(ev){if(ev.target.id==="op")setOp()});
-window.addEventListener("hashchange",function(){if(!$("cam").hidden)camClose();render();scrollTo({top:0})});
+document.addEventListener("input",function(ev){
+  var el=ev.target;
+  if(el.id==="op"){setOp();return}
+  if(el.id==="q"){S.q=el.value;$("results").innerHTML=resultsHtml();return}
+  if(el.id==="cmpR"){var p=el.value;$("cmpOver").style.clipPath="inset(0 0 0 "+p+"%)";$("cmpLine").style.left=p+"%";return}
+});
+document.addEventListener("focusin",function(e){if(e.target.id==="q")S.typing=true});
+document.addEventListener("focusout",function(e){if(e.target.id==="q")S.typing=false});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("modal").hidden)closeModal()});
+window.addEventListener("hashchange",function(){if(!$("cam").hidden)camClose();closeModal();render();scrollTo({top:0})});
 window.addEventListener("orientationchange",updLevel);
 
 /* ---------- Start ---------- */
-S.refMeta=ls("refMeta",{});
-dbOpen().then(allVisits).then(function(list){(list||[]).forEach(function(v){S.visits[v.id]=v});render()}).catch(function(){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>'});
+function seed(){if(ls("seeded",false))return Promise.resolve();return Promise.all(SEED.map(function(b){return S.bw[b.id]?null:saveB(JSON.parse(JSON.stringify(b)))})).then(function(){lss("seeded",true)})}
+function migrateOld(){ // Daten der ersten Demo-Version übernehmen (Positionen, Vergleichsbilder, abgeschlossene Besichtigungen)
+  var c=ls("coords",{}),r=ls("refs",{});Object.keys(c).forEach(function(k){if(S.bw[k]&&S.bw[k].lat==null&&c[k]){S.bw[k].lat=c[k][0];S.bw[k].lon=c[k][1];saveB(S.bw[k])}});
+  Object.keys(r).forEach(function(k){if(r[k]&&S.bw[k]&&!S.bw[k].refKey){S.bw[k].refKey=r[k];saveB(S.bw[k])}});
+  Object.keys(S.visits).forEach(function(id){var v=S.visits[id];if(!v.audios)v.audios=[];if(v.status==="abgeschlossen"&&S.bw[v.bw]&&(!S.bw[v.bw].letzte||S.bw[v.bw].letzte.datum<v.datum)){v.basisLetzte=v.basisLetzte||S.bw[v.bw].letzte;S.bw[v.bw].letzte={datum:v.datum,pruefer:v.pruefer,ja:v.ja.slice(),verunreinigungen:v.verunreinigungen,schaden:v.schaden,sonstige:v.sonstige};saveB(S.bw[v.bw]);saveV(v)}});
+}
+dbOpen().then(function(){return Promise.all([all("bauwerke"),all("visits")])}).then(function(r){
+  (r[0]||[]).forEach(function(b){S.bw[b.id]=b});(r[1]||[]).forEach(function(v){S.visits[v.id]=v});
+  return seed().then(function(){if(!ls("migrated3",false)){migrateOld();lss("migrated3",true)}});
+}).then(function(){applyLook();startReflex(false);render()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});
 </script>
