@@ -165,6 +165,42 @@ textarea{resize:vertical;min-height:70px}
 .swatches button[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent)}
 .swatches .dot{width:30px;height:30px;border-radius:15px;flex-shrink:0}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#lookPop.glass{position:fixed;z-index:9;top:calc(max(8px,env(safe-area-inset-top,0px)) + 74px);right:max(16px,calc((100vw - 640px)/2));width:min(360px,calc(100vw - 32px));max-height:calc(100vh - 190px);overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background-color:rgba(var(--gbase),.86)}
+select option{background-color:#FFFFFF;color:#0C1422}
+:root[data-theme="dark"] select option{background-color:#1B2130;color:#EEF1F6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) select option{background-color:#1B2130;color:#EEF1F6}}
+select{background-color:rgba(var(--gbase),.7)}
+.chiprow{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.chiprow button{font:600 13px var(--f);white-space:nowrap;min-height:36px;padding:0 13px;border-radius:18px;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer}
+.chiprow button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:transparent}
+details.glass>summary{cursor:pointer;font-weight:650;list-style:none;padding:14px 16px}
+details.glass>summary::-webkit-details-marker{display:none}
+details.glass>summary::after{content:"›";float:right;color:var(--muted);transition:transform .15s}
+details.glass[open]>summary::after{transform:rotate(90deg)}
+details.glass>.panel{padding-top:0}
+/* Protokoll-Vorschau im Stil der Kasseler Vorlage */
+.pwrap{width:100%;max-width:700px;margin:0 auto;overflow:hidden;flex-shrink:0}
+.prot{width:640px;background:#fff;color:#111;font:12px/1.35 Arial,Helvetica,sans-serif;padding:26px 30px;border-radius:6px;transform-origin:0 0}
+.prot .lg{margin:0 auto 14px;width:max-content;border:1px solid #333;padding:6px 14px;font-size:18px}
+.prot .lg span{color:#C8102E;font-size:12px;margin-left:10px}
+.prot .org{margin-bottom:12px}
+.prot .bx{display:inline-block;border:1px solid #333;background:#d9d9d9;padding:1px 8px;font-weight:700;min-width:40px;text-align:center}
+.prot .hd{display:grid;grid-template-columns:auto auto auto 1fr auto auto;gap:6px 8px;align-items:center;margin-bottom:10px}
+.prot h4{text-align:center;font-size:17px;margin:8px 0}
+.prot .fr{border:1px solid #333;padding:10px 12px}
+.prot .dt{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.prot .gr{display:grid;grid-template-columns:42% 58%;gap:0 14px}
+.prot .lbl{border:1px solid #333;background:#d9d9d9;font-weight:700;padding:2px 8px;margin-top:8px}
+.prot .tb{border:1px solid #333;min-height:90px;padding:6px 8px;white-space:pre-line;margin-top:4px}
+.prot .pt{display:grid;grid-template-columns:22px 1fr 34px 34px;align-items:center;gap:4px;padding:3px 0}
+.prot .pt.sh .tx{background:#d9d9d9;font-weight:700;padding:1px 4px}
+.prot .ck{width:16px;height:16px;border:1.5px solid #333;margin:0 auto;font-weight:700;font-size:12px;line-height:14px;text-align:center}
+.prot .jn{display:grid;grid-template-columns:22px 1fr 34px 34px;font-weight:700;text-align:center}
+.prot .sp{display:grid;grid-template-columns:1fr 34px 34px;gap:4px;align-items:center;margin-top:10px}.prot .sp .lbl{justify-self:end}
+.prot .ft{display:flex;justify-content:space-between;margin-top:26px}
+.prot .ft span{border-bottom:1px solid #333;min-width:150px;display:inline-block;margin-left:6px}
+.prot .fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.prot .fotos img{width:100%;aspect-ratio:4/3;object-fit:cover}
 .empty{padding:22px 16px;text-align:center;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;padding:12px 18px;border-radius:22px;font-size:14px;max-width:90vw}
 /* Modal (Foto, Protokoll-Vorschau) */
@@ -209,9 +245,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <header class="top glass">
   <div class="brand"><span class="eyebrow" id="eyebrow">DIN 1076</span><h1 id="title">BauwerkCheck</h1></div>
   <a class="ibtn sync" href="#einst" id="syncBtn" aria-label="Synchronisierung" data-st="off"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.1 4.75 4.75 0 0 0 7 18.5z"/></svg><i></i></a>
-  <a class="ibtn" href="#einst" aria-label="Farbwelt und Hintergrund"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.7S5.5 9.6 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.6 12 2.7 12 2.7z"/></svg></a>
-  <button class="ibtn" type="button" data-act="theme" aria-label="Hell oder dunkel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg></button>
+  <button class="ibtn" type="button" data-act="look" id="lookBtn" aria-label="Darstellung" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.7S5.5 9.6 5.5 14.2a6.5 6.5 0 0 0 13 0C18.5 9.6 12 2.7 12 2.7z"/></svg></button>
 </header>
+<div id="lookPop" class="glass" hidden></div>
 <main id="app" class="wrap" style="margin-top:12px"><div class="glass empty">Wird geladen …</div></main>
 
 <nav class="tabbar glass" aria-label="Bereiche">
@@ -245,15 +281,15 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.5";
+var APPVER="0.6";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
 function P(list,pos){return list.map(function(t,i){return {t:t,pos:pos.indexOf(i)>=0}})}
 var TAGS_STD=["Übersicht","Detail","Schaden","Entwässerung","Geländer","Sonstiges"];
 var DEF_TYPES=[
-  {id:"stuetzwand",name:"Stützwand",protokoll:"kassel",pp:P(PP_SW,[2]),tags:TAGS_SW},
-  {id:"bruecke",name:"Brücke",protokoll:"standard",tags:["Übersicht","Überbau","Unterbau","Lager","Übergang","Kappe","Geländer","Entwässerung","Schaden"],
+  {id:"stuetzwand",name:"Stützwand",gruppe:"Bezirk",protokoll:"kassel",pp:P(PP_SW,[2]),tags:TAGS_SW},
+  {id:"bruecke",name:"Brücke",gruppe:"Gruppe",protokoll:"standard",tags:["Übersicht","Überbau","Unterbau","Lager","Übergang","Kappe","Geländer","Entwässerung","Schaden"],
     pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Überbau (Risse, Abplatzungen, freiliegende Bewehrung)","Unterbauten / Widerlager / Pfeiler","Lager","Übergangskonstruktionen","Kappen / Gesimse","Geländer / Schutzeinrichtungen","Fahrbahnbelag","Entwässerung","Feuchtstellen / Aussinterungen","Korrosion an Stahlteilen","Bewuchs / Verunreinigung","Böschungen / Kolk / Gewässersohle","sonstige Mängel / Auffälligkeiten"],[1])},
   {id:"laermschutz",name:"Lärmschutzwand",protokoll:"standard",tags:TAGS_STD,
     pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Gründung / Pfosten / Fußbereich","Wandelemente (Schäden, Verschiebungen)","Verankerungen / Verbindungsmittel","Korrosion","Bewuchs / Verunreinigung / Graffiti","sonstige Mängel / Auffälligkeiten"],[1])},
@@ -263,8 +299,7 @@ var DEF_TYPES=[
     pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Fundamente / Fußplatten","Stützen / Riegel","Schraub- und Schweißverbindungen","Korrosionsschutz","Schilder / Befestigungen","sonstige Mängel / Auffälligkeiten"],[1])},
   {id:"sonstiges",name:"Sonstiges Ingenieurbauwerk",protokoll:"standard",tags:TAGS_STD,
     pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","Tragende Bauteile","Risse / Abplatzungen","Korrosion","Entwässerung","Absturzsicherung","Bewuchs / Verunreinigung","sonstige Mängel / Auffälligkeiten"],[1])}];
-var PRUEFARTEN=[["besichtigung","Besichtigung"],["ep","Einfache Prüfung"],["hp","Hauptprüfung"],["sonder","Sonderprüfung"],["beobachtung","Beobachtung"]];
-function paName(a){var r=PRUEFARTEN.filter(function(p){return p[0]===(a||"besichtigung")})[0];return r?r[1]:"Besichtigung"}
+function paName(){return "Besichtigung"}
 var DEF_ORG={kommune:"Stadt Kassel",amt:"Straßenverkehrs- und Tiefbauamt",abteilung:"Brücken- und Ingenieurbauwerke",kennung:"-6622-",ort:"Kassel",gebiet:"Bezirk",
   intervalle:{besichtigung:12,ep:36,hp:72},types:DEF_TYPES,upd:0};
 function ja(list){var a=[];for(var i=1;i<=18;i++)a.push(list.indexOf(i)>=0);return a}
@@ -375,7 +410,7 @@ function mergeList(a,b,del){var seen={},out=[];a.concat(b).forEach(function(f){i
   return out.sort(function(x,y){return String(x.ts||x.zeit).localeCompare(String(y.ts||y.zeit))})}
 function applyRemote(d){
   var t=d.k.split(":"),typ=t[0],id=t.slice(1).join(":"),loc=recOf(d.k),lu=loc?(loc.upd||0):(SY.tomb[d.k]||0);
-  if(typ==="cfg"){if(!d.d||d.upd<=lu)return false;ORG=d.d;if(!ORG.intervalle)ORG.intervalle=DEF_ORG.intervalle;lss("org",ORG);applyOrg();delete SY.ob.rec[d.k];saveOb();return true}
+  if(typ==="cfg"){if(!d.d||d.upd<=lu)return false;ORG=d.d;migrateOrg();lss("org",ORG);applyOrg();delete SY.ob.rec[d.k];saveOb();return true}
   if(d.deleted){if(!loc||d.upd<=lu)return false;SY.tomb[d.k]=d.upd;lss("tomb",SY.tomb);delete SY.ob.rec[d.k];saveOb();
     if(typ==="bw"){delete S.bw[id];del("bauwerke",id)}else{var xv=S.visits[id];(xv.fotos||[]).concat(xv.audios||[]).forEach(function(f){delBlob(f.key)});delete S.visits[id];del("visits",id)}return true}
   if(!loc){if((SY.tomb[d.k]||0)>=d.upd)return false;if(typ==="bw")saveB(d.d,true);else saveV(d.d,true);return true}
@@ -479,23 +514,14 @@ var ORG=ls("org",null)||JSON.parse(JSON.stringify(DEF_ORG));
 if(!ORG.types||!ORG.types.length)ORG.types=JSON.parse(JSON.stringify(DEF_TYPES));if(!ORG.intervalle)ORG.intervalle=DEF_ORG.intervalle;
 function saveOrg(remote){if(!remote){ORG.upd=Date.now();markDirty("cfg:org")}lss("org",ORG);applyOrg()}
 function applyOrg(){var e=$("eyebrow");if(e)e.textContent=(ORG.kennung?ORG.kennung+" · ":"")+"DIN 1076"}
+function migrateOrg(){ORG.types.forEach(function(t){if(!t.gruppe){var d=DEF_TYPES.filter(function(x){return x.id===t.id})[0];t.gruppe=d&&d.gruppe||"Stadtteil"}})}
+migrateOrg();
+function grp(t){return (t&&t.gruppe)||"Stadtteil"}
 function typeById(id){return ORG.types.filter(function(t){return t.id===id})[0]}
 function typeOf(b){return typeById(b&&b.art||"stuetzwand")||ORG.types[0]}
 function ppOf(o){return (o&&o.pp)||DEF_TYPES[0].pp}
 function mapLast(points,l){var names=ppOf(l).map(function(p){return p.t});return points.map(function(p){var i=names.indexOf(p.t);return l&&l.ja&&i>=0?!!l.ja[i]:!!p.pos})}
 function ortSuffix(){return ORG.ort?", "+ORG.ort:""}
-function addMonths(iso,m){var d=new Date(String(iso).slice(0,10)+"T12:00:00");d.setMonth(d.getMonth()+m);return d.toISOString().slice(0,10)}
-function faellig(b){ // nächste fällige Prüfung nach den eingestellten Intervallen
-  var I=ORG.intervalle||DEF_ORG.intervalle,c=[];
-  if(I.hp)c.push(["hp",b.letzteHP?addMonths(b.letzteHP,I.hp):""]);
-  if(I.ep&&b.letzteHP){var ep=addMonths(b.letzteHP,I.ep);if(!b.letzteEP||b.letzteEP<b.letzteHP)c.push(["ep",ep])}
-  var last=[b.letzte&&b.letzte.datum,b.letzteHP,b.letzteEP].filter(Boolean).sort().pop();
-  if(I.besichtigung)c.push(["besichtigung",last?addMonths(last,I.besichtigung):""]);
-  var t=today(),od=c.filter(function(x){return !x[1]||x[1]<t}),prio={hp:0,ep:1,besichtigung:2};
-  if(od.length){od.sort(function(a,z){return prio[a[0]]-prio[z[0]]});return {art:od[0][0],datum:od[0][1]}}
-  c.sort(function(a,z){return a[1]<z[1]?-1:1});var r=c[0];return r?{art:r[0],datum:r[1]}:null}
-function faelligText(f){if(!f)return "";if(!f.datum)return paName(f.art)+": noch nie erfasst";var u=f.datum<today();return paName(f.art)+(u?" überfällig seit ":" fällig ")+deDate(f.datum)}
-function ueberfaellig(b){var f=faellig(b);return !!(f&&(!f.datum||f.datum<today()))}
 var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme",th);
 S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
 document.documentElement.setAttribute("data-glass",SET.glas);
@@ -556,81 +582,77 @@ function render(){
   hydrate();
   if(v.name==="bw"){var xv=S.visits[vid(v.id)];if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
 }
-function lastChips(l){if(!l||!l.ja)return '<span class="chip">Noch keine Prüfung</span>';var pp=ppOf(l),h="";
+function lastChips(l){if(!l||!l.ja)return '<span class="chip">Noch keine Besichtigung</span>';var pp=ppOf(l),h="";
   l.ja.forEach(function(x,i){var p=pp[i];if(!p)return;if(p.pos&&!x)h+='<span class="chip bad">'+(i+1)+" Nicht: "+esc(p.t)+"</span>";else if(!p.pos&&x)h+='<span class="chip warn">'+(i+1)+" "+esc(p.t)+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
 
 /* Übersicht / Dashboard */
 function viewStart(){
-  var list=bwList(),y=year(),done=list.filter(doneThisYear).length,offen=list.length-done,mang=list.filter(hasMangel).length,uns=list.filter(unsafe).length,ueb=list.filter(ueberfaellig).length;
+  var list=bwList(),y=year(),done=list.filter(doneThisYear).length,offen=list.length-done,mang=list.filter(hasMangel).length,uns=list.filter(unsafe).length;
   var running=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"});
   var pct=list.length?Math.round(done/list.length*100):0;
-  var h='<section class="glass panel"><span class="eyebrow">'+deDate(today())+" · "+esc(SET.pruefer)+'</span><h2>Übersicht '+y+'</h2>'+
-    '<div class="row between small"><span>'+done+" von "+list.length+" Bauwerken geprüft oder besichtigt</span><b>"+pct+' %</b></div><div class="bar"><i style="width:'+pct+'%"></i></div></section>';
+  var h='<section class="glass panel"><span class="eyebrow">'+deDate(today())+" · "+esc(SET.pruefer)+'</span><h2>Besichtigungen '+y+'</h2>'+
+    '<div class="row between small"><span>'+done+" von "+list.length+" Bauwerken besichtigt</span><b>"+pct+' %</b></div><div class="bar"><i style="width:'+pct+'%"></i></div></section>';
   h+='<div class="tiles">'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="alle"><b>'+list.length+'</b><span class="muted small">Bauwerke</span></a>'+
-    '<a class="tile glass" href="#liste" data-act="filt" data-f="faellig"><b style="color:'+(ueb?"var(--bad)":"var(--ok)")+'">'+ueb+'</b><span class="muted small">fällig / überfällig</span></a>'+
+    '<a class="tile glass" href="#liste" data-act="filt" data-f="offen"><b>'+offen+'</b><span class="muted small">noch offen '+y+'</span></a>'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="mangel"><b style="color:var(--warn)">'+mang+'</b><span class="muted small">mit Befund</span></a>'+
     '<a class="tile glass" href="#liste" data-act="filt" data-f="unsicher"><b style="color:'+(uns?"var(--bad)":"var(--ok)")+'">'+uns+'</b><span class="muted small">nicht verkehrssicher</span></a></div>';
-  if(running.length)h+='<section class="glass panel"><h3>In Arbeit</h3>'+running.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="muted small">'+deDate(v.datum)+" · "+v.fotos.length+" Fotos</span></a>"}).join("")+"</section>";
-  var bz={};if(ORG.gebiet)list.forEach(function(b){var k=b.bezirk||"–";bz[k]=bz[k]||{n:0,d:0};bz[k].n++;if(doneThisYear(b))bz[k].d++});
-  var keys=Object.keys(bz).sort(natCmp);
-  if(keys.length)h+='<section class="glass panel"><h3>Fortschritt nach '+esc(ORG.gebiet)+'</h3>'+keys.map(function(k){var o=bz[k],p=Math.round(o.d/o.n*100);return '<div style="display:flex;flex-direction:column;gap:4px"><div class="row between small"><span>'+esc(ORG.gebiet)+" "+esc(k)+'</span><span class="muted">'+o.d+" / "+o.n+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join("")+"</section>";
-  var at={};list.forEach(function(b){var t=typeOf(b).name;at[t]=(at[t]||0)+1});var atk=Object.keys(at);
-  if(atk.length>1)h+='<section class="glass panel"><h3>Bauwerksarten</h3><div class="chips">'+atk.map(function(k){return '<span class="chip">'+esc(k)+" · "+at[k]+"</span>"}).join("")+"</div></section>";
+  if(running.length)h+='<section class="glass panel"><h3>In Arbeit</h3>'+running.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="muted small">'+v.fotos.length+" Fotos</span></a>"}).join("")+"</section>";
+  var at=ORG.types.map(function(t){var l=list.filter(function(b){return typeOf(b).id===t.id});return {t:t,n:l.length,d:l.filter(doneThisYear).length}}).filter(function(o){return o.n});
+  if(at.length>1)h+='<section class="glass panel"><h3>Fortschritt</h3>'+at.map(function(o){var p=Math.round(o.d/o.n*100);return '<a href="#liste" data-act="filtArt" data-art="'+esc(o.t.id)+'" style="display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit"><div class="row between small"><span>'+esc(o.t.name)+'</span><span class="muted">'+o.d+" / "+o.n+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></a>'}).join("")+"</section>";
   var last=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"}).sort(function(a,b){return (b.ende||b.datum).localeCompare(a.ende||a.datum)}).slice(0,5);
-  h+='<section class="glass panel"><h3>Zuletzt abgeschlossen</h3>'+(last.length?last.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="chip '+(v.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+deDate(v.datum)+"</span></a>"}).join(""):'<span class="muted small">Noch keine Besichtigung abgeschlossen.</span>')+"</section>";
+  if(last.length)h+='<section class="glass panel"><h3>Zuletzt abgeschlossen</h3>'+last.map(function(v){var b=S.bw[v.bw]||{nr:v.bw,name:""};return '<a class="row between" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px" href="#bw-'+esc(v.bw)+'"><span><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="chip '+(v.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+deDate(v.datum)+"</span></a>"}).join("")+"</section>";
   return h;
 }
 
-/* Bauwerksliste mit Suche */
+/* Bauwerksliste: Suche, Bauwerksart, Einteilung */
+var FILT={offen:"Noch offen",mangel:"Mit Befund",unsicher:"Nicht verkehrssicher"};
 function filtered(){
   var q=S.q.trim().toLowerCase();
   return bwList().filter(function(b){
-    if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" "+(ORG.gebiet||"")+" "+(b.bezirk||"")+" "+typeOf(b).name).toLowerCase().indexOf(q)<0)return false;
-    if(S.art&&typeOf(b).id!==S.art)return false;
-    if(S.bez&&String(b.bezirk)!==S.bez)return false;
+    var t=typeOf(b);
+    if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" "+grp(t)+" "+(b.bezirk||"")+" "+t.name).toLowerCase().indexOf(q)<0)return false;
+    if(S.art&&t.id!==S.art)return false;
+    if(S.art&&S.bez&&String(b.bezirk||"")!==S.bez)return false;
     if(S.filter==="offen")return !doneThisYear(b);
-    if(S.filter==="erledigt")return doneThisYear(b);
     if(S.filter==="mangel")return hasMangel(b);
     if(S.filter==="unsicher")return unsafe(b);
-    if(S.filter==="faellig")return ueberfaellig(b);
     return true;
   }).map(function(b){return {b:b,d:S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null}})
    .sort(function(a,b){return S.pos?((a.d==null)-(b.d==null)||(a.d||0)-(b.d||0)):natCmp(a.b.nr,b.b.nr)});
 }
 function viewListe(){
-  var bez=Array.from(new Set(bwList().map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
-  var F=[["alle","Alle"],["faellig","Fällig"],["offen","Offen "+year()],["mangel","Mit Befund"],["unsicher","Nicht sicher"]];
-  var arten=ORG.types.filter(function(t){return bwList().some(function(b){return typeOf(b).id===t.id})});
-  var h='<section class="glass panel"><div class="row between"><h2>Bauwerke</h2><a class="btn sm" href="#neu">+ Neues Bauwerk</a></div>'+
-    '<input type="search" id="q" placeholder="Suchen: Nr., Straße, Art'+(ORG.gebiet?", "+esc(ORG.gebiet):"")+'" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">'+
-    '<div class="seg" role="group" aria-label="Filter">'+F.map(function(f){return '<button type="button" data-act="filt" data-f="'+f[0]+'" aria-pressed="'+(S.filter===f[0])+'">'+f[1]+"</button>"}).join("")+"</div>"+
-    (arten.length>1?'<select id="artF" aria-label="Bauwerksart"><option value="">Alle Bauwerksarten</option>'+arten.map(function(t){return '<option value="'+esc(t.id)+'" '+(S.art===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+"</select>":"")+
-    (ORG.gebiet&&bez.length>1?'<select id="bez" aria-label="'+esc(ORG.gebiet)+'"><option value="">Alle: '+esc(ORG.gebiet)+'</option>'+bez.map(function(z){return '<option value="'+esc(z)+'" '+(S.bez===z?"selected":"")+">"+esc(ORG.gebiet)+" "+esc(z)+"</option>"}).join("")+"</select>":"")+
-    '<div class="row between"><span class="muted small">'+(S.pos?"Sortiert nach Entfernung (± "+Math.round(S.pos.acc)+" m)":S.gpsErr||"Sortiert nach Nummer")+'</span>'+(S.pos?"":'<button type="button" class="btn soft sm" data-act="gps">Nach Entfernung</button>')+"</div></section>";
+  var all=bwList(),arten=ORG.types.map(function(t){return {t:t,n:all.filter(function(b){return typeOf(b).id===t.id}).length}}).filter(function(o){return o.n});
+  if(S.art&&!arten.some(function(o){return o.t.id===S.art})){S.art="";S.bez=""}
+  var h='<section class="glass panel">'+
+    '<input type="search" id="q" placeholder="Bauwerk suchen …" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">';
+  if(arten.length>1)h+='<div class="chiprow" role="group" aria-label="Bauwerksart"><button type="button" data-act="setArtF" data-v="" aria-pressed="'+!S.art+'">Alle · '+all.length+"</button>"+arten.map(function(o){return '<button type="button" data-act="setArtF" data-v="'+esc(o.t.id)+'" aria-pressed="'+(S.art===o.t.id)+'">'+esc(o.t.name)+" · "+o.n+"</button>"}).join("")+"</div>";
+  var ta=S.art?typeById(S.art):(arten.length===1?arten[0].t:null);
+  if(ta){if(!S.art)S.art=ta.id;var gs=Array.from(new Set(all.filter(function(b){return typeOf(b).id===ta.id}).map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
+    if(gs.length>1)h+='<div class="chiprow" role="group" aria-label="'+esc(grp(ta))+'"><button type="button" data-act="setGrp" data-v="" aria-pressed="'+!S.bez+'">Alle</button>'+gs.map(function(g){return '<button type="button" data-act="setGrp" data-v="'+esc(g)+'" aria-pressed="'+(S.bez===g)+'">'+(g.length<=3?esc(grp(ta))+" ":"")+esc(g)+"</button>"}).join("")+"</div>"}
+  if(FILT[S.filter])h+='<div class="row"><button type="button" class="chip warn" data-act="filt" data-f="alle" style="cursor:pointer;border:0;min-height:32px">'+esc(FILT[S.filter])+" ✕</button></div>";
+  h+='<div class="row between"><button type="button" class="btn soft sm" data-act="gps">'+(S.pos?"Nach Entfernung ✓":"Nach Entfernung")+'</button><a class="btn sm" href="#neu">+ Neues Bauwerk</a></div></section>';
   h+='<div id="results">'+resultsHtml()+"</div>";
   return h;
 }
 function resultsHtml(){
   var list=filtered();
   if(!list.length)return '<div class="glass empty">Keine Bauwerke gefunden.</div>';
-  return list.map(function(o){var b=o.b,x=S.visits[vid(b.id)];
-    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+" · "+esc(typeOf(b).name.toUpperCase())+(b.bezirk&&ORG.gebiet?" · "+esc(ORG.gebiet.toUpperCase())+" "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte)+'</div><span class="muted small">'+(b.letzte?"Zuletzt "+deDate(b.letzte.datum):"Noch nicht erfasst")+" · "+esc(faelligText(faellig(b)))+(x?" · heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+'</span></div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
+  return list.map(function(o){var b=o.b,t=typeOf(b),x=S.visits[vid(b.id)];
+    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+" · "+esc(t.name.toUpperCase())+(b.bezirk?" · "+esc(grp(t).toUpperCase())+" "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="chips">'+lastChips(b.letzte)+'</div>'+(b.letzte||x?'<span class="muted small">'+(b.letzte?"Zuletzt besichtigt "+deDate(b.letzte.datum):"")+(x?(b.letzte?" · ":"")+"heute "+(x.status==="abgeschlossen"?"abgeschlossen":"in Arbeit"):"")+"</span>":"")+'</div><span aria-hidden="true" class="muted">›</span></a>'}).join("");
 }
 
 /* Bauwerk anlegen / bearbeiten */
 function viewEdit(b){
-  var n=!b;b=b||{nr:"",name:"",bezirk:"",adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:[],art:S.art||"stuetzwand"};
-  function f(id,label,val,ph,type){return '<label class="fld">'+label+'<input type="'+(type||"text")+'" id="e_'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  var n=!b;b=b||{nr:"",name:"",bezirk:S.bez||"",adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:[],art:S.art||"stuetzwand"};
+  function f(id,label,val,ph){return '<label class="fld"><span'+(id==="bezirk"?' id="grpLbl"':"")+">"+label+'</span><input type="text" id="e_'+id+'" value="'+esc(val||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
   var art='<label class="fld">Bauwerksart<select id="e_art">'+ORG.types.map(function(t){return '<option value="'+esc(t.id)+'" '+(typeOf(b).id===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+"</select></label>";
   return '<a class="btn soft sm" href="'+(n?"#liste":"#bw-"+esc(b.id))+'" style="align-self:flex-start">‹ Zurück</a>'+
     '<section class="glass panel"><h2>'+(n?"Neues Bauwerk":"Bauwerk bearbeiten")+'</h2>'+
-    art+'<div class="grid2">'+f("nr","Bauwerksnummer *",b.nr,"z. B. M 301")+(ORG.gebiet?f("bezirk",esc(ORG.gebiet),b.bezirk,"z. B. 3"):"")+"</div>"+
+    art+'<div class="grid2">'+f("nr","Bauwerksnummer *",b.nr,"z. B. M 301")+f("bezirk",esc(grp(typeOf(b))),b.bezirk,"")+"</div>"+
     f("name","Bezeichnung *",b.name,"z. B. Am Hange 56")+f("adresse","Adresse für Navigation",b.adresse,"Straße Nr."+ortSuffix())+f("eigentum","Eigentümer",b.eigentum,"Kommune / Privat / Fremd")+
-    '<div class="grid2">'+f("hp","Letzte Hauptprüfung",b.letzteHP,"","date")+f("ep","Letzte Einfache Prüfung",b.letzteEP,"","date")+"</div>"+
     '<div class="grid2">'+f("laenge","Länge",b.laenge,"m")+f("hoehe","Ansichtshöhe",b.hoehe,"m")+"</div>"+f("flaeche","Fläche",b.flaeche,"m²")+
     '<label class="fld">Hinweise (eine Zeile je Hinweis)<textarea id="e_hinweise" rows="3">'+esc((b.hinweise||[]).join("\n"))+"</textarea></label>"+
-    (n?'<span class="muted small">Die Prüfpunkte kommen aus der gewählten Bauwerksart (Einstellungen → Bauwerksarten).</span>':"")+
     '<button type="button" class="btn block" data-act="saveBw" data-id="'+esc(b.id||"")+'">Speichern</button>'+
     (n?"":'<button type="button" class="btn danger block" data-act="delBw" data-id="'+esc(b.id)+'">Bauwerk löschen</button>')+"</section>";
 }
@@ -639,7 +661,7 @@ function readEdit(old){
   var nr=g("nr"),name=g("name");if(!nr||!name){toast("Bitte Nummer und Bezeichnung angeben.");return null}
   var b=old?Object.assign({},old):{id:nr.replace(/[^A-Za-z0-9]/g,"")||("bw"+Date.now()),letzte:null,lat:null,lon:null};
   if(!old&&S.bw[b.id])b.id=b.id+"_"+Date.now().toString(36);
-  Object.assign(b,{nr:nr,name:name,art:g("art")||"stuetzwand",letzteHP:g("hp"),letzteEP:g("ep"),bezirk:ORG.gebiet?g("bezirk"):(b.bezirk||""),adresse:g("adresse")||name+ortSuffix(),eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),
+  Object.assign(b,{nr:nr,name:name,art:g("art")||"stuetzwand",bezirk:g("bezirk"),adresse:g("adresse")||name+ortSuffix(),eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),
     hinweise:g("hinweise").split("\n").map(function(s){return s.trim()}).filter(Boolean)});
   return b;
 }
@@ -652,29 +674,27 @@ function deleteBw(id){
 
 /* Bauwerk-Detail */
 function viewBw(b){
-  var x=S.visits[vid(b.id)],l=b.letzte;
+  var x=S.visits[vid(b.id)],l=b.letzte,t=typeOf(b);
   var h='<a class="btn soft sm" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>';
   var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche]].filter(function(p){return p[1]});
-  h+='<section class="glass panel"><span class="eyebrow">'+(b.bezirk&&ORG.gebiet?esc(ORG.gebiet)+" "+esc(b.bezirk)+" · ":"")+esc(typeOf(b).name)+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
+  h+='<section class="glass panel"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+(b.eigentum?" · Eigentum "+esc(b.eigentum):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
     (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
     '<div class="row"><a class="btn sm" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation</a><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bearbeiten</a>'+
     (S.pos?'<button type="button" class="btn soft sm" data-act="setCoord" data-bw="'+esc(b.id)+'">Standort speichern</button>':'<button type="button" class="btn soft sm" data-act="gps">GPS</button>')+"</div>"+
     (b.lat==null?'<span class="muted small">Noch keine Position hinterlegt. Vor Ort „GPS“ und dann „Standort speichern“ tippen.</span>':"")+"</section>";
-  h+='<section class="glass panel"><div class="row between"><h3>Letzte Prüfung</h3><span class="muted small">'+(l?paName(l.art)+" "+deDate(l.datum)+" · "+esc(l.pruefer):"–")+'</span></div>'+
-    '<div class="kv"><div><span>Nächste</span><span>'+esc(faelligText(faellig(b))||"–")+'</span></div><div><span>Letzte HP</span><span>'+deDate(b.letzteHP)+'</span></div><div><span>Letzte EP</span><span>'+deDate(b.letzteEP)+"</span></div></div>"+'<div class="chips">'+lastChips(l)+"</div>"+
+  h+='<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+(l?deDate(l.datum)+" · "+esc(l.pruefer):"–")+'</span></div><div class="chips">'+lastChips(l)+"</div>"+
     (l&&l.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(l.verunreinigungen)+"</div>":"")+
     (l&&l.schaden?'<div class="small"><span class="muted">Schäden: </span>'+esc(l.schaden)+"</div>":"")+
     (l&&l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>";
   if(b.hinweise&&b.hinweise.length)h+='<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>";
   h+='<section class="glass panel"><div class="row between"><h3>Vergleichsbild (altes Bild)</h3>'+(b.refKey?'<button type="button" class="btn soft sm" data-act="viewRef" data-bw="'+esc(b.id)+'">Ansehen</button>':"")+"</div>"+
-    (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:220px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Wird in der Kamera halbtransparent über das Live-Bild gelegt, damit das neue Foto vom gleichen Standpunkt entsteht. Danach neues Foto antippen: alt und neu mit Schieberegler vergleichen.</span>':
+    (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:220px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Wird in der Kamera halbtransparent über das Live-Bild gelegt. Danach neues Foto antippen: alt und neu mit Schieberegler vergleichen.</span>':
       '<span class="muted small">Noch kein altes Bild. Foto aus der Galerie wählen oder später ein Foto antippen und „Als Vergleichsbild“ wählen.</span>')+
     '<label class="btn soft sm">Altes Bild aus Galerie wählen<input type="file" accept="image/*" data-ref="'+esc(b.id)+'"></label></section>';
-  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+esc(b.id)+'" style="min-height:58px;font-size:17px">Prüfung / Besichtigung heute starten</button>'+historyHtml(b);
+  if(!x)return h+'<button type="button" class="btn block" data-act="start" data-bw="'+esc(b.id)+'" style="min-height:58px;font-size:17px">Besichtigung heute starten</button>'+historyHtml(b);
   var done=x.status==="abgeschlossen",id=esc(x.id);
   var pts=ppOf(x),bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
-  h+='<section class="glass panel"><h3>Art der Prüfung</h3><div class="seg" role="group">'+PRUEFARTEN.map(function(p){return '<button type="button" data-act="setArt" data-visit="'+id+'" data-v="'+p[0]+'" aria-pressed="'+((x.art||"besichtigung")===p[0])+'" '+(done?"disabled":"")+">"+p[1]+"</button>"}).join("")+"</div></section>";
   h+='<section class="glass panel"><div class="row between"><h3>Fotos heute</h3><span class="muted small">'+x.fotos.length+"</span></div>";
   if(!done)h+='<button type="button" class="btn block" data-act="camOpen" data-visit="'+id+'">Kamera öffnen'+(b.refKey?" (mit altem Bild)":"")+'</button><label class="btn soft sm">Fotos aus Galerie hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'"></label>';
   if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
@@ -688,19 +708,19 @@ function viewBw(b){
   h+='<section class="glass panel"><div class="row between"><h3>Prüfpunkte</h3><span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" Änderung"+(diff>1?"en":""):"wie zuletzt")+"</span></div>";
   if(!done)h+='<button type="button" class="btn soft block" data-act="reset" data-visit="'+id+'">Alles wie zuletzt – keine Schadenserweiterung</button>';
   h+='<div class="pp">';
-  pts.forEach(function(pt,i){var t=pt.t,on=x.ja[i],ch=on!==x.ref[i],hint=pt.pos?"Ja = in Ordnung":ch?(on?"neu gegenüber letzter Besichtigung":"entfällt gegenüber letzter Besichtigung"):"";
-    h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t"><span>'+esc(t)+"</span>"+(hint?'<span class="pp-h'+(ch?" chg":"")+'">'+hint+"</span>":"")+'</span><button type="button" class="sw'+(pt.pos?" vs":"")+'" aria-pressed="'+on+'" aria-label="'+(i+1)+" "+esc(t)+'" data-act="pp" data-i="'+i+'" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div>"});
+  pts.forEach(function(pt,i){var tx=pt.t,on=x.ja[i],ch=on!==x.ref[i],hint=pt.pos?"Ja = in Ordnung":ch?(on?"neu gegenüber letzter Besichtigung":"entfällt gegenüber letzter Besichtigung"):"";
+    h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t"><span>'+esc(tx)+"</span>"+(hint?'<span class="pp-h'+(ch?" chg":"")+'">'+hint+"</span>":"")+'</span><button type="button" class="sw'+(pt.pos?" vs":"")+'" aria-pressed="'+on+'" aria-label="'+(i+1)+" "+esc(tx)+'" data-act="pp" data-i="'+i+'" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div>"});
   h+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung nach DIN 1076 veranlasst</span><button type="button" class="sw sp" aria-pressed="'+x.sonder+'" aria-label="Sonderprüfung veranlasst" data-act="sonder" data-visit="'+id+'" '+(done?"disabled":"")+"></button></div></div></section>";
   h+='<section class="glass panel"><h3>Beschreibung</h3>'+fld(x,"verunreinigungen","Verunreinigungen",done)+fld(x,"schaden","Schadensbeschreibung(en)",done)+fld(x,"sonstige","Sonstige Mängel / Auffälligkeiten",done)+
     '<span class="muted small">'+(S.speech?"Mikrofon-Taste: direkt ins Feld diktieren.":"Zum Diktieren die Mikrofon-Taste der Tastatur nutzen.")+"</span></section>";
-  if(!done)h+='<button type="button" class="btn block" data-act="finish" data-visit="'+id+'" style="min-height:58px;font-size:17px">'+esc(paName(x.art))+' abschließen</button>';
+  if(!done)h+='<button type="button" class="btn block" data-act="finish" data-visit="'+id+'" style="min-height:58px;font-size:17px">Besichtigung abschließen</button>';
   else h+=exportPanel(x);
   return h+historyHtml(b);
 }
 function historyHtml(b){
   var vs=visitsOf(b.id).filter(function(v){return v.datum!==today()});
   if(!vs.length)return "";
-  return '<section class="glass panel"><h3>Frühere Prüfungen in der App</h3>'+vs.map(function(v){return '<div class="row between" style="border-top:1px solid var(--line);padding-top:8px"><span>'+esc(paName(v.art))+" "+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll ansehen</button></div>'}).join("")+"</section>";
+  return '<section class="glass panel"><h3>Frühere Besichtigungen</h3>'+vs.map(function(v){return '<div class="row between" style="border-top:1px solid var(--line);padding-top:8px"><span>'+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll ansehen</button></div>'}).join("")+"</section>";
 }
 function fld(x,k,label,done){
   var on=S.dict&&S.dict.visit===x.id&&S.dict.k===k;
@@ -714,64 +734,64 @@ function exportPanel(x){
     '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Teilen (Outlook / Mail)</button>'+
     '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.'+protExt(x)+')</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
     '<button type="button" class="btn soft sm" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button>'+
-    '<span class="muted small mono">'+esc(protName(x,b))+"<br>"+esc(fotoName(x,0))+(n>1?" … "+pad(n):"")+"</span>"+
-    '<span class="muted small">Die Excel-Datei ist für den Büro-PC gedacht. Am Handy „Protokoll ansehen“ nutzen – sonst bietet das Handy evtl. eine unpassende App (z. B. PayPal) zum Öffnen an.</span>'+
+    '<span class="muted small mono">'+esc(protName(x,b))+(n?"<br>"+esc(fotoName(x,0))+(n>1?"<br>"+esc(fotoName(x,1))+(n>2?" …":""):""):"")+"</span>"+
     '<div class="row between"><button type="button" class="btn soft sm" data-act="reopen" data-visit="'+esc(x.id)+'">Wieder öffnen</button><button type="button" class="btn danger sm" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung löschen</button></div></section>';
 }
 
-/* Einstellungen */
+/* Darstellung (Tropfen) */
 function seg(k,opts,small){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" data-act="setOpt" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(SET[k])===String(o[0]))+'"'+(small?' style="font-size:12px"':"")+">"+esc(o[1])+"</button>"}).join("")+"</div>"}
-function viewEinst(){
+function lookHtml(){
   var t=document.documentElement.getAttribute("data-theme")||"auto";
+  return '<div class="row between"><h3>Darstellung</h3><button type="button" class="ibtn" data-act="lookClose" aria-label="Schließen" style="width:36px;height:36px">✕</button></div>'+
+    '<div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
+    '<div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Auto"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div>"+
+    seg("glas",[["klar","Klar"],["milchig","Milchig"]])+
+    '<div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbverlauf</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
+    (SET.hgFoto?'<label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label>':"")+
+    '<div class="setrow"><span class="small">Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>';
+}
+function lookOpen(open){var p=$("lookPop");if(open){p.innerHTML=lookHtml();p.hidden=false}else{p.hidden=true;p.innerHTML=""}$("lookBtn").setAttribute("aria-expanded",String(!!open))}
+function lookRefresh(){if(!$("lookPop").hidden)$("lookPop").innerHTML=lookHtml()}
+
+/* Einstellungen */
+function viewEinst(){
   var h='<section class="glass panel"><h2>Einstellungen</h2>'+
     '<label class="fld">Name des Prüfers (erscheint im Protokoll bei „von“)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label></section>';
   h+='<section class="glass panel" id="sync"><h3>Synchronisierung (Google Drive)</h3><span class="small" id="syncStat">'+esc(syncText())+'</span>'+
     (!SY.on||SY.needLogin?'<button type="button" class="btn block" data-act="login">Mit Google anmelden</button>':'<button type="button" class="btn soft block" data-act="syncNow">Jetzt synchronisieren</button>')+
-    '<span class="muted small">Handy und Büro-PC mit <b>demselben</b> Google-Konto anmelden (6622brueckenbau@gmail.com). Daten, Fotos und Protokolle liegen dann im Drive-Ordner „BauwerkCheck“ und sind auf allen Geräten gleich. Ohne Internet wird lokal gespeichert und später übertragen.</span>'+
+    '<span class="muted small">Handy und Büro-PC mit demselben Google-Konto anmelden. Daten, Fotos und Protokolle liegen dann im Drive-Ordner „BauwerkCheck“.</span>'+
     (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
+  h+='<section class="glass panel"><div class="row between"><h3>Bauwerksarten</h3><a class="btn soft sm" href="#art-neu">+ Neu</a></div>'+ORG.types.map(function(t){var n=bwList().filter(function(b){return typeOf(b).id===t.id}).length;
+    return '<a class="row between" href="#art-'+esc(t.id)+'" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px"><span><b>'+esc(t.name)+'</b><br><span class="muted small">Einteilung: '+esc(grp(t))+" · "+t.pp.length+' Prüfpunkte</span></span><span class="muted small">'+n+" ›</span></a>"}).join("")+"</section>";
   function oi(k,label,ph){return '<label class="fld">'+label+'<input type="text" data-org="'+k+'" value="'+esc(ORG[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
-  h+='<section class="glass panel"><h3>Organisation</h3>'+oi("kommune","Kommune","z. B. Stadt Musterstadt")+oi("amt","Amt / Dienststelle","z. B. Tiefbauamt")+
-    '<div class="grid2">'+oi("abteilung","Abteilung","z. B. Ingenieurbauwerke")+oi("kennung","Kennung","z. B. 66.2")+"</div>"+
-    '<div class="grid2">'+oi("ort","Ort (für Protokoll und Navigation)","z. B. Musterstadt")+'<label class="fld">Gebietseinteilung<select data-org="gebiet">'+["Bezirk","Ortsteil","Stadtteil","Gebiet","Los",""].map(function(g){return '<option value="'+g+'" '+((ORG.gebiet||"")===g?"selected":"")+">"+(g||"keine")+"</option>"}).join("")+"</select></label></div>"+
-    '<span class="muted small">Prüfintervalle in Monaten (Vorgabe nach DIN 1076 – bitte mit der eigenen Dienstanweisung abgleichen)</span>'+
-    '<div class="grid2"><label class="fld">Besichtigung<input type="number" min="0" data-int="besichtigung" value="'+(ORG.intervalle.besichtigung||"")+'"></label><label class="fld">Einfache Prüfung (nach HP)<input type="number" min="0" data-int="ep" value="'+(ORG.intervalle.ep||"")+'"></label></div>'+
-    '<label class="fld">Hauptprüfung<input type="number" min="0" data-int="hp" value="'+(ORG.intervalle.hp||"")+'"></label></section>';
-  h+='<section class="glass panel"><div class="row between"><h3>Bauwerksarten und Prüfpunkte</h3><a class="btn soft sm" href="#art-neu">+ Neu</a></div>'+ORG.types.map(function(t){var n=bwList().filter(function(b){return typeOf(b).id===t.id}).length;
-    return '<a class="row between" href="#art-'+esc(t.id)+'" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px"><span><b>'+esc(t.name)+'</b><br><span class="muted small">'+t.pp.length+" Prüfpunkte · Protokoll "+(t.protokoll==="kassel"?"Kassel-Vorlage":"Standard")+'</span></span><span class="muted small">'+n+" BW ›</span></a>"}).join("")+"</section>";
-  h+='<section class="glass panel" id="darstellung"><h3>Darstellung</h3>'+
-    '<span class="muted small">Hintergrund</span><div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbwelt</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
-    (SET.hgFoto?'<div class="row"><label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label><span class="muted small">Ein farbiges Foto mit Kontrasten (Himmel, Grün, Menschen) lässt das Glas am lebendigsten wirken.</span></div>':"")+
-    '<span class="muted small">Farbwelt'+(SET.hgFoto?" (bestimmt die Akzentfarbe)":"")+'</span><div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
-    '<span class="muted small">Glas</span>'+seg("glas",[["klar","Klar"],["milchig","Milchig (besser lesbar)"]])+
-    '<div class="setrow"><span>Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>'+
-    '<span class="muted small">Hell / Dunkel</span><div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Automatisch"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div></section>";
-  h+='<section class="glass panel"><h3>Fotos und Protokoll</h3>'+
-    '<span class="muted small">Dateiname der Fotos</span>'+seg("fotoName",[["datum",today()+"_Besichtigung_01.jpg"],["bw","M 201_"+today()+"_Besichtigung_01.jpg"]],true)+
-    '<span class="muted small">Fotoqualität</span>'+seg("fotoMax",[[1600,"Klein (~0,4 MB)"],[1920,"Standard (~0,6 MB)"],[2560,"Hoch (~1 MB)"]])+
-    '<span class="muted small">Protokoll-Format</span>'+seg("protFormat",[["xlsx","Excel .xlsx (empfohlen)"],["xlsm","Excel .xlsm (mit Makros)"]])+
-    '<span class="muted small">Navigation</span>'+seg("mode",[["driving","Auto"],["transit","ÖPNV"],["walking","zu Fuß"]])+"</section>";
-  h+='<section class="glass panel"><h3>Bauwerke</h3><a class="btn soft block" href="#neu">+ Neues Bauwerk anlegen</a>'+
-    '<label class="btn soft block">Bauwerksliste importieren (CSV)<input type="file" accept=".csv,text/csv,text/plain" id="csvIn"></label>'+
-    '<span class="muted small">CSV mit Kopfzeile, z. B. <span class="mono">Nr;Bezeichnung;Art;'+esc(ORG.gebiet||"Gebiet")+';Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span></section>';
-  h+='<section class="glass panel"><h3>Datensicherung</h3><span class="muted small">'+(SY.on?"Zusätzlich zur Synchronisierung kann eine Sicherung als ZIP heruntergeladen werden.":"Ohne Synchronisierung liegen alle Daten nur auf diesem Gerät. Regelmäßig sichern – z. B. vor einem Handywechsel.")+'</span>'+
-    '<button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
+  h+='<details class="glass"><summary>Weitere Einstellungen</summary><div class="panel">'+
+    '<h3>Protokollkopf</h3>'+oi("kommune","Kommune","z. B. Stadt Musterstadt")+oi("amt","Amt / Dienststelle","z. B. Tiefbauamt")+
+    '<div class="grid2">'+oi("abteilung","Abteilung","z. B. Ingenieurbauwerke")+oi("kennung","Kennung","z. B. 66.2")+"</div>"+oi("ort","Ort","z. B. Musterstadt")+
+    '<h3 style="margin-top:8px">Fotos und Protokoll</h3><span class="muted small">Fotoqualität</span>'+seg("fotoMax",[[1600,"Klein"],[1920,"Standard"],[2560,"Hoch"]])+
+    '<span class="muted small">Protokoll-Format</span>'+seg("protFormat",[["xlsx","Excel .xlsx"],["xlsm","Excel .xlsm"]])+
+    '<span class="muted small">Navigation</span>'+seg("mode",[["driving","Auto"],["transit","ÖPNV"],["walking","zu Fuß"]])+
+    '<h3 style="margin-top:8px">Bauwerksliste importieren</h3><label class="btn soft block">CSV-Datei wählen<input type="file" accept=".csv,text/csv,text/plain" id="csvIn"></label>'+
+    '<span class="muted small">Kopfzeile z. B. <span class="mono">Nr;Bezeichnung;Art;Einteilung;Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span>'+
+    '<h3 style="margin-top:8px">Datensicherung</h3><button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
     '<label class="btn soft block">Sicherung wiederherstellen<input type="file" accept=".zip,application/zip" id="restoreIn"></label>'+
     '<span class="muted small" id="usage"></span>'+
-    '<button type="button" class="btn danger block" data-act="wipe">Alle Daten auf diesem Gerät löschen</button><span class="muted small">Löscht nur die Kopie auf diesem Gerät. Bei aktiver Synchronisierung werden die Daten danach aus Google Drive neu geladen.</span></section>';
-  h+='<p class="muted small" style="text-align:center">Version '+APPVER+" · Demo</p>";
+    '<button type="button" class="btn danger block" data-act="wipe">Alle Daten auf diesem Gerät löschen</button><span class="muted small">Löscht nur die Kopie auf diesem Gerät. Bei aktiver Synchronisierung werden die Daten danach aus Google Drive neu geladen.</span></div></details>';
+  h+='<p class="muted small" style="text-align:center">BauwerkCheck · Version '+APPVER+"</p>";
   setTimeout(function(){if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var u=$("usage");if(u)u.textContent="Belegter Speicher: "+(e.usage/1048576).toFixed(1).replace(".",",")+" MB"})},0);
   return h;
 }
 
 function viewArt(id){
-  var n=id==="neu",t=n?{id:"",name:"",protokoll:"standard",pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","sonstige Mängel / Auffälligkeiten"],[1]),tags:TAGS_STD}:typeById(id);
+  var n=id==="neu",t=n?{id:"",name:"",gruppe:"Stadtteil",protokoll:"standard",pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","sonstige Mängel / Auffälligkeiten"],[1]),tags:TAGS_STD}:typeById(id);
   if(!t)return '<div class="glass empty">Bauwerksart nicht gefunden.</div>';
   var used=n?0:bwList().filter(function(b){return typeOf(b).id===t.id}).length;
   return '<a class="btn soft sm" href="#einst" style="align-self:flex-start">‹ Einstellungen</a><section class="glass panel"><h2>'+(n?"Neue Bauwerksart":esc(t.name))+'</h2>'+
-    '<label class="fld">Name *<input type="text" id="a_name" value="'+esc(t.name)+'" placeholder="z. B. Treppenanlage"></label>'+
+    '<div class="grid2"><label class="fld">Name *<input type="text" id="a_name" value="'+esc(t.name)+'" placeholder="z. B. Treppenanlage"></label>'+
+    '<label class="fld">Einteilung nach<input type="text" id="a_grp" list="grpList" value="'+esc(grp(t))+'" placeholder="z. B. Bezirk"></label></div>'+
+    '<datalist id="grpList"><option value="Bezirk"><option value="Stadtteil"><option value="Fluss"><option value="Gruppe"><option value="Buchstabe"></datalist>'+
     '<label class="fld">Prüfpunkte – eine Zeile je Punkt<textarea id="a_pp" rows="12">'+esc(t.pp.map(function(p){return (p.pos?"+ ":"")+p.t}).join("\n"))+'</textarea></label>'+
-    '<span class="muted small">„+“ am Zeilenanfang: Ja bedeutet „in Ordnung“ (z. B. „+ Verkehrssicherheit gegeben“). Bei allen anderen Punkten bedeutet Ja „Befund vorhanden“. Änderungen gelten für neue Prüfungen; abgeschlossene Protokolle bleiben unverändert.</span>'+
-    '<label class="fld">Protokoll<select id="a_prot"><option value="standard" '+(t.protokoll!=="kassel"?"selected":"")+'>Standard-Protokoll (Excel)</option><option value="kassel" '+(t.protokoll==="kassel"?"selected":"")+'>Kassel-Vorlage Stützwand (nur mit genau 18 Punkten)</option></select></label>'+
+    '<span class="muted small">„+“ am Zeilenanfang: Ja bedeutet „in Ordnung“ (z. B. „+ Verkehrssicherheit gegeben“). Änderungen gelten für neue Besichtigungen.</span>'+
+    '<label class="fld">Protokoll<select id="a_prot"><option value="standard" '+(t.protokoll!=="kassel"?"selected":"")+'>Standard-Protokoll</option><option value="kassel" '+(t.protokoll==="kassel"?"selected":"")+'>Kassel-Vorlage Stützwand (18 Punkte)</option></select></label>'+
     '<label class="fld">Foto-Stichworte – eine Zeile je Stichwort<textarea id="a_tags" rows="4">'+esc((t.tags||TAGS_STD).join("\n"))+'</textarea></label>'+
     '<button type="button" class="btn block" data-act="saveArt" data-id="'+esc(t.id)+'">Speichern</button>'+
     (!n&&ORG.types.length>1?(used?'<span class="muted small">Löschen nicht möglich: '+used+" Bauwerk(e) dieser Art vorhanden.</span>":'<button type="button" class="btn danger block" data-act="delArt" data-id="'+esc(t.id)+'">Bauwerksart löschen</button>'):"")+"</section>";
@@ -784,7 +804,7 @@ function saveArt(id){
   var tags=$("a_tags").value.split("\n").map(function(l){return l.trim()}).filter(Boolean);
   var t=id?typeById(id):null;
   if(!t){var base=name.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"art",nid=base,k=2;while(typeById(nid))nid=base+"-"+(k++);t={id:nid};ORG.types.push(t)}
-  Object.assign(t,{name:name,pp:pp,protokoll:prot,tags:tags.length?tags:TAGS_STD});saveOrg();toast("Gespeichert");location.hash="#einst";
+  Object.assign(t,{name:name,gruppe:$("a_grp").value.trim()||"Stadtteil",pp:pp,protokoll:prot,tags:tags.length?tags:TAGS_STD});saveOrg();toast("Gespeichert");location.hash="#einst";
 }
 
 /* Bilder/Audio aus IndexedDB nachladen */
@@ -799,18 +819,17 @@ function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return ensure
 /* ---------- Besichtigung ---------- */
 function startVisit(bwId){var b=S.bw[bwId],t=typeOf(b),l=b.letzte||{verunreinigungen:"",schaden:"",sonstige:"",datum:""};
   var pts=JSON.parse(JSON.stringify(t.pp)),ref=mapLast(pts,b.letzte);
-  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:ref.slice(),ja:ref.slice(),sonder:false,pp:pts,typ:t.id,protokoll:t.protokoll,art:"besichtigung",basisHP:b.letzteHP||"",basisEP:b.letzteEP||"",
+  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:ref.slice(),ja:ref.slice(),sonder:false,pp:pts,typ:t.id,protokoll:t.protokoll,
     verunreinigungen:l.verunreinigungen||"",schaden:l.schaden||"",sonstige:l.sonstige||"",fotos:[],audios:[],basis:l.datum||"",basisLetzte:b.letzte||null,seq:0};
   saveV(v).then(render)}
 function finishVisit(x){
   var same=x.ja.every(function(v,i){return v===x.ref[i]})&&!x.sonder;
   x.status="abgeschlossen";x.befund=same?"keine Schadenserweiterung":"Veränderung festgestellt";x.ende=new Date().toISOString();x.pruefer=SET.pruefer;
-  var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),pp:ppOf(x),art:x.art||"besichtigung",verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
-  if(x.art==="hp")b.letzteHP=x.datum;if(x.art==="ep")b.letzteEP=x.datum;
+  var b=S.bw[x.bw];b.letzte={datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),pp:ppOf(x),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige};
   SY.ob.prot[x.id]=1;saveOb();
   return Promise.all([saveV(x),saveB(b)]);
 }
-function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;if(x.art==="hp")b.letzteHP=x.basisHP||"";if(x.art==="ep")b.letzteEP=x.basisEP||"";return Promise.all([saveV(x),saveB(b)])}
+function reopenVisit(x){x.status="in Arbeit";var b=S.bw[x.bw];b.letzte=x.basisLetzte||null;return Promise.all([saveV(x),saveB(b)])}
 
 /* ---------- Bilder ---------- */
 function toJpeg(src,w,h,max,q){var s=Math.min(1,max/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
@@ -840,22 +859,33 @@ function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openM
 
 /* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
 function preview(x){
-  var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x);
-  var rows=ppOf(x).map(function(p,i){var t=p.t;return "<tr><td>"+(i+1)+". "+esc(t)+'</td><td class="x">'+(x.ja[i]?"X":"")+'</td><td class="x">'+(x.ja[i]?"":"X")+"</td></tr>"}).join("");
-  openModal('<div class="mbar"><b>Protokoll-Vorschau</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
-    '<div class="paper"><div style="font-size:11px;color:#555">'+esc(orgLine())+'</div>'+
-    '<h4 style="margin-top:8px">'+esc(protTitle(x,b))+'</h4>'+
-    "<table><tr><th>BW-Nr.</th><td>"+esc(b.nr)+"</td><th>BW-Name</th><td>"+esc(b.name)+"</td></tr><tr><th>Eigentümer</th><td>"+esc(b.eigentum||"–")+"</td><th>Jahr</th><td>"+x.datum.slice(0,4)+"</td></tr><tr><th>Datum</th><td>"+deDate(x.datum)+"</td><th>von</th><td>"+esc(x.pruefer)+"</td></tr></table>"+
-    '<table style="margin-top:10px"><tr><th>Prüfpunkt</th><th class="x">Ja</th><th class="x">Nein</th></tr>'+rows+'<tr><td>Sonderprüfung nach DIN 1076 veranlasst</td><td class="x">'+(x.sonder?"X":"")+'</td><td class="x">'+(x.sonder?"":"X")+"</td></tr></table>"+
-    '<p style="margin:10px 0 4px"><b>Verunreinigungen</b></p><div class="box">'+esc(x.verunreinigungen||"")+'</div><p style="margin:0 0 4px"><b>Schadensbeschreibung(en)</b></p><div class="box">'+esc(sch)+'</div><p style="margin:0 0 4px"><b>Sonstige Mängel / Auffälligkeiten</b></p><div class="box">'+esc(x.sonstige||"")+"</div>"+
-    '<div style="display:flex;justify-content:space-between;margin-top:10px"><span>'+esc(ORG.ort||"")+(ORG.ort?", ":"")+deDate(today())+"</span><span>Gesehen"+esc(ortSuffix())+"</span></div>"+
-    (x.fotos.length?'<p style="margin:12px 0 6px"><b>Fotos ('+x.fotos.length+')</b></p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px">'}).join("")+"</div>":"")+"</div>");
-  hydrate();
+  var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x),pts=ppOf(x),kas=isKassel(x);
+  var d=x.datum.split("-"),dt=d[2]+" / "+d[1]+" / "+d[0],t2=today().split("-"),dt2=t2[2]+" / "+t2[1]+" / "+t2[0];
+  var nrParts=String(b.nr).match(/^([A-Za-zÄÖÜ]+)\s*(.*)$/)||[null,"",b.nr];
+  function ck(v){return '<div class="ck">'+(v?"X":"")+"</div>"}
+  var rows=pts.map(function(p,i){var sh=kas?i<3:p.pos;return '<div class="pt'+(sh?" sh":"")+'"><span>'+(i+1)+'.</span><span class="tx">'+esc(p.t)+"</span>"+ck(x.ja[i])+ck(!x.ja[i])+"</div>"}).join("");
+  var logo=/kassel/i.test(ORG.kommune||"")?'<div class="lg">Kassel<span>documenta Stadt</span></div>':(ORG.kommune?'<div class="lg">'+esc(ORG.kommune)+"</div>":"");
+  var html='<div class="prot" id="prot">'+logo+
+    '<div class="org">'+[ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).map(esc).join("<br>")+"</div>"+
+    '<div class="hd"><span>BW-Nr.:</span><span class="bx">'+esc(nrParts[1])+" "+esc(nrParts[2])+'</span><span style="text-align:right">BW - Name:</span><span class="bx">'+esc(b.name)+'</span><span>Jahr:</span><span class="bx">'+x.datum.slice(0,4)+"</span>"+
+    '<span></span><span></span><span style="text-align:right">BW - Eigentümer:</span><span class="bx">'+esc(b.eigentum||"")+"</span><span></span><span></span></div>"+
+    "<h4>"+esc(protTitle(x,b))+"</h4>"+
+    '<div class="fr"><div class="dt">Besichtigung durchgeführt am: <span class="bx">'+dt+'</span> von: <span class="bx">'+esc(x.pruefer)+"</span></div>"+
+    '<div class="gr"><div><div class="lbl">Verunreinigungen:</div><div class="tb">'+esc(x.verunreinigungen||"")+'</div><div class="lbl">Schadensbeschreibung(en):</div><div class="tb" style="min-height:150px">'+esc(sch)+"</div></div>"+
+    '<div><div class="jn"><span></span><span></span><span>Ja</span><span>Nein</span></div>'+rows+"</div></div>"+
+    '<div class="lbl">Beschreibung sonstiger Mängel / Auffälligkeiten:</div><div class="tb" style="min-height:50px">'+esc(x.sonstige||"")+"</div>"+
+    '<div class="sp"><span class="lbl" style="margin:0">Sonderprüfung nach DIN 1076 veranlasst</span>'+ck(x.sonder)+ck(!x.sonder)+"</div>"+
+    '<div class="ft"><div>'+esc(ORG.ort||"")+(ORG.ort?",":"")+"<span>"+dt2+"</span></div><div>Gesehen"+esc(ortSuffix())+"<span></span></div></div></div>"+
+    (x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'">'}).join("")+"</div>":"")+"</div>";
+  openModal('<div class="mbar"><b>Protokoll</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="pwrap" id="pwrap">'+html+"</div>");
+  fitProt();hydrate();
 }
+function fitProt(){var w=$("pwrap"),p=$("prot");if(!w||!p)return;var sc=Math.min(1,w.clientWidth/640);p.style.transform="scale("+sc+")";w.style.height=(p.offsetHeight*sc)+"px"}
+window.addEventListener("resize",fitProt);
 function orgLine(){return [ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).join(" · ")}
-function protTitle(x,b){var t=typeById(x.typ)||typeOf(b);return paName(x.art)+" "+t.name+" nach DIN 1076"+(isKassel(x)?" (Abschnitt 6.2)":"")}
+function protTitle(x,b){var t=typeById(x.typ)||typeOf(b);return "Besichtigung "+t.name+" nach DIN 1076"+(isKassel(x)?" (Abschnitt 6.2)":"")}
 function isKassel(x){return (x.protokoll||"kassel")==="kassel"&&ppOf(x).length===18}
-function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Prüfung vom "+deDate(x.basis);return sch}
+function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befund==="keine Schadenserweiterung"&&x.basis)sch=(sch?sch+"\n":"")+"Keine Schadenserweiterung gegenüber der Besichtigung vom "+deDate(x.basis);return sch}
 
 /* ---------- Kamera ---------- */
 var CAM={stream:null,visit:null,ori:null,heading:null};
@@ -920,10 +950,10 @@ function dictToggle(id,k){
 }
 
 /* ---------- Protokoll (.xlsx / .xlsm) aus Vorlage ---------- */
-function fotoName(x,i){var b=S.bw[x.bw],a=x.art&&x.art!=="besichtigung"?fsafe(paName(x.art)).replace(/ /g,""):"Besichtigung";return fsafe((SET.fotoName==="bw"&&b?b.nr+"_":"")+x.datum+"_"+a+"_"+pad(i+1)+".jpg")}
+function fotoName(x,i){return fsafe(x.datum+"_Besichtigung"+(i>0?" ("+(i+1)+")":"")+".jpg")}
 function protExt(x){return isKassel(x)?SET.protFormat:"xlsx"}
 function fsafe(n){return String(n).replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss").replace(/[\/\\:*?"<>|]/g,"-")}
-function protName(x,b){var nr=b?b.nr:x.bw;return fsafe(((x.art||"besichtigung")==="besichtigung"?nr+" Besichtigungsprotokoll "+x.datum.slice(0,4):nr+" Protokoll "+paName(x.art)+" "+x.datum)+"."+protExt(x))}
+function protName(x,b){return fsafe((b?b.nr:x.bw)+" Besichtigungsprotokoll "+x.datum.slice(0,4)+"."+protExt(x))}
 function xe(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function serial(iso){var p=String(iso).slice(0,10).split("-");return Math.round((Date.UTC(+p[0],p[1]-1,+p[2])-Date.UTC(1899,11,30))/86400000)}
 function setCell(xml,ref,kind,val){var re=new RegExp('<c r="'+ref+'"([^>]*?)(/>|>[\\s\\S]*?</c>)'),m=xml.match(re);if(!m)return xml;var at=m[1].replace(/\s*t="[^"]*"/,""),c;
@@ -959,7 +989,7 @@ function buildStandard(x,b){ // allgemeines Excel-Protokoll für alle Bauwerksar
   function row(cs,st){r++;rows.push('<row r="'+r+'">'+cs.map(function(v,i){return cell("ABCD"[i]+r,v,Array.isArray(st)?st[i]:st)}).join("")+"</row>")}
   row([orgLine()]);row([protTitle(x,b)],1);row([]);
   row(["BW-Nr.",b.nr,"Bauwerksart",t.name],[1,0,1,0]);row(["Bezeichnung",b.name,"Eigentümer",b.eigentum||"–"],[1,0,1,0]);
-  row(["Datum",deDate(x.datum),"Prüfer",x.pruefer],[1,0,1,0]);if(ORG.gebiet&&b.bezirk)row([ORG.gebiet,b.bezirk],[1,0]);row([]);
+  row(["Datum",deDate(x.datum),"Prüfer",x.pruefer],[1,0,1,0]);if(b.bezirk)row([grp(t),b.bezirk],[1,0]);row([]);
   row(["Prüfpunkt","Ja","Nein"],1);pts.forEach(function(p,i){row([(i+1)+". "+p.t+(p.pos?" (Ja = in Ordnung)":""),x.ja[i]?"X":"",x.ja[i]?"":"X"],[0,3,3])});
   row(["Sonderprüfung nach DIN 1076 veranlasst",x.sonder?"X":"",x.sonder?"":"X"],[0,3,3]);row([]);
   [["Verunreinigungen",x.verunreinigungen],["Schadensbeschreibung(en)",schadenText(x)],["Sonstige Mängel / Auffälligkeiten",x.sonstige]].forEach(function(p){row([p[0]],1);row([p[1]||"–"],2)});
@@ -1022,7 +1052,7 @@ function importCsv(file){
     function cells(l){var out=[],cur="",q=false;for(var i=0;i<l.length;i++){var c=l[i];if(c==='"'){if(q&&l[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===sep&&!q){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(function(s){return s.trim()})}
     var head=cells(lines[0]).map(function(h){return h.toLowerCase()});
     function col(re){for(var i=0;i<head.length;i++)if(re.test(head[i]))return i;return -1}
-    var cNr=col(/^(nr|bw|bauwerk|nummer)/),cName=col(/bezeich|name/),cBez=col(new RegExp("bezirk|gebiet|ortsteil|stadtteil"+(ORG.gebiet?"|"+ORG.gebiet.toLowerCase():""))),cAdr=col(/adress|straße|strasse/),cEig=col(/eigent/),cArt=col(/^art|bauwerksart|typ/);
+    var cNr=col(/^(nr|bw|bauwerk|nummer)/),cName=col(/bezeich|name/),cBez=col(/einteilung|bezirk|gebiet|ortsteil|stadtteil|fluss|gruppe/),cAdr=col(/adress|straße|strasse/),cEig=col(/eigent/),cArt=col(/^art|bauwerksart|typ/);
     if(cNr<0||cName<0)throw new Error("Spalten „Nr“ und „Bezeichnung“ nicht gefunden");
     var n=0,u=0,jobs=[];
     lines.slice(1).forEach(function(l){var c=cells(l),nr=c[cNr],name=c[cName];if(!nr||!name)return;
@@ -1038,14 +1068,19 @@ function wipe(){
 
 /* ---------- Ereignisse ---------- */
 function confirmTap(el,text){if(el.dataset.sure==="1")return true;el.dataset.sure="1";var old=el.textContent;el.textContent=text;setTimeout(function(){if(el.isConnected){el.dataset.sure="";el.textContent=old}},4000);return false}
+document.addEventListener("click",function(ev){var p=$("lookPop");if(p&&!p.hidden&&!ev.target.closest("#lookPop")&&!ev.target.closest("#lookBtn"))lookOpen(false)},true);
 document.addEventListener("click",function(ev){
   var el=ev.target.closest("[data-act]");if(!el)return;var a=el.dataset.act,id=el.dataset.visit,x=id&&S.visits[id];
-  if(a==="theme"){var cur=document.documentElement.getAttribute("data-theme"),dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches,nt=dark?"light":"dark";document.documentElement.setAttribute("data-theme",nt);lss("theme",nt);if(view().name==="einst")render();return}
-  if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}render();return}
-  if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);render();return}
-  if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();render();return}
-  if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();render();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
-  if(a==="reflex"){SET.reflex=!SET.reflex;saveSet();if(SET.reflex)startReflex(true);else setLight(25,0);render();return}
+  if(a==="look"){lookOpen($("lookPop").hidden);return}
+  if(a==="lookClose"){lookOpen(false);return}
+  if(a==="setArtF"){S.art=el.dataset.v;S.bez="";render();return}
+  if(a==="setGrp"){S.bez=el.dataset.v;render();return}
+  if(a==="filtArt"){S.art=el.dataset.art;S.bez="";S.filter="alle";return}
+  if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}lookRefresh();return}
+  if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);lookRefresh();return}
+  if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();if(k==="glas")lookRefresh();else render();return}
+  if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();lookRefresh();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
+  if(a==="reflex"){SET.reflex=!SET.reflex;saveSet();if(SET.reflex)startReflex(true);else setLight(25,0);lookRefresh();return}
   if(a==="filt"){S.filter=el.dataset.f;if(view().name==="liste"){ev.preventDefault();render()}return}
   if(a==="gps"){startGps();toast("Standort wird ermittelt …");render();return}
   if(a==="start"){startVisit(el.dataset.bw);return}
@@ -1075,7 +1110,6 @@ document.addEventListener("click",function(ev){
   if(a==="preview"){preview(x);return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
   if(a==="sonder"){x.sonder=!x.sonder;saveV(x);render();return}
-  if(a==="setArt"){x.art=el.dataset.v;saveV(x);render();return}
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
@@ -1094,10 +1128,8 @@ document.addEventListener("change",function(ev){
   var el=ev.target;
   if(el.matches("textarea[data-k]")){var x=S.visits[el.dataset.visit];if(x){x[el.dataset.k]=el.value;saveV(x)}return}
   if(el.id==="s_pruefer"){SET.pruefer=el.value.trim()||"Dogan";saveSet();toast("Gespeichert");return}
-  if(el.id==="bez"){S.bez=el.value;$("results").innerHTML=resultsHtml();return}
-  if(el.id==="artF"){S.art=el.value;$("results").innerHTML=resultsHtml();return}
-  if(el.dataset.org!=null){ORG[el.dataset.org]=el.value.trim();saveOrg();toast("Gespeichert");if(el.dataset.org==="gebiet")render();return}
-  if(el.dataset.int!=null){ORG.intervalle[el.dataset.int]=Math.max(0,parseInt(el.value,10)||0);saveOrg();toast("Gespeichert");return}
+  if(el.id==="e_art"){var gl=$("grpLbl");if(gl)gl.textContent=grp(typeById(el.value));return}
+  if(el.dataset.org!=null){ORG[el.dataset.org]=el.value.trim();saveOrg();toast("Gespeichert");return}
   if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
@@ -1114,7 +1146,7 @@ document.addEventListener("input",function(ev){
 document.addEventListener("focusin",function(e){if(e.target.id==="q")S.typing=true});
 document.addEventListener("focusout",function(e){if(e.target.id==="q")S.typing=false});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("modal").hidden)closeModal()});
-window.addEventListener("hashchange",function(){if(!$("cam").hidden)camClose();closeModal();render();scrollTo({top:0})});
+window.addEventListener("hashchange",function(){lookOpen(false);if(!$("cam").hidden)camClose();closeModal();render();scrollTo({top:0})});
 window.addEventListener("orientationchange",updLevel);
 
 /* ---------- Start ---------- */
