@@ -281,7 +281,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.6";
+var APPVER="0.6.1";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -368,7 +368,7 @@ function maybeSilent(){ // abgelaufenes Token still erneuern (kurzer Sprung zu G
 }
 function api(method,url,body,headers){
   if(!tokOk())return Promise.reject(new Error("auth"));
-  return fetch(url,{method:method,headers:Object.assign({Authorization:"Bearer "+SY.tok.t},headers||{}),body:body}).then(function(r){
+  return fetch(url,{method:method,headers:Object.assign({Authorization:"Bearer "+SY.tok.t},headers||{}),body:body}).catch(function(e){var er=new Error("net");er.net=true;er.where=method+" "+url.replace(/\?.*/,"").replace("https://www.googleapis.com","");throw er}).then(function(r){
     if(r.status===401){SY.tok=null;lss("tok",null);throw new Error("auth")}
     if(!r.ok)return r.text().then(function(t){var e=new Error("Drive "+r.status+": "+t.replace(/\s+/g," ").slice(0,140));e.status=r.status;throw e});
     return r})}
@@ -432,11 +432,13 @@ function pull(){
         return SY.pushed[f.id]!==f.modifiedTime});
       saveDm();
       var i=0;function next(){if(i>=todo.length)return Promise.resolve();var f=todo[i++];
-        return dGet(f.id).then(function(r){return r.json()}).then(function(d){if(d&&d.k&&applyRemote(d))changed=true}).catch(function(){}).then(next)}
+        return dGet(f.id).then(function(r){return r.json()}).then(function(d){if(d&&d.k&&applyRemote(d))changed=true}).catch(function(e){if(e&&e.message==="auth")throw e;SY.errs.push("Abruf: "+errText(e));console.error("[Sync] Abruf",e&&e.where||"",e)}).then(next)}
       return Promise.all([next(),next(),next(),next()]).then(function(){if(max)lss("lastPull",max);return changed})})})}
+function errText(e){if(!e)return "";if(e.net)return "keine Verbindung zu Google Drive ("+e.where+")";if(e.status)return "Drive meldet "+e.status;return String(e.message||e)}
+function soft(label,fn){return function(){return Promise.resolve().then(fn).catch(function(e){if(e&&e.message==="auth")throw e;SY.errs.push(label+": "+errText(e));console.error("[Sync] "+label,e&&e.where||"",e)})}}
 function pushBlobs(){
   var keys=Object.keys(SY.ob.blobs);
-  return keys.reduce(function(p,k){return p.then(function(){var q=SY.ob.blobs[k];if(!q)return;
+  return keys.reduce(function(p,k){return p.then(soft("Foto hochladen",function(){var q=SY.ob.blobs[k];if(!q)return;
     return getBlob(k).then(function(bl){if(!bl){delete SY.ob.blobs[k];saveOb();return}
       return ensureBwFolder(q.bw).then(function(fo){return dCreate({name:q.name,parents:[fo],appProperties:{bbBlob:k}},bl)}).then(function(j){
         var t=q.owner.split(":"),oid=t.slice(1).join(":"),hit=false;
@@ -444,24 +446,24 @@ function pushBlobs(){
           Object.keys(S.bw).forEach(function(b){if(S.bw[b].refKey===k&&!S.bw[b].refDriveId){S.bw[b].refDriveId=j.id;saveB(S.bw[b])}})}
         if(t[0]==="bw"&&S.bw[oid]&&S.bw[oid].refKey===k){S.bw[oid].refDriveId=j.id;saveB(S.bw[oid]);hit=true}
         if(!hit)SY.ob.trash.push(j.id);
-        delete SY.ob.blobs[k];saveOb()})})})},Promise.resolve())}
+        delete SY.ob.blobs[k];saveOb()})})}))},Promise.resolve())}
 function pushRecs(){
-  return Object.keys(SY.ob.rec).reduce(function(p,key){return p.then(function(){
+  return Object.keys(SY.ob.rec).reduce(function(p,key){return p.then(soft("Daten hochladen",function(){
     var t=key.split(":"),id=t.slice(1).join(":"),rec=recOf(key);
     var data=rec?{k:key,upd:rec.upd||0,d:rec}:{k:key,upd:SY.tomb[key]||Date.now(),deleted:true},u=data.upd;
     var blob=new Blob([JSON.stringify(data)],{type:"application/json"}),fid=SY.dm.files[key];
     return (fid?dUpdate(fid,blob).catch(function(e){if(e.status===404){delete SY.dm.files[key];return null}throw e}):Promise.resolve(null)).then(function(r){if(r)return r;
       return ensureData().then(function(dd){return dCreate({name:key.replace(":","_")+".json",parents:[dd],appProperties:{bbKey:key}},blob)})})
     .then(function(j){SY.dm.files[key]=j.id;SY.pushed[j.id]=j.modifiedTime;saveDm();
-      var now=recOf(key),cu=now?(now.upd||0):(SY.tomb[key]||0);if(cu===u){delete SY.ob.rec[key];saveOb()}})})},Promise.resolve())}
+      var now=recOf(key),cu=now?(now.upd||0):(SY.tomb[key]||0);if(cu===u){delete SY.ob.rec[key];saveOb()}})}))},Promise.resolve())}
 function pushProts(){
-  return Object.keys(SY.ob.prot).reduce(function(p,id){return p.then(function(){var x=S.visits[id];
+  return Object.keys(SY.ob.prot).reduce(function(p,id){return p.then(soft("Protokoll hochladen",function(){var x=S.visits[id];
     if(!x||x.status!=="abgeschlossen"||!S.bw[x.bw]){delete SY.ob.prot[id];saveOb();return}
     return buildProtokoll(x,S.bw[x.bw]).then(function(bl){
       return (x.protDriveId?dUpdate(x.protDriveId,bl).catch(function(e){if(e.status===404)return null;throw e}):Promise.resolve(null)).then(function(r){if(r)return r;
         return ensureBwFolder(x.bw).then(function(fo){return dCreate({name:protName(x,S.bw[x.bw]),parents:[fo],appProperties:{bbProt:id}},bl)})})})
-    .then(function(j){if(x.protDriveId!==j.id){x.protDriveId=j.id;saveV(x)}delete SY.ob.prot[id];saveOb()})})},Promise.resolve())}
-function pushTrash(){var l=SY.ob.trash.slice();return l.reduce(function(p,id){return p.then(function(){return dTrash(id).then(function(){SY.ob.trash=SY.ob.trash.filter(function(z){return z!==id});saveOb()})})},Promise.resolve())}
+    .then(function(j){if(x.protDriveId!==j.id){x.protDriveId=j.id;saveV(x)}delete SY.ob.prot[id];saveOb()})}))},Promise.resolve())}
+function pushTrash(){var l=SY.ob.trash.slice();return l.reduce(function(p,id){return p.then(soft("Löschen in Drive",function(){return dTrash(id).then(function(){SY.ob.trash=SY.ob.trash.filter(function(z){return z!==id});saveOb()})}))},Promise.resolve())}
 function firstUpload(){ // nach der ersten Anmeldung: alles Lokale hochladen
   if(ls("initPushed",false))return;
   if(ORG.upd)SY.ob.rec["cfg:org"]=1;
@@ -478,11 +480,11 @@ function syncNow(){
   if(!SY.on||SY.busy)return Promise.resolve();
   if(!navigator.onLine){SY.err="Offline – wird später übertragen";updSync();return Promise.resolve()}
   if(!tokOk()){SY.needLogin=true;updSync();maybeSilent();return Promise.resolve()}
-  SY.busy=true;SY.err="";updSync();var changed=false;
+  SY.busy=true;SY.err="";SY.errs=[];updSync();var changed=false;
   var email=SY.email?Promise.resolve():jget("https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)").then(function(j){SY.email=j.user&&j.user.emailAddress||"";lss("gEmail",SY.email)}).catch(function(){});
   return email.then(function(){firstUpload();return pull()}).then(function(c){changed=c}).then(pushBlobs).then(pushProts).then(pushRecs).then(pushTrash)
-    .then(function(){SY.last=Date.now();lss("lastSync",SY.last);SY.needLogin=false})
-    .catch(function(e){if(e&&e.message==="auth"){SY.needLogin=true;SY.err="";maybeSilent()}else SY.err=navigator.onLine?String(e&&e.message||e):"Offline – wird später übertragen";console.warn(e)})
+    .then(function(){SY.needLogin=false;if(SY.errs.length){var u={};SY.errs.forEach(function(x){u[x]=(u[x]||0)+1});SY.err=Object.keys(u).map(function(x){return x+(u[x]>1?" ("+u[x]+"×)":"")}).join(" · ")}else{SY.last=Date.now();lss("lastSync",SY.last)}})
+    .catch(function(e){if(e&&e.message==="auth"){SY.needLogin=true;SY.err="";maybeSilent()}else SY.err=navigator.onLine?errText(e):"Offline – wird später übertragen";console.error("[Sync]",e&&e.where||"",e)})
     .then(function(){SY.busy=false;updSync();if(changed)renderSoon()});
 }
 function syncState(){if(!SY.on)return "off";if(SY.busy)return "busy";if(SY.needLogin||(SY.err&&!/Offline/.test(SY.err)))return "err";if(pending()||SY.err)return "wait";return "ok"}
