@@ -292,7 +292,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.7";
+var APPVER="0.7.1";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -505,7 +505,8 @@ function syncText(){var st=syncState();
   if(SY.needLogin)return "Anmeldung abgelaufen – bitte erneut anmelden.";
   var t=(SY.email?"Angemeldet als "+SY.email:"Angemeldet")+(SY.last?" · zuletzt "+hm(new Date(SY.last)):"");
   if(SY.err)return t+" · "+SY.err;return t+(pending()?" · "+pending()+" ausstehend":" · alles aktuell")}
-function updSync(){var b=$("syncBtn");if(b){b.dataset.st=syncState();b.setAttribute("aria-label","Synchronisierung: "+syncText())}var s=$("syncStat");if(s)s.textContent=syncText()}
+function updSync(){var b=$("syncBtn");if(b){b.dataset.st=syncState();b.setAttribute("aria-label","Synchronisierung: "+syncText())}var s=$("syncStat");if(s)s.textContent=syncText();
+  var k=SY.on?(SY.needLogin?"L":"")+(SY.err||""):"";if(k!==SY.bk){SY.bk=k;if(view().name==="liste"&&!editing()&&!SY.busy)renderSoon()}}
 
 /* ---------- Speicher (IndexedDB, nur auf diesem Gerät) ---------- */
 var DB=null;
@@ -617,6 +618,8 @@ function viewListe(){
   if(S.filter!=="offen")S.filter="alle";
   var run=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"&&S.bw[v.bw]});
   var h="";
+  if(SY.on&&SY.needLogin)h+='<button type="button" class="alert bad" data-act="login" style="text-align:left;font:inherit;cursor:pointer"><b>Synchronisierung angehalten</b> – Google-Anmeldung abgelaufen. Hier tippen zum Anmelden.</button>';
+  else if(SY.on&&SY.err)h+='<a class="alert warn" href="#einst" style="text-decoration:none;color:inherit"><b>Synchronisierung gestört:</b> '+esc(SY.err)+'</a>';
   if(run.length)h+=run.map(function(v){var b=S.bw[v.bw];return '<a class="alert warn" href="#bw-'+esc(b.id)+'" style="display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:inherit"><span><b>Weiter: '+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span aria-hidden="true">›</span></a>'}).join("");
   h+='<section class="glass panel">'+
     '<input type="search" id="q" placeholder="Nummer, Name oder Straße …" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">';
@@ -672,13 +675,17 @@ function deleteBw(id){
 }
 
 /* Bauwerk-Detail und Besichtigung */
-function headHtml(b){var t=typeOf(b);
+function headHtml(b,ro){var t=typeOf(b);
   return '<a class="btn soft sm" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+
   '<section class="glass panel"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
+  (ro?'<div class="small"><span class="muted">Eigentümer: </span>'+esc(b.eigentum||"–")+"</div>":
+  '<label class="fld">Eigentümer (erscheint im Protokoll)<input type="text" list="eigList" data-eig="'+esc(b.id)+'" value="'+esc(b.eigentum||"")+'" placeholder="z. B. '+esc(ORG.kommune||"Stadt")+' / Privat / Fremd"'+(b.eigentum?"":' style="box-shadow:inset 0 0 0 2px var(--warn)"')+'></label>'+
+  '<datalist id="eigList">'+eigOpts().map(function(v){return '<option value="'+esc(v)+'">'}).join("")+"</datalist>")+
   '<a class="btn soft sm" style="align-self:flex-start" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation starten</a></section>'+
   (b.hinweise&&b.hinweise.length?'<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>":"")}
+function eigOpts(){var o={};o[ORG.kommune||"Stadt"]=1;o["Privat"]=1;o["Fremd"]=1;bwList().forEach(function(b){if(b.eigentum)o[b.eigentum]=1});return Object.keys(o)}
 function moreHtml(b){
-  var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche],["Eigentümer",b.eigentum]].filter(function(p){return p[1]});
+  var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche]].filter(function(p){return p[1]});
   return '<details class="glass"><summary>Bauwerksdaten, Vergleichsbild, frühere Besichtigungen</summary><div class="panel">'+
     (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
     '<div class="row"><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bauwerk bearbeiten</a>'+
@@ -703,7 +710,7 @@ function viewBw(b){
   var x=S.visits[vid(b.id)];
   var h=headHtml(b);
   if(!x)return h+lastHtml(b)+'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Besichtigung starten</button>'+moreHtml(b);
-  var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);
+  var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);h=headHtml(b,done);
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
   if(done)h+=exportPanel(x);
@@ -1133,7 +1140,8 @@ document.addEventListener("click",function(ev){
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
-  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();scrollTo({top:document.body.scrollHeight,behavior:"smooth"})});return}
+  if(a==="finish"){var fb=S.bw[x.bw];if(fb&&!fb.eigentum){toast("Bitte zuerst den Eigentümer eintragen – er steht im Protokoll.");var ei=document.querySelector("[data-eig]");if(ei){ei.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(function(){ei.focus()},400)}return}
+    if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();scrollTo({top:0,behavior:"smooth"})});return}
   if(a==="reopen"){reopenVisit(x).then(render);return}
   if(a==="share"){share(x);return}
   if(a==="dlProt"){exportFiles(x,"prot").then(dlAll).catch(function(e){toast("Fehler: "+e.message)});return}
@@ -1149,6 +1157,7 @@ document.addEventListener("change",function(ev){
   if(el.matches("textarea[data-k]")){var x=S.visits[el.dataset.visit];if(x){x[el.dataset.k]=el.value;saveV(x)}return}
   if(el.id==="s_pruefer"){SET.pruefer=el.value.trim()||"Dogan";saveSet();toast("Gespeichert");return}
   if(el.id==="e_art"){var gl=$("grpLbl");if(gl)gl.textContent=grp(typeById(el.value));return}
+  if(el.dataset.eig!=null){var eb=S.bw[el.dataset.eig];if(eb){eb.eigentum=el.value.trim();saveB(eb);el.style.boxShadow=eb.eigentum?"":"inset 0 0 0 2px var(--warn)";toast("Eigentümer gespeichert")}return}
   if(el.dataset.org!=null){ORG[el.dataset.org]=el.value.trim();saveOrg();toast("Gespeichert");return}
   if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
