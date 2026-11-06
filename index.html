@@ -244,6 +244,7 @@ details.glass>.panel{padding-top:0}
 .yn button:disabled{cursor:default;opacity:.85}
 .pp-t{flex:1;min-width:0;font-size:15px}
 .pp-chg{display:block;font:600 11px var(--f);color:var(--warn);letter-spacing:.02em}
+.stepn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:12px;background:var(--accent);color:var(--on-accent);font:700 13px var(--f);margin-right:8px;vertical-align:2px}
 details.sub>summary{cursor:pointer;list-style:none;font:600 14px var(--f);color:var(--accent);padding:4px 0}
 details.sub>summary::-webkit-details-marker{display:none}
 details.sub[open]>summary{margin-bottom:8px}
@@ -350,7 +351,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.8";
+var APPVER="0.9";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -740,17 +741,16 @@ function deleteBw(id){
 }
 
 /* Bauwerk-Detail und Besichtigung */
-function headHtml(b,ro){var t=typeOf(b);
+function headHtml(b,mid){var t=typeOf(b);
   return '<a class="btn soft sm" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+
   '<section class="glass panel"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
-  (ro?'<div class="small"><span class="muted">Eigentümer: </span>'+esc(b.eigentum||"–")+"</div>":
-  '<label class="fld">Eigentümer (erscheint im Protokoll)<input type="text" list="eigList" data-eig="'+esc(b.id)+'" value="'+esc(b.eigentum||"")+'" placeholder="z. B. '+esc(ORG.kommune||"Stadt")+' / Privat / Fremd"'+(b.eigentum?"":' style="box-shadow:inset 0 0 0 2px var(--warn)"')+'></label>'+
-  '<datalist id="eigList">'+eigOpts().map(function(v){return '<option value="'+esc(v)+'">'}).join("")+"</datalist>")+
   '<a class="btn soft sm" style="align-self:flex-start" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation starten</a></section>'+
+  (mid||"")+
   (b.hinweise&&b.hinweise.length?'<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>":"")}
+function eigOf(b){return (b&&b.eigentum)||ORG.kommune||""}
 function eigOpts(){var o={};o[ORG.kommune||"Stadt"]=1;o["Privat"]=1;o["Fremd"]=1;bwList().forEach(function(b){if(b.eigentum)o[b.eigentum]=1});return Object.keys(o)}
 function moreHtml(b){
-  var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche]].filter(function(p){return p[1]});
+  var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche],["Eigentümer",b.eigentum]].filter(function(p){return p[1]});
   return '<details class="glass"><summary>Bauwerksdaten, Vergleichsbild, frühere Besichtigungen</summary><div class="panel">'+
     (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
     '<div class="row"><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bauwerk bearbeiten</a>'+
@@ -771,40 +771,44 @@ function ynHtml(act,i,id,on,pos,done,ar){
   var yesCls=pos?"g":(act==="sonderSet"?"b":"w"),noCls=pos?"b":"g";
   return '<div class="yn" role="group" aria-label="'+esc(ar)+'"><button type="button" class="'+yesCls+'" data-act="'+act+'" data-i="'+i+'" data-v="1" data-visit="'+id+'" aria-pressed="'+!!on+'" aria-label="Ja" '+(done?"disabled":"")+'><span class="l">Ja</span><span class="x">X</span></button>'+
     '<button type="button" class="'+noCls+'" data-act="'+act+'" data-i="'+i+'" data-v="0" data-visit="'+id+'" aria-pressed="'+!on+'" aria-label="Nein" '+(done?"disabled":"")+'><span class="l">Nein</span><span class="x">X</span></button></div>'}
+function stepH(n,t,extra){return '<div class="row between"><h3><span class="stepn">'+n+"</span>"+t+"</h3>"+(extra||"")+"</div>"}
 function viewBw(b){
   var x=S.visits[vid(b.id)];
+  if(!x)return headHtml(b,'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Besichtigung starten</button>')+lastHtml(b)+moreHtml(b);
+  var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);
   var h=headHtml(b);
-  if(!x)return h+lastHtml(b)+'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Besichtigung starten</button>'+moreHtml(b);
-  var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);h=headHtml(b,done);
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
-  if(done)h+=exportPanel(x);
-  /* 1 Prüfpunkte */
+  /* 1 Vor Ort: Fotos */
+  h+='<section class="glass panel">'+stepH(1,"Fotos",'<span class="muted small">'+x.fotos.length+"</span>");
+  if(!done)h+='<button type="button" class="btn block big" data-act="camOpen" data-visit="'+id+'">Foto aufnehmen</button>';
+  if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
+    h+='<button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+"</span></button>"});h+="</div>"}
+  if(!done)h+='<label class="btn soft sm" style="align-self:flex-start">Fotos vom Gerät hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'"></label>';
+  h+="</section>";
+  /* 2 Prüfpunkte */
   var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
-  h+='<section class="glass panel"><div class="row between"><h3>Prüfpunkte</h3><span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" geändert":"wie zuletzt")+"</span></div>";
+  h+='<section class="glass panel">'+stepH(2,"Prüfpunkte",'<span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" geändert":"wie zuletzt")+"</span>");
   if(!done&&!diff&&x.ref.some(function(v){return v!=null}))h+='<span class="small muted">Vorbelegt mit dem Stand vom '+deDate((b.letzte||{}).datum||"")+'. Nur antippen, was sich geändert hat.</span>';
   if(!done&&diff)h+='<button type="button" class="btn soft sm" data-act="reset" data-visit="'+id+'" style="align-self:flex-start">Zurück auf Stand der letzten Besichtigung</button>';
   h+='<div class="pp"><div class="pp-head"><span>Ja</span><span>Nein</span></div>';
   pts.forEach(function(pt,i){var on=x.ja[i],ch=on!==x.ref[i];
     h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t">'+esc(pt.t)+(ch?'<span class="pp-chg">geändert</span>':"")+"</span>"+ynHtml("ppSet",i,id,on,pt.pos,done,(i+1)+" "+pt.t)+"</div>"});
   h+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung veranlasst</span>'+ynHtml("sonderSet",0,id,x.sonder,false,done,"Sonderprüfung veranlasst")+"</div></div></section>";
-  /* 2 Fotos */
-  h+='<section class="glass panel"><div class="row between"><h3>Fotos</h3><span class="muted small">'+x.fotos.length+"</span></div>";
-  if(!done)h+='<button type="button" class="btn block" data-act="camOpen" data-visit="'+id+'">Foto aufnehmen</button>';
-  if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
-    h+='<button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+"</span></button>"});h+="</div>"}
-  if(!done)h+='<label class="small" style="color:var(--accent);font-weight:600;cursor:pointer;align-self:flex-start">Aus Galerie hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'" hidden></label>';
-  h+="</section>";
   /* 3 Bemerkungen */
   var extra=!!(x.verunreinigungen||x.sonstige||x.audios.length);
-  h+='<section class="glass panel"><h3>Bemerkungen</h3>'+fld(x,"schaden","Schadensbeschreibung",done)+
+  h+='<section class="glass panel">'+stepH(3,"Bemerkungen")+fld(x,"schaden","Schadensbeschreibung",done)+
     '<details class="sub"'+(extra?" open":"")+'><summary>Verunreinigungen, Sonstiges, Sprachnotiz</summary><div>'+
     fld(x,"verunreinigungen","Verunreinigungen",done)+fld(x,"sonstige","Sonstige Mängel / Auffälligkeiten",done);
   if(!done)h+='<button type="button" class="btn '+(S.rec?"":"soft ")+'sm" data-act="rec" data-visit="'+id+'" style="align-self:flex-start;'+(S.rec?"background:var(--bad);color:#fff":"")+'">'+(S.rec?"Aufnahme beenden ("+S.recSec+" s)":"Sprachnotiz aufnehmen")+"</button>";
   x.audios.forEach(function(a,i){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted" style="flex:1">'+esc(a.zeit)+" · "+a.dauer+' s</span>'+(done?"":'<button type="button" class="btn danger sm" data-act="delAudio" data-visit="'+id+'" data-i="'+i+'">Löschen</button>')+'<audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
   h+="</div></details></section>";
-  if(!done)h+=diff?'<button type="button" class="btn block big" data-act="finish" data-visit="'+id+'">Abschließen ('+diff+(diff>1?" Änderungen":" Änderung")+')</button>':
-    '<button type="button" class="btn block big ok" data-act="finish" data-visit="'+id+'">Unverändert bestätigen &amp; abschließen</button>';
+  /* 4 Protokoll */
+  if(!done){h+='<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll")+
+    '<span class="small muted">Erstellt das Protokoll mit Fotos und Prüfpunkten. Danach: ansehen, als Excel speichern zum Drucken oder per Outlook senden.</span>'+
+    (diff?'<button type="button" class="btn block big" data-act="finish" data-visit="'+id+'">Abschließen ('+diff+(diff>1?" Änderungen":" Änderung")+')</button>':
+    '<button type="button" class="btn block big ok" data-act="finish" data-visit="'+id+'">Unverändert bestätigen &amp; abschließen</button>')+"</section>"}
+  else h+=exportPanel(x);
   return h+moreHtml(b);
 }
 function historyHtml(b){
@@ -819,13 +823,14 @@ function fld(x,k,label,done){
 }
 function exportPanel(x){
   var b=S.bw[x.bw],n=x.fotos.length;
-  return '<section class="glass panel"><div class="row between"><h3>Abgeschlossen</h3><span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span></div>"+
-    '<button type="button" class="btn block big" data-act="share" data-visit="'+esc(x.id)+'">Senden (Outlook / Mail)</button>'+
+  return '<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll",'<span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span>")+
     '<button type="button" class="btn soft block" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
-    '<details class="sub"><summary>Herunterladen, wieder öffnen, löschen</summary><div>'+
-    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Protokoll (.'+protExt(x)+')</button><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button></div>"+
-    '<button type="button" class="btn soft sm" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button>'+
-    '<span class="muted small mono">'+esc(protName(x,b))+(n?"<br>"+esc(fotoName(x,0))+(n>1?" …":""):"")+"</span>"+
+    '<button type="button" class="btn block big" data-act="dlProt" data-visit="'+esc(x.id)+'">Excel speichern (zum Drucken)</button>'+
+    '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Per Outlook / Mail senden</button>'+
+    '<span class="muted small mono">'+esc(protName(x,b))+"</span>"+
+    '<details class="sub"><summary>Fotos herunterladen, wieder öffnen, löschen</summary><div>'+
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button>"+
+    '<button type="button" class="btn soft sm" style="flex:1" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button></div>'+
     '<div class="row between"><button type="button" class="btn soft sm" data-act="reopen" data-visit="'+esc(x.id)+'">Wieder öffnen</button><button type="button" class="btn danger sm" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung löschen</button></div></div></details></section>';
 }
 
@@ -961,7 +966,7 @@ function preview(x){
   var html='<div class="prot" id="prot">'+logo+
     '<div class="org">'+[ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).map(esc).join("<br>")+"</div>"+
     '<div class="hd"><span>BW-Nr.:</span><span class="bx">'+esc(nrParts[1])+" "+esc(nrParts[2])+'</span><span style="text-align:right">BW - Name:</span><span class="bx">'+esc(b.name)+'</span><span>Jahr:</span><span class="bx">'+x.datum.slice(0,4)+"</span>"+
-    '<span></span><span></span><span style="text-align:right">BW - Eigentümer:</span><span class="bx">'+esc(b.eigentum||"")+"</span><span></span><span></span></div>"+
+    '<span></span><span></span><span style="text-align:right">BW - Eigentümer:</span><span class="bx">'+esc(eigOf(b))+"</span><span></span><span></span></div>"+
     "<h4>"+esc(protTitle(x,b))+"</h4>"+
     '<div class="fr"><div class="dt">Besichtigung durchgeführt am: <span class="bx">'+dt+'</span> von: <span class="bx">'+esc(x.pruefer)+"</span></div>"+
     '<div class="gr"><div><div class="lbl">Verunreinigungen:</div><div class="tb">'+esc(x.verunreinigungen||"")+'</div><div class="lbl">Schadensbeschreibung(en):</div><div class="tb" style="min-height:150px">'+esc(sch)+"</div></div>"+
@@ -1063,7 +1068,7 @@ function buildProtokoll(x,b){
   return (VORLAGE?Promise.resolve(VORLAGE):fetch("vorlage.xlsm").then(function(r){if(!r.ok)throw new Error("Vorlage fehlt");return r.arrayBuffer()}).then(function(a){VORLAGE=a;return a})).then(function(buf){return JSZip.loadAsync(buf.slice(0))}).then(function(z){
     return Promise.all(["xl/worksheets/sheet1.xml","xl/drawings/drawing1.xml","xl/workbook.xml","xl/worksheets/sheet2.xml","[Content_Types].xml","xl/_rels/workbook.xml.rels"].map(function(p){return z.file(p).async("string")})).then(function(a){
       var s=a[0],d=a[1],w=a[2],s2=a[3],ct=a[4],rels=a[5],nr=parseInt(String(b.nr).replace(/\D/g,""),10)||0;
-      s=setCell(s,"C11","n",nr);s=setCell(s,"F11","str",b.name);s=setCell(s,"K11","n",+x.datum.slice(0,4));s=setCell(s,"F12","str",b.eigentum||"");
+      s=setCell(s,"C11","n",nr);s=setCell(s,"F11","str",b.name);s=setCell(s,"K11","n",+x.datum.slice(0,4));s=setCell(s,"F12","str",eigOf(b));
       s=setCell(s,"E16","n",serial(x.datum));s=setCell(s,"H16","str",x.pruefer);
       for(var n=0;n<18;n++){var r=18+2*n;s=setCell(s,"J"+r,"s",x.ja[n]?62:30);s=setCell(s,"L"+r,"s",x.ja[n]?30:62)}
       s=setCell(s,"J61","s",x.sonder?62:30);s=setCell(s,"L61","s",x.sonder?30:62);s=setCell(s,"B66","n",serial(today()));
@@ -1081,7 +1086,7 @@ function buildStandard(x,b){ // allgemeines Excel-Protokoll für alle Bauwerksar
   function cell(ref,v,st){if(v==null||v==="")return "";var s=st?' s="'+st+'"':"";return typeof v==="number"?'<c r="'+ref+'"'+s+"><v>"+v+"</v></c>":'<c r="'+ref+'"'+s+' t="inlineStr"><is><t xml:space="preserve">'+xe(v)+"</t></is></c>"}
   function row(cs,st){r++;rows.push('<row r="'+r+'">'+cs.map(function(v,i){return cell("ABCD"[i]+r,v,Array.isArray(st)?st[i]:st)}).join("")+"</row>")}
   row([orgLine()]);row([protTitle(x,b)],1);row([]);
-  row(["BW-Nr.",b.nr,"Bauwerksart",t.name],[1,0,1,0]);row(["Bezeichnung",b.name,"Eigentümer",b.eigentum||"–"],[1,0,1,0]);
+  row(["BW-Nr.",b.nr,"Bauwerksart",t.name],[1,0,1,0]);row(["Bezeichnung",b.name,"Eigentümer",eigOf(b)||"–"],[1,0,1,0]);
   row(["Datum",deDate(x.datum),"Prüfer",x.pruefer],[1,0,1,0]);if(b.bezirk)row([grp(t),b.bezirk],[1,0]);row([]);
   row(["Prüfpunkt","Ja","Nein"],1);pts.forEach(function(p,i){row([(i+1)+". "+p.t+(p.pos?" (Ja = in Ordnung)":""),x.ja[i]?"X":"",x.ja[i]?"":"X"],[0,3,3])});
   row(["Sonderprüfung nach DIN 1076 veranlasst",x.sonder?"X":"",x.sonder?"":"X"],[0,3,3]);row([]);
@@ -1208,8 +1213,7 @@ document.addEventListener("click",function(ev){
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
-  if(a==="finish"){var fb=S.bw[x.bw];if(fb&&!fb.eigentum){toast("Bitte zuerst den Eigentümer eintragen – er steht im Protokoll.");var ei=document.querySelector("[data-eig]");if(ei){ei.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(function(){ei.focus()},400)}return}
-    if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();scrollTo({top:0,behavior:"smooth"})});return}
+  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
   if(a==="reopen"){reopenVisit(x).then(render);return}
   if(a==="share"){share(x);return}
   if(a==="dlProt"){exportFiles(x,"prot").then(dlAll).catch(function(e){toast("Fehler: "+e.message)});return}
