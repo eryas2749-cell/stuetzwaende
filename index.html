@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-bg="nebel" data-glass="klar">
+<html lang="de" data-bg="nebel" data-glass="klar" data-look="papier">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -178,6 +178,64 @@ details.glass>summary::-webkit-details-marker{display:none}
 details.glass>summary::after{content:"›";float:right;color:var(--muted);transition:transform .15s}
 details.glass[open]>summary::after{transform:rotate(90deg)}
 details.glass>.panel{padding-top:0}
+/* Stil "Schlicht": wie das Papierprotokoll – weiß, Linien statt Glas, hoher Kontrast; dunkel: Nachtblau */
+:root[data-look="papier"]{--bg:#FFFFFF;--fg:#111111;--muted:#525252;--field:#FFFFFF;--line:#E2E2E2;--accent:#1F3A5F;--on-accent:#FFFFFF;
+  --ok:#166534;--warn:#B45309;--bad:#B91C1C;--okbg:#EAF6EE;--warnbg:#FFF4E5;--badbg:#FDECEC;--edge:#111111;--inbd:#A3A3A3;--shadow:none}
+@media (prefers-color-scheme: dark){:root[data-look="papier"]:not([data-theme="light"]){--bg:#0F1B2D;--fg:#F1F5F9;--muted:#A8B3C4;--field:#16243A;--line:#24344F;--accent:#93C5FD;--on-accent:#0F1B2D;
+  --ok:#4ADE80;--warn:#FBBF24;--bad:#F87171;--okbg:#0F2E1F;--warnbg:#3B2A12;--badbg:#3A1618;--edge:#F1F5F9;--inbd:#3B4D6B}}
+:root[data-look="papier"][data-theme="dark"]{--bg:#0F1B2D;--fg:#F1F5F9;--muted:#A8B3C4;--field:#16243A;--line:#24344F;--accent:#93C5FD;--on-accent:#0F1B2D;
+  --ok:#4ADE80;--warn:#FBBF24;--bad:#F87171;--okbg:#0F2E1F;--warnbg:#3B2A12;--badbg:#3A1618;--edge:#F1F5F9;--inbd:#3B4D6B}
+[data-look="papier"] body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+[data-look="papier"] .bgfx{display:none}
+[data-look="papier"] .wrap{gap:0}
+[data-look="papier"] .glass,[data-look="papier"] .glass.panel,[data-look="papier"] .glass.card,[data-look="papier"] .glass.empty{background:var(--bg);background-image:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;box-shadow:none;border-bottom:1px solid var(--line)}
+[data-look="papier"] header.top{margin:0 auto;top:0;padding:10px 8px 10px 16px;border-bottom:2px solid var(--edge);padding-top:max(10px,env(safe-area-inset-top,0px))}
+[data-look="papier"] .ibtn{background:transparent;box-shadow:none}
+[data-look="papier"] .ibtn.sync i{box-shadow:0 0 0 2px var(--bg)}
+[data-look="papier"] .panel{padding:14px 16px}
+[data-look="papier"] .btn{border-radius:8px;box-shadow:none}
+[data-look="papier"] .btn.soft{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 1px var(--edge)}
+[data-look="papier"] .btn.big{border-radius:8px;min-height:56px}
+[data-look="papier"] .btn.block{margin:0}
+[data-look="papier"] .btn.ok{background:var(--ok);color:var(--bg)}
+[data-look="papier"] .chip{border-radius:4px}
+[data-look="papier"] textarea,[data-look="papier"] input[type=search],[data-look="papier"] input[type=text],[data-look="papier"] input[type=number],[data-look="papier"] input[type=date],[data-look="papier"] select{border-radius:6px;border:1px solid var(--inbd);background:var(--field)}
+[data-look="papier"] .alert{border-radius:0;-webkit-backdrop-filter:none;backdrop-filter:none;margin:0;border-bottom:1px solid var(--line)}
+[data-look="papier"] a.btn.soft.sm[href="#liste"]{box-shadow:none;padding:0 16px;min-height:44px;color:var(--accent);background:transparent}
+[data-look="papier"] details.glass>summary{padding:14px 16px}
+[data-look="papier"] .wrap>.btn.block.big{margin:14px 16px;width:auto}
+[data-look="papier"] .seg{border-radius:8px}
+[data-look="papier"] .seg button{border-radius:6px}
+[data-look="papier"] #lookPop{display:none}
+[data-look="papier"] .toast.glass{background:var(--fg);color:var(--bg);border:0;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+[data-look="papier"] #modal .glass,[data-look="papier"] .sheet.glass{border-radius:12px}
+/* Liste als Tabelle */
+.thead,.trow{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:10px;align-items:center;padding:0 16px}
+.thead{font:700 12px var(--f);color:var(--muted);padding-top:8px;padding-bottom:8px;border-bottom:1px solid var(--line);letter-spacing:.02em}
+.trow{min-height:58px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.trow .tn{font-weight:700;font-size:15px}
+.trow .tm{display:flex;flex-direction:column;min-width:0}
+.trow .tm b{font-weight:500;font-size:16px;overflow:hidden;text-overflow:ellipsis}
+.trow .tm span{font-size:12px;color:var(--muted)}
+.trow .ts{text-align:right;font:600 13px var(--f);display:flex;flex-direction:column;align-items:flex-end}
+.trow .ts small{font-weight:400;font-size:12px;color:var(--muted)}
+.ts.ok{color:var(--ok)} .ts.warn{color:var(--warn)} .ts.bad{color:var(--bad)} .ts.run{color:var(--accent)}
+[data-look="glas"] .tlist{border-radius:26px;overflow:hidden}
+.srow{display:flex;gap:8px;align-items:center}
+.srow input{flex:1;min-width:0}
+/* Prüfpunkte als Ankreuzkästchen */
+.pp-head{display:none}
+.yn .x{display:none}
+[data-look="papier"] .pp-head{display:flex;justify-content:flex-end;gap:6px;font:700 12px var(--f);color:var(--muted);padding:0 0 4px}
+[data-look="papier"] .pp-head span{width:48px;text-align:center}
+[data-look="papier"] .pp-row{padding:4px 0;min-height:48px;border-top:1px solid var(--line)}
+[data-look="papier"] .pp-row.chg{background:var(--warnbg);margin:0 -16px;padding:4px 16px}
+[data-look="papier"] .yn button{min-width:48px;width:48px;height:44px;border-radius:6px;border:2px solid var(--edge);background:var(--bg);padding:0;box-shadow:none;color:var(--fg);font:800 20px var(--f)}
+[data-look="papier"] .yn button .l{display:none}
+[data-look="papier"] .yn button[aria-pressed="true"] .x{display:inline}
+[data-look="papier"] .yn button[aria-pressed="true"].g{color:var(--ok);background:var(--bg);box-shadow:none;border-color:var(--edge)}
+[data-look="papier"] .yn button[aria-pressed="true"].w{color:var(--warn);background:var(--bg);box-shadow:none;border-color:var(--edge)}
+[data-look="papier"] .yn button[aria-pressed="true"].b{color:var(--bad);background:var(--bg);box-shadow:none;border-color:var(--edge)}
 .yn{display:flex;gap:6px;flex-shrink:0}
 .yn button{font:650 15px var(--f);min-width:58px;min-height:44px;border-radius:22px;border:1px solid var(--line);background:var(--field);color:var(--muted);cursor:pointer;padding:0 12px}
 .yn button[aria-pressed="true"].g{background:var(--okbg);color:var(--ok);border-color:transparent;box-shadow:inset 0 0 0 2px var(--ok)}
@@ -292,7 +350,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.7.1";
+var APPVER="0.8";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -340,7 +398,7 @@ function fmtDist(m){return m<1000?Math.round(m/10)*10+" m":(m/1000).toFixed(1).r
 function natCmp(a,b){return String(a).localeCompare(String(b),"de",{numeric:true})}
 
 /* ---------- Einstellungen ---------- */
-var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true},ls("settings",{}));
+var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true,look:"papier"},ls("settings",{}));
 function saveSet(){lss("settings",SET)}
 
 /* ---------- Synchronisierung über Google Drive ----------
@@ -538,7 +596,7 @@ function mapLast(points,l){var names=ppOf(l).map(function(p){return p.t});return
 function ortSuffix(){return ORG.ort?", "+ORG.ort:""}
 var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme",th);
 S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
-document.documentElement.setAttribute("data-glass",SET.glas);
+document.documentElement.setAttribute("data-glass",SET.glas);document.documentElement.setAttribute("data-look",SET.look==="glas"?"glas":"papier");
 function vid(bw){return bw+"_"+today()}
 function saveV(v,remote){S.visits[v.id]=v;if(S.files)delete S.files[v.id];if(!remote){v.upd=Date.now();markDirty("v:"+v.id)}return put("visits",v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
 function saveB(b,remote){S.bw[b.id]=b;if(!remote){b.upd=Date.now();markDirty("bw:"+b.id)}return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
@@ -551,7 +609,8 @@ function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.vi
 
 /* ---------- Liquid-Glass-Darstellung ---------- */
 function applyLook(){
-  var r=document.documentElement;r.setAttribute("data-glass",SET.glas);
+  var r=document.documentElement;r.setAttribute("data-glass",SET.glas);r.setAttribute("data-look",SET.look==="glas"?"glas":"papier");
+  var tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.setAttribute("content",SET.look==="glas"?"#4D6A8C":(matchMedia("(prefers-color-scheme: dark)").matches&&r.getAttribute("data-theme")!=="light"||r.getAttribute("data-theme")==="dark"?"#0F1B2D":"#FFFFFF"));
   var fx=$("bgfx");
   if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl){fx.classList.remove("foto");fx.style.backgroundImage="";return}
     if(S.hgUrl)URL.revokeObjectURL(S.hgUrl);S.hgUrl=URL.createObjectURL(bl);fx.style.backgroundImage="url("+S.hgUrl+")";fx.classList.add("foto")}).catch(function(){});
@@ -622,7 +681,7 @@ function viewListe(){
   else if(SY.on&&SY.err)h+='<a class="alert warn" href="#einst" style="text-decoration:none;color:inherit"><b>Synchronisierung gestört:</b> '+esc(SY.err)+'</a>';
   if(run.length)h+=run.map(function(v){var b=S.bw[v.bw];return '<a class="alert warn" href="#bw-'+esc(b.id)+'" style="display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:inherit"><span><b>Weiter: '+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span aria-hidden="true">›</span></a>'}).join("");
   h+='<section class="glass panel">'+
-    '<input type="search" id="q" placeholder="Nummer, Name oder Straße …" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off">';
+    '<div class="srow"><input type="search" id="q" placeholder="Nummer, Name oder Straße …" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off"></div>';
   if(arten.length>1)h+='<div class="chiprow" role="group" aria-label="Bauwerksart"><button type="button" data-act="setArtF" data-v="" aria-pressed="'+!S.art+'">Alle</button>'+arten.map(function(o){return '<button type="button" data-act="setArtF" data-v="'+esc(o.t.id)+'" aria-pressed="'+(S.art===o.t.id)+'">'+esc(o.t.name)+"</button>"}).join("")+"</div>";
   var ta=S.art?typeById(S.art):(arten.length===1?arten[0].t:null);
   if(ta){if(!S.art)S.art=ta.id;var gs=Array.from(new Set(all.filter(function(b){return typeOf(b).id===ta.id}).map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
@@ -636,12 +695,18 @@ function statHtml(b){var x=S.visits[vid(b.id)];
   if(x)return x.status==="abgeschlossen"?'<span class="chip ok">Heute erledigt</span>':'<span class="chip warn">Heute in Arbeit</span>';
   if(!b.letzte)return '<span class="chip">Noch nicht besichtigt</span>';
   return (unsafe(b)?'<span class="chip bad">Nicht verkehrssicher</span>':hasMangel(b)?'<span class="chip warn">Mit Befund</span>':'<span class="chip ok">Ohne Befund</span>')+'<span class="muted small">'+deDate(b.letzte.datum)+"</span>"}
+function tstat(b){var x=S.visits[vid(b.id)];
+  if(x)return x.status==="abgeschlossen"?'<span class="ts ok">heute ✓</span>':'<span class="ts run">in Arbeit</span>';
+  if(!b.letzte)return '<span class="ts">neu</span>';
+  var c=unsafe(b)?"bad":hasMangel(b)?"warn":"ok",w=unsafe(b)?"nicht verkehrssicher":hasMangel(b)?"Befund":"o. B.";
+  return '<span class="ts '+c+'">'+w+"<small>"+deDate(b.letzte.datum)+"</small></span>"}
 function resultsHtml(){
   var list=filtered();
   if(!list.length)return '<div class="glass empty">'+(!bwList().length?"Noch keine Bauwerke angelegt.":S.filter==="offen"&&!S.q?"Alles erledigt – alle Bauwerke für "+year()+" besichtigt.":"Keine Bauwerke gefunden.")+'</div><a class="btn soft sm" href="#neu" style="align-self:center">+ Neues Bauwerk</a>';
-  return list.map(function(o){var b=o.b,t=typeOf(b);
-    return '<a class="card glass" href="#bw-'+esc(b.id)+'" style="margin-bottom:10px"><div class="main"><span class="nr">'+esc(b.nr)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+(o.d!=null?" · "+fmtDist(o.d):"")+'</span><span class="name">'+esc(b.name)+'</span><div class="stat">'+statHtml(b)+'</div></div><span aria-hidden="true" class="muted">›</span></a>'}).join("")+
-    '<a class="btn soft sm" href="#neu" style="align-self:center">+ Neues Bauwerk</a>';
+  return '<div class="glass tlist"><div class="thead"><span>Nr.</span><span>Bauwerk</span><span style="text-align:right">Letzte</span></div>'+list.map(function(o){var b=o.b,t=typeOf(b);
+    var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?fmtDist(o.d):""].filter(Boolean).join(" · ");
+    return '<a class="trow" href="#bw-'+esc(b.id)+'"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
+    '<div style="display:flex;justify-content:center;padding:16px"><a class="btn soft sm" href="#neu">+ Neues Bauwerk</a></div>';
 }
 
 /* Bauwerk anlegen / bearbeiten */
@@ -704,8 +769,8 @@ function lastHtml(b){var l=b.letzte;
     (l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>"}
 function ynHtml(act,i,id,on,pos,done,ar){
   var yesCls=pos?"g":(act==="sonderSet"?"b":"w"),noCls=pos?"b":"g";
-  return '<div class="yn" role="group" aria-label="'+esc(ar)+'"><button type="button" class="'+yesCls+'" data-act="'+act+'" data-i="'+i+'" data-v="1" data-visit="'+id+'" aria-pressed="'+!!on+'" '+(done?"disabled":"")+'>Ja</button>'+
-    '<button type="button" class="'+noCls+'" data-act="'+act+'" data-i="'+i+'" data-v="0" data-visit="'+id+'" aria-pressed="'+!on+'" '+(done?"disabled":"")+">Nein</button></div>"}
+  return '<div class="yn" role="group" aria-label="'+esc(ar)+'"><button type="button" class="'+yesCls+'" data-act="'+act+'" data-i="'+i+'" data-v="1" data-visit="'+id+'" aria-pressed="'+!!on+'" aria-label="Ja" '+(done?"disabled":"")+'><span class="l">Ja</span><span class="x">X</span></button>'+
+    '<button type="button" class="'+noCls+'" data-act="'+act+'" data-i="'+i+'" data-v="0" data-visit="'+id+'" aria-pressed="'+!on+'" aria-label="Nein" '+(done?"disabled":"")+'><span class="l">Nein</span><span class="x">X</span></button></div>'}
 function viewBw(b){
   var x=S.visits[vid(b.id)];
   var h=headHtml(b);
@@ -717,8 +782,9 @@ function viewBw(b){
   /* 1 Prüfpunkte */
   var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
   h+='<section class="glass panel"><div class="row between"><h3>Prüfpunkte</h3><span class="chip '+(diff?"warn":"ok")+'">'+(diff?diff+" geändert":"wie zuletzt")+"</span></div>";
+  if(!done&&!diff&&x.ref.some(function(v){return v!=null}))h+='<span class="small muted">Vorbelegt mit dem Stand vom '+deDate((b.letzte||{}).datum||"")+'. Nur antippen, was sich geändert hat.</span>';
   if(!done&&diff)h+='<button type="button" class="btn soft sm" data-act="reset" data-visit="'+id+'" style="align-self:flex-start">Zurück auf Stand der letzten Besichtigung</button>';
-  h+='<div class="pp">';
+  h+='<div class="pp"><div class="pp-head"><span>Ja</span><span>Nein</span></div>';
   pts.forEach(function(pt,i){var on=x.ja[i],ch=on!==x.ref[i];
     h+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t">'+esc(pt.t)+(ch?'<span class="pp-chg">geändert</span>':"")+"</span>"+ynHtml("ppSet",i,id,on,pt.pos,done,(i+1)+" "+pt.t)+"</div>"});
   h+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung veranlasst</span>'+ynHtml("sonderSet",0,id,x.sonder,false,done,"Sonderprüfung veranlasst")+"</div></div></section>";
@@ -737,7 +803,8 @@ function viewBw(b){
   if(!done)h+='<button type="button" class="btn '+(S.rec?"":"soft ")+'sm" data-act="rec" data-visit="'+id+'" style="align-self:flex-start;'+(S.rec?"background:var(--bad);color:#fff":"")+'">'+(S.rec?"Aufnahme beenden ("+S.recSec+" s)":"Sprachnotiz aufnehmen")+"</button>";
   x.audios.forEach(function(a,i){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted" style="flex:1">'+esc(a.zeit)+" · "+a.dauer+' s</span>'+(done?"":'<button type="button" class="btn danger sm" data-act="delAudio" data-visit="'+id+'" data-i="'+i+'">Löschen</button>')+'<audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
   h+="</div></details></section>";
-  if(!done)h+='<button type="button" class="btn block big" data-act="finish" data-visit="'+id+'">Besichtigung abschließen</button>';
+  if(!done)h+=diff?'<button type="button" class="btn block big" data-act="finish" data-visit="'+id+'">Abschließen ('+diff+(diff>1?" Änderungen":" Änderung")+')</button>':
+    '<button type="button" class="btn block big ok" data-act="finish" data-visit="'+id+'">Unverändert bestätigen &amp; abschließen</button>';
   return h+moreHtml(b);
 }
 function historyHtml(b){
@@ -767,12 +834,13 @@ function seg(k,opts,small){return '<div class="seg" role="group">'+opts.map(func
 function lookHtml(inl){
   var t=document.documentElement.getAttribute("data-theme")||"auto";
   return (inl?'<h3 style="margin-top:8px">Darstellung</h3>':'<div class="row between"><h3>Darstellung</h3><button type="button" class="ibtn" data-act="lookClose" aria-label="Schließen" style="width:36px;height:36px">✕</button></div>')+
-    '<div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
+    seg("look",[["papier","Schlicht"],["glas","Glas"]])+
     '<div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Auto"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div>"+
+    (SET.look!=="glas"?"":'<div class="swatches">'+BGS.map(function(g){return '<button type="button" data-act="setbg" data-v="'+g[0]+'" aria-pressed="'+(S.bg===g[0])+'"><span class="dot" style="background:linear-gradient(135deg,'+g[2]+","+g[3]+" 50%,"+g[4]+')"></span>'+g[1]+"</button>"}).join("")+"</div>"+
     seg("glas",[["klar","Klar"],["milchig","Milchig"]])+
     '<div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbverlauf</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
     (SET.hgFoto?'<label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label>':"")+
-    '<div class="setrow"><span class="small">Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>';
+    '<div class="setrow"><span class="small">Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>');
 }
 function lookOpen(open){var p=$("lookPop");if(!$("lookBtn"))open=false;if(open){p.innerHTML=lookHtml();p.hidden=false}else{p.hidden=true;p.innerHTML=""}if($("lookBtn"))$("lookBtn").setAttribute("aria-expanded",String(!!open))}
 function lookRefresh(){if(!$("lookPop").hidden)$("lookPop").innerHTML=lookHtml();var d=$("lookIn");if(d)d.innerHTML=lookHtml(true)}
@@ -1103,7 +1171,7 @@ document.addEventListener("click",function(ev){
   if(a==="filtArt"){S.art=el.dataset.art;S.bez="";S.filter="alle";return}
   if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}lookRefresh();return}
   if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);lookRefresh();return}
-  if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();if(k==="glas")lookRefresh();else render();return}
+  if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();if(k==="glas"||k==="look")lookRefresh();else render();return}
   if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();lookRefresh();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
   if(a==="reflex"){SET.reflex=!SET.reflex;saveSet();if(SET.reflex)startReflex(true);else setLight(25,0);lookRefresh();return}
   if(a==="filt"){S.filter=el.dataset.f;if(view().name==="liste"){ev&&ev.preventDefault&&ev.preventDefault();render()}return}
