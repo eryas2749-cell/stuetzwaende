@@ -360,7 +360,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.16";
+var APPVER="0.17";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -609,6 +609,11 @@ var th=ls("theme",null);if(th)document.documentElement.setAttribute("data-theme"
 S.bg=ls("bg","nebel");if(!BGS.some(function(b){return b[0]===S.bg}))S.bg="nebel";document.documentElement.setAttribute("data-bg",S.bg);
 document.documentElement.setAttribute("data-glass",SET.glas);document.documentElement.setAttribute("data-look",SET.look==="glas"?"glas":"papier");
 function vid(bw){return bw+"_"+today()}
+function newVid(bw){var id=vid(bw),n=2;while(S.visits[id])id=vid(bw)+"_"+(n++);return id}
+function lastDone(b){return visitsOf(b.id).filter(function(v){return v.status==="abgeschlossen"})[0]||null}
+function curVisit(b){var vs=visitsOf(b.id),open=vs.filter(function(v){return v.status!=="abgeschlossen"})[0];if(open)return open;
+  if(S.show&&S.show[b.id]&&S.visits[S.show[b.id]])return S.visits[S.show[b.id]];
+  return vs[0]&&vs[0].datum===today()?vs[0]:null}
 function saveV(v,remote){S.visits[v.id]=v;if(S.files)delete S.files[v.id];if(!remote){v.upd=Date.now();markDirty("v:"+v.id)}return put("visits",v).catch(function(){toast("Speichern fehlgeschlagen – Speicherplatz prüfen.")})}
 function saveB(b,remote){S.bw[b.id]=b;if(!remote){b.upd=Date.now();markDirty("bw:"+b.id)}return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
 function bwList(){return Object.keys(S.bw).map(function(k){return S.bw[k]})}
@@ -616,7 +621,7 @@ function year(){return today().slice(0,4)}
 function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())}
 function hasMangel(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return x&&pp[i]&&!pp[i].pos}))}
 function unsafe(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return !x&&pp[i]&&pp[i].pos}))}
-function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.bw===bwId}).sort(function(a,b){return b.datum.localeCompare(a.datum)})}
+function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.bw===bwId}).sort(function(a,b){return b.datum.localeCompare(a.datum)||String(b.ende||"~").localeCompare(String(a.ende||"~"))})}
 
 /* ---------- Liquid-Glass-Darstellung ---------- */
 function applyLook(){
@@ -666,7 +671,7 @@ function render(){
   $("gearBtn").setAttribute("aria-current",v.name==="einst"||v.name==="art"?"page":"false");
   $("app").innerHTML=v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="einst"?viewEinst():v.name==="art"?viewArt(v.id):v.name==="neu"?viewNeu():v.name==="import"?viewImport():viewListe();
   hydrate();
-  if(v.name==="bw"){var xv=S.visits[vid(v.id)];if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
+  if(v.name==="bw"){var xv=S.bw[v.id]&&curVisit(S.bw[v.id]);if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
 }
 function lastChips(l){if(!l||!l.ja)return '<span class="chip">Noch keine Besichtigung</span>';var pp=ppOf(l),h="";
   l.ja.forEach(function(x,i){var p=pp[i];if(!p)return;if(p.pos&&!x)h+='<span class="chip bad">'+(i+1)+" Nicht: "+esc(p.t)+"</span>";else if(!p.pos&&x)h+='<span class="chip warn">'+(i+1)+" "+esc(p.t)+"</span>"});return h||'<span class="chip ok">Ohne Befund</span>'}
@@ -704,11 +709,11 @@ function viewListe(){
   h+='<div id="results">'+resultsHtml()+"</div>";
   return h;
 }
-function statHtml(b){var x=S.visits[vid(b.id)];
+function statHtml(b){var x=curVisit(b);if(x&&x.status==="abgeschlossen"&&x.datum!==today())x=null;
   if(x)return x.status==="abgeschlossen"?'<span class="chip ok">Heute erledigt</span>':'<span class="chip warn">Heute in Arbeit</span>';
   if(!b.letzte)return '<span class="chip">Noch nicht besichtigt</span>';
   return (unsafe(b)?'<span class="chip bad">Nicht verkehrssicher</span>':hasMangel(b)?'<span class="chip warn">Mit Befund</span>':'<span class="chip ok">Ohne Befund</span>')+'<span class="muted small">'+deDate(b.letzte.datum)+"</span>"}
-function tstat(b){var x=S.visits[vid(b.id)];
+function tstat(b){var x=curVisit(b);if(x&&x.status==="abgeschlossen"&&x.datum!==today())x=null;
   if(x)return x.status==="abgeschlossen"?'<span class="ts ok">heute ✓</span>':'<span class="ts run">in Arbeit</span>';
   if(!b.letzte)return '<span class="ts">neu</span>';
   var c=unsafe(b)?"bad":hasMangel(b)?"warn":"ok",w=unsafe(b)?"nicht verkehrssicher":hasMangel(b)?"Befund":"o. B.";
@@ -772,22 +777,25 @@ function moreHtml(b){
     (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:200px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Erscheint in der Kamera halbtransparent über dem Live-Bild.</span>':
       '<span class="muted small">Ein altes Foto unten antippen und „Als Vergleichsbild“ wählen – es erscheint dann in der Kamera als Vorlage für den gleichen Blickwinkel.</span>')+
     arcHtml(b)+"</div></details>"}
-function lastHtml(b){var l=b.letzte;
-  if(!l)return '<section class="glass panel"><h3>Letzte Besichtigung</h3><span class="muted small">Noch keine.</span></section>';
+function lastHtml(b){var l=b.letzte,lv=lastDone(b);
+  var acts=lv?'<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="preview" data-visit="'+esc(lv.id)+'">Protokoll ansehen</button><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+esc(lv.id)+'">Bearbeiten</button></div>':"";
+  if(!l)return '<section class="glass panel"><h3>Letzte Besichtigung</h3><span class="muted small">Noch keine.</span>'+acts+'</section>';
   return '<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+deDate(l.datum)+(l.pruefer?" · "+esc(l.pruefer):"")+'</span></div><div class="chips">'+lastChips(l)+"</div>"+
     (l.schaden?'<div class="small"><span class="muted">Schäden: </span>'+esc(l.schaden)+"</div>":"")+
     (l.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(l.verunreinigungen)+"</div>":"")+
-    (l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+"</section>"}
+    (l.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(l.sonstige)+"</div>":"")+acts+"</section>"}
 function ynHtml(act,i,id,on,pos,done,ar){
   var yesCls=pos?"g":(act==="sonderSet"?"b":"w"),noCls=pos?"b":"g";
   return '<div class="yn" role="group" aria-label="'+esc(ar)+'"><button type="button" class="'+yesCls+'" data-act="'+act+'" data-i="'+i+'" data-v="1" data-visit="'+id+'" aria-pressed="'+!!on+'" aria-label="Ja" '+(done?"disabled":"")+'><span class="l">Ja</span><span class="x">X</span></button>'+
     '<button type="button" class="'+noCls+'" data-act="'+act+'" data-i="'+i+'" data-v="0" data-visit="'+id+'" aria-pressed="'+!on+'" aria-label="Nein" '+(done?"disabled":"")+'><span class="l">Nein</span><span class="x">X</span></button></div>'}
 function stepH(n,t,extra){return '<div class="row between"><h3><span class="stepn">'+n+"</span>"+t+"</h3>"+(extra||"")+"</div>"}
 function viewBw(b){
-  var x=S.visits[vid(b.id)];
-  if(!x)return headHtml(b,'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Besichtigung starten</button>')+lastHtml(b)+moreHtml(b);
+  var x=curVisit(b);
+  if(!x)return headHtml(b,lastHtml(b)+'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung starten</button>')+moreHtml(b);
   var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);
-  var h=headHtml(b);
+  var h=headHtml(b,done?'<section class="glass panel"><div class="row between"><h3>Besichtigung vom '+deDate(x.datum)+'</h3><span class="chip ok">abgeschlossen</span></div>'+
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+id+'">Bearbeiten</button><button type="button" class="btn soft sm" style="flex:1" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung</button></div></section>':
+    (x.datum!==today()?'<div class="alert warn">Du bearbeitest die Besichtigung vom <b>'+deDate(x.datum)+'</b>. Zum Schluss wieder „Besichtigung abschließen“ tippen.</div>':""));
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
   /* 1 Vor Ort: Fotos */
@@ -935,7 +943,8 @@ function blobUrl(k){if(S.urls[k])return Promise.resolve(S.urls[k]);return ensure
 /* ---------- Besichtigung ---------- */
 function startVisit(bwId){var b=S.bw[bwId],t=typeOf(b),l=b.letzte||{verunreinigungen:"",schaden:"",sonstige:"",datum:""};
   var pts=JSON.parse(JSON.stringify(t.pp)),ref=mapLast(pts,b.letzte);
-  var v={id:vid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:ref.slice(),ja:ref.slice(),sonder:false,pp:pts,typ:t.id,protokoll:t.protokoll,
+  if(S.show)delete S.show[bwId];
+  var v={id:newVid(bwId),bw:bwId,datum:today(),pruefer:SET.pruefer,status:"in Arbeit",ref:ref.slice(),ja:ref.slice(),sonder:false,pp:pts,typ:t.id,protokoll:t.protokoll,
     verunreinigungen:l.verunreinigungen||"",schaden:l.schaden||"",sonstige:l.sonstige||"",fotos:[],audios:[],basis:l.datum||"",basisLetzte:b.letzte||null,seq:0};
   saveV(v).then(render)}
 function finishVisit(x){
@@ -1504,8 +1513,9 @@ document.addEventListener("click",function(ev){
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
-  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}finishVisit(x).then(function(){render();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
+  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}S.show=S.show||{};S.show[x.bw]=x.id;finishVisit(x).then(function(){render();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
   if(a==="reopen"){reopenVisit(x).then(render);return}
+  if(a==="editLast"){if(S.show)delete S.show[x.bw];reopenVisit(x).then(function(){closeModal&&$("modal")&&!$("modal").hidden&&closeModal();location.hash="#bw-"+x.bw;render();scrollTo(0,0);toast("Besichtigung vom "+deDate(x.datum)+" wieder geöffnet")});return}
   if(a==="share"){share(x);return}
   if(a==="dlPdf"){dlPdf(x,el.dataset.f==="1");return}
   if(a==="dlProt"){exportFiles(x,"prot").then(dlAll).catch(function(e){toast("Fehler: "+e.message)});return}
