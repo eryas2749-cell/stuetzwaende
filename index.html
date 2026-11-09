@@ -255,6 +255,7 @@ details.sub>div{display:flex;flex-direction:column;gap:10px}
 /* Protokoll-Vorschau im Stil der Kasseler Vorlage */
 .pwrap{width:100%;max-width:700px;margin:0 auto;overflow:hidden;flex-shrink:0}
 .prot{width:640px;background:#fff;color:#111;font:12px/1.35 Arial,Helvetica,sans-serif;padding:26px 30px;border-radius:6px;transform-origin:0 0}
+.prot .lgimg{display:block;width:240px;height:auto;margin:0 0 6px auto}
 .prot .lg{margin:0 auto 14px;width:max-content;border:1px solid #333;padding:6px 14px;font-size:18px}
 .prot .lg span{color:#C8102E;font-size:12px;margin-left:10px}
 .prot .org{margin-bottom:12px}
@@ -351,7 +352,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.10";
+var APPVER="0.11";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -470,7 +471,7 @@ function queueTrash(id){if(id){SY.ob.trash.push(id);saveOb();schedSync(3000)}}
 function pending(){return Object.keys(SY.ob.rec).length+Object.keys(SY.ob.blobs).length+Object.keys(SY.ob.prot).length+SY.ob.trash.length}
 function recOf(key){var t=key.split(":"),id=t.slice(1).join(":");return t[0]==="cfg"?ORG:t[0]==="bw"?S.bw[id]:S.visits[id]}
 function remoteIdOf(k){var id=null;Object.keys(S.visits).some(function(v){var x=S.visits[v];return (x.fotos||[]).concat(x.audios||[]).some(function(f){if(f.key===k&&f.driveId){id=f.driveId;return true}})});
-  if(!id)Object.keys(S.bw).some(function(b){if(S.bw[b].refKey===k&&S.bw[b].refDriveId){id=S.bw[b].refDriveId;return true}});return id}
+  if(!id)Object.keys(S.bw).some(function(b){if(S.bw[b].refKey===k&&S.bw[b].refDriveId){id=S.bw[b].refDriveId;return true}return (S.bw[b].archiv||[]).some(function(a){if(a.key===k&&a.driveId){id=a.driveId;return true}})});return id}
 var fetching={};
 function ensureBlob(k){return getBlob(k).then(function(bl){if(bl)return bl;var id=remoteIdOf(k);if(!id||!tokOk())return null;
   if(!fetching[k])fetching[k]=dGet(id).then(function(r){return r.blob()}).then(function(b2){return putBlob(k,b2).then(function(){return b2})}).catch(function(){delete fetching[k];return null});return fetching[k]})}
@@ -514,7 +515,8 @@ function pushBlobs(){
         var t=q.owner.split(":"),oid=t.slice(1).join(":"),hit=false;
         if(t[0]==="v"&&S.visits[oid]){var x=S.visits[oid];(x.fotos||[]).concat(x.audios||[]).forEach(function(f){if(f.key===k){f.driveId=j.id;hit=true}});if(hit)saveV(x);
           Object.keys(S.bw).forEach(function(b){if(S.bw[b].refKey===k&&!S.bw[b].refDriveId){S.bw[b].refDriveId=j.id;saveB(S.bw[b])}})}
-        if(t[0]==="bw"&&S.bw[oid]&&S.bw[oid].refKey===k){S.bw[oid].refDriveId=j.id;saveB(S.bw[oid]);hit=true}
+        if(t[0]==="bw"&&S.bw[oid]){var ob=S.bw[oid],ch=false;if(ob.refKey===k){ob.refDriveId=j.id;ch=true}(ob.archiv||[]).forEach(function(a){if(a.key===k){a.driveId=j.id;ch=true}});
+          Object.keys(S.bw).forEach(function(z){if(z!==oid&&S.bw[z].refKey===k&&!S.bw[z].refDriveId){S.bw[z].refDriveId=j.id;saveB(S.bw[z])}});if(ch){saveB(ob);hit=true}}
         if(!hit)SY.ob.trash.push(j.id);
         delete SY.ob.blobs[k];saveOb()})})}))},Promise.resolve())}
 function pushRecs(){
@@ -537,7 +539,7 @@ function pushTrash(){var l=SY.ob.trash.slice();return l.reduce(function(p,id){re
 function firstUpload(){ // nach der ersten Anmeldung: alles Lokale hochladen
   if(ls("initPushed",false))return;
   if(ORG.upd)SY.ob.rec["cfg:org"]=1;
-  Object.keys(S.bw).forEach(function(id){var b=S.bw[id];SY.ob.rec["bw:"+id]=1;if(b.refKey&&!/^foto_/.test(b.refKey)&&!b.refDriveId)SY.ob.blobs[b.refKey]={owner:"bw:"+id,bw:id,name:b.nr+"_Vergleichsbild.jpg"}});
+  Object.keys(S.bw).forEach(function(id){var b=S.bw[id];SY.ob.rec["bw:"+id]=1;if(b.refKey&&/^ref_/.test(b.refKey)&&!b.refDriveId)SY.ob.blobs[b.refKey]={owner:"bw:"+id,bw:id,name:b.nr+"_Vergleichsbild.jpg"};(b.archiv||[]).forEach(function(a){if(!a.driveId)SY.ob.blobs[a.key]={owner:"bw:"+id,bw:id,name:"Archiv "+a.jahr+" "+a.name}})});
   Object.keys(S.visits).forEach(function(id){var x=S.visits[id];SY.ob.rec["v:"+id]=1;
     (x.fotos||[]).forEach(function(f,i){if(!f.driveId)SY.ob.blobs[f.key]={owner:"v:"+id,bw:x.bw,name:fotoName(x,i)}});
     (x.audios||[]).forEach(function(a){if(!a.driveId)SY.ob.blobs[a.key]={owner:"v:"+id,bw:x.bw,name:audioName(x,a)}});
@@ -737,7 +739,7 @@ function readEdit(old){
 }
 function deleteBw(id){
   var vs=visitsOf(id),keys=[];vs.forEach(function(v){v.fotos.forEach(function(f){keys.push(f.key)});v.audios.forEach(function(a){keys.push(a.key)})});
-  if(S.bw[id].refKey&&!/^foto_/.test(S.bw[id].refKey))keys.push(S.bw[id].refKey);
+  if(S.bw[id].refKey&&/^ref_/.test(S.bw[id].refKey))keys.push(S.bw[id].refKey);
   vs.forEach(function(v){tombstone("v:"+v.id)});tombstone("bw:"+id);queueTrash(SY.dm.folders["bbFolder="+id]);delete SY.dm.folders["bbFolder="+id];saveDm();
   return Promise.all(keys.map(delBlob).concat(vs.map(function(v){delete S.visits[v.id];return del("visits",v.id)}))).then(function(){delete S.bw[id];return del("bauwerke",id)});
 }
@@ -753,16 +755,15 @@ function eigOf(b){return (b&&b.eigentum)||ORG.kommune||""}
 function eigOpts(){var o={};o[ORG.kommune||"Stadt"]=1;o["Privat"]=1;o["Fremd"]=1;bwList().forEach(function(b){if(b.eigentum)o[b.eigentum]=1});return Object.keys(o)}
 function moreHtml(b){
   var kv=[["Länge",b.laenge],["Ansichtshöhe",b.hoehe],["Fläche",b.flaeche],["Eigentümer",b.eigentum]].filter(function(p){return p[1]});
-  return '<details class="glass"><summary>Bauwerksdaten, Vergleichsbild, frühere Besichtigungen</summary><div class="panel">'+
+  return '<details class="glass"'+(S.arcOpen===b.id?" open":"")+'><summary>Bauwerksdaten, frühere Besichtigungen, Vergleichsbild</summary><div class="panel">'+
     (kv.length?'<div class="kv">'+kv.map(function(p){return "<div><span>"+p[0]+"</span><span>"+esc(p[1])+"</span></div>"}).join("")+"</div>":"")+
     '<div class="row"><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bauwerk bearbeiten</a>'+
     (S.pos?'<button type="button" class="btn soft sm" data-act="setCoord" data-bw="'+esc(b.id)+'">Standort hier speichern</button>':'<button type="button" class="btn soft sm" data-act="gps">Standort ermitteln</button>')+"</div>"+
     (b.lat==null?'<span class="muted small">Noch keine Position gespeichert. Vor Ort „Standort ermitteln“ und dann „Standort hier speichern“ tippen; die Liste sortiert dann nach Entfernung.</span>':"")+
     '<h3 style="margin-top:6px">Vergleichsbild</h3>'+
     (b.refKey?'<button type="button" class="ph" data-act="viewRef" data-bw="'+esc(b.id)+'" style="max-width:200px"><img data-key="'+esc(b.refKey)+'" alt="Vergleichsbild"></button><span class="muted small">Erscheint in der Kamera halbtransparent über dem Live-Bild.</span>':
-      '<span class="muted small">Ein altes Foto als Vorlage für den gleichen Blickwinkel.</span>')+
-    '<label class="btn soft sm" style="align-self:flex-start">Altes Bild wählen<input type="file" accept="image/*" data-ref="'+esc(b.id)+'"></label>'+
-    historyHtml(b)+"</div></details>"}
+      '<span class="muted small">Ein altes Foto unten antippen und „Als Vergleichsbild“ wählen – es erscheint dann in der Kamera als Vorlage für den gleichen Blickwinkel.</span>')+
+    arcHtml(b)+"</div></details>"}
 function lastHtml(b){var l=b.letzte;
   if(!l)return '<section class="glass panel"><h3>Letzte Besichtigung</h3><span class="muted small">Noch keine.</span></section>';
   return '<section class="glass panel"><div class="row between"><h3>Letzte Besichtigung</h3><span class="muted small">'+deDate(l.datum)+(l.pruefer?" · "+esc(l.pruefer):"")+'</span></div><div class="chips">'+lastChips(l)+"</div>"+
@@ -966,7 +967,7 @@ function preview(x){
   var nrParts=String(b.nr).match(/^([A-Za-zÄÖÜ]+)\s*(.*)$/)||[null,"",b.nr];
   function ck(v){return '<div class="ck">'+(v?"X":"")+"</div>"}
   var rows=pts.map(function(p,i){var sh=kas?i<3:p.pos;return '<div class="pt'+(sh?" sh":"")+'"><span>'+(i+1)+'.</span><span class="tx">'+esc(p.t)+"</span>"+ck(x.ja[i])+ck(!x.ja[i])+"</div>"}).join("");
-  var logo=/kassel/i.test(ORG.kommune||"")?'<div class="lg">Kassel<span>documenta Stadt</span></div>':(ORG.kommune?'<div class="lg">'+esc(ORG.kommune)+"</div>":"");
+  var logo=/kassel/i.test(ORG.kommune||"")?'<img class="lgimg" src="logo-kassel.jpg" alt="Stadt Kassel">':(ORG.kommune?'<div class="lg">'+esc(ORG.kommune)+"</div>":"");
   var html='<div class="prot" id="prot">'+logo+
     '<div class="org">'+[ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).map(esc).join("<br>")+"</div>"+
     '<div class="hd"><span>BW-Nr.:</span><span class="bx">'+esc(nrParts[1])+" "+esc(nrParts[2])+'</span><span style="text-align:right">BW - Name:</span><span class="bx">'+esc(b.name)+'</span><span>Jahr:</span><span class="bx">'+x.datum.slice(0,4)+"</span>"+
@@ -1124,6 +1125,73 @@ function share(x){
 }
 function dlZip(x){var b=S.bw[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"})}).then(function(bl){download(new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip",{type:"application/zip"}))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
 
+/* ---------- Archiv: frühere Besichtigungen (alte Protokolle und Fotos) ---------- */
+function arcOf(b){return b.archiv||(b.archiv=[])}
+function arcYears(b){var y={};arcOf(b).forEach(function(a){y[a.jahr]=1});visitsOf(b.id).forEach(function(v){if(v.datum!==today())y[v.datum.slice(0,4)]=1});return Object.keys(y).sort().reverse()}
+function arcHtml(b){
+  var yrs=arcYears(b),cy=+year(),sel=S.arcJahr||String(cy-1),opts="";for(var j=cy;j>=cy-15;j--)opts+='<option value="'+j+'" '+(String(j)===sel?"selected":"")+">"+j+"</option>";
+  var h='<h3 style="margin-top:6px">Frühere Besichtigungen</h3>'+
+    '<div class="row" style="align-items:flex-end"><label class="fld" style="flex:0 0 110px">Jahr<select id="arcJahr">'+opts+"</select></label>"+
+    '<label class="btn soft sm" style="flex:1">Alte Fotos hinzufügen<input type="file" accept="image/*" multiple data-arcfoto="'+esc(b.id)+'"></label>'+
+    '<label class="btn soft sm" style="flex:1">Altes Protokoll hinzufügen<input type="file" accept=".pdf,.xlsx,.xlsm,.xls,.docx,application/pdf" multiple data-arcdoc="'+esc(b.id)+'"></label></div>'+
+    '<span class="small muted">Mehrere Dateien auf einmal möglich. Bei Protokollen wird das Jahr aus dem Dateinamen erkannt (z. B. „… 2025.xlsm“). Ein Kasseler Excel-Protokoll wird gelesen: Prüfpunkte und Texte werden als letzter Stand übernommen, wenn es das neueste ist.</span>';
+  if(!yrs.length)return h+'<span class="small muted">Noch nichts hinterlegt.</span>';
+  yrs.forEach(function(y){
+    var docs=arcOf(b).filter(function(a){return a.jahr===y&&a.art==="datei"}),fotos=arcOf(b).filter(function(a){return a.jahr===y&&a.art==="foto"}),vs=visitsOf(b.id).filter(function(v){return v.datum.slice(0,4)===y&&v.datum!==today()});
+    h+='<div style="border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:8px"><b>'+y+"</b>";
+    vs.forEach(function(v){h+='<div class="row between"><span class="small">Besichtigung '+deDate(v.datum)+" · "+v.fotos.length+' Fotos</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll</button></div>'});
+    docs.forEach(function(a){h+='<div class="row between" style="gap:8px"><span class="small" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">'+esc(a.name)+(a.gelesen?' <span class="chip ok">gelesen</span>':"")+'</span><button type="button" class="btn soft sm" data-act="arcOpen" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'">Öffnen</button><button type="button" class="btn danger sm" data-act="arcDel" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'" aria-label="Löschen">✕</button></div>'});
+    if(fotos.length)h+='<div class="photos">'+fotos.map(function(a){return '<button type="button" class="ph'+(b.refKey===a.key?" ref":"")+'" data-act="arcFoto" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'"><img data-key="'+esc(a.key)+'" alt="Foto '+y+'"><span class="cap">'+(b.refKey===a.key?"Vergleichsbild":y)+"</span></button>"}).join("")+"</div>";
+    h+="</div>"});
+  return h;
+}
+function arcAdd(b,files,art){
+  var list=Array.prototype.slice.call(files),sel=($("arcJahr")||{}).value||String(+year()-1),n=0,read=0;
+  toast((art==="foto"?"Fotos":"Dateien")+" werden gespeichert …",8000);
+  return list.reduce(function(p,f){return p.then(function(){
+    var m=f.name.match(/(?:^|\D)(20\d\d)(?:\D|$)/),jahr=art==="datei"&&m?m[1]:sel,key="arc_"+b.id+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    var blobP=art==="foto"?fileToJpeg(f):Promise.resolve(f);
+    return blobP.then(function(bl){return putBlob(key,bl).then(function(){
+      var ext=art==="foto"?"jpg":(f.name.split(".").pop()||"bin").toLowerCase(),name=art==="foto"?fsafe(b.nr+" Foto "+jahr+" ("+(arcOf(b).filter(function(a){return a.art==="foto"&&a.jahr===jahr}).length+1)+").jpg"):f.name;
+      var e={key:key,art:art,jahr:jahr,name:name,mime:art==="foto"?"image/jpeg":(f.type||""),ts:new Date().toISOString()};arcOf(b).push(e);n++;
+      queueBlob(key,"bw:"+b.id,b.id,"Archiv "+jahr+" "+name);
+      if(art==="datei"&&/\.xls[xm]$/i.test(f.name))return readKasselProt(f).then(function(r){if(!r)return;e.gelesen=true;if(r.datum)e.jahr=r.datum.slice(0,4);read++;
+        if(!b.letzte||!b.letzte.datum||(r.datum&&r.datum>b.letzte.datum))b.letzte=r}).catch(function(){});
+    })})})},Promise.resolve())
+  .then(function(){return saveB(b)}).then(function(){toast(n+(art==="foto"?" Foto(s)":" Datei(en)")+" gespeichert"+(read?" – Protokoll gelesen, letzter Stand: "+deDate(b.letzte.datum):"")+".",5000);render()})
+  .catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});
+}
+function readKasselProt(file){
+  return JSZip.loadAsync(file).then(function(z){var P=new DOMParser();
+    function xml(p){var f=z.file(p);return f?f.async("string").then(function(s){return P.parseFromString(s,"application/xml")}):Promise.resolve(null)}
+    return Promise.all([xml("xl/workbook.xml"),xml("xl/_rels/workbook.xml.rels"),xml("xl/sharedStrings.xml")]).then(function(r){
+      var wb=r[0],rels=r[1],ss=r[2];if(!wb)return null;var sheets=wb.getElementsByTagName("sheet"),sh=null;
+      Array.prototype.forEach.call(sheets,function(s){if(!sh&&/besichtigung/i.test(s.getAttribute("name")))sh=s});sh=sh||sheets[0];
+      var rid=sh.getAttribute("r:id")||sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id"),target="worksheets/sheet1.xml";
+      if(rels)Array.prototype.forEach.call(rels.getElementsByTagName("Relationship"),function(e){if(e.getAttribute("Id")===rid)target=e.getAttribute("Target")});
+      target=target.replace(/^\/?xl\//,"");
+      var strs=ss?Array.prototype.map.call(ss.getElementsByTagName("si"),function(si){return Array.prototype.map.call(si.getElementsByTagName("t"),function(t){return t.textContent}).join("")}):[];
+      return xml("xl/"+target).then(function(d){if(!d)return null;var C={};
+        Array.prototype.forEach.call(d.getElementsByTagName("c"),function(c){var t=c.getAttribute("t"),v=c.getElementsByTagName("v")[0],val="";
+          if(t==="s"&&v)val=strs[+v.textContent]||"";else if(t==="inlineStr")val=Array.prototype.map.call(c.getElementsByTagName("t"),function(x){return x.textContent}).join("");else if(v)val=v.textContent;C[c.getAttribute("r")]=String(val).trim()});
+        function X(ref){return /^x$/i.test(C[ref]||"")}
+        var ja=[],ok=0;for(var i=0;i<18;i++){var jr="J"+(18+2*i),nr="L"+(18+2*i);if(X(jr)||X(nr))ok++;ja.push(X(jr))}
+        if(ok<10)return null;
+        var dv=C.E16||"",datum="";if(/^\d+(\.\d+)?$/.test(dv)){var dt=new Date(Date.UTC(1899,11,30)+Math.round(+dv)*864e5);datum=dt.toISOString().slice(0,10)}
+        else{var m=dv.match(/(\d{1,2})\s*[.\/]\s*(\d{1,2})\s*[.\/]\s*(\d{2,4})/);if(m)datum=(m[3].length===2?"20"+m[3]:m[3])+"-"+pad(+m[2])+"-"+pad(+m[1])}
+        var res={datum:datum,pruefer:C.H16||"",ja:ja,sonder:X("J61"),verunreinigungen:"",schaden:"",sonstige:"",quelle:file.name};
+        var dr=z.file(/xl\/drawings\/drawing\d+\.xml$/)[0];
+        return (dr?dr.async("string"):Promise.resolve("")).then(function(s){if(!s)return res;var dd=P.parseFromString(s,"application/xml");
+          Array.prototype.forEach.call(dd.getElementsByTagNameNS("*","sp"),function(sp){var nv=sp.getElementsByTagNameNS("*","cNvPr")[0],nm=nv?nv.getAttribute("name"):"";
+            var paras=Array.prototype.map.call(sp.getElementsByTagNameNS("*","p"),function(p){return Array.prototype.map.call(p.getElementsByTagNameNS("*","t"),function(t){return t.textContent}).join("")}).join("\n").trim();
+            if(/Textfeld 1$/.test(nm))res.verunreinigungen=paras;else if(/Textfeld 4$/.test(nm))res.schaden=paras;else if(/Textfeld 3$/.test(nm)&&paras)res.sonstige=paras;else if(/Textfeld 2$/.test(nm)&&paras&&!res.sonstige)res.sonstige=paras});
+          res.schaden=res.schaden.replace(/^\s*Keine Schadenserweiterung gegenüber.*$/gim,"").trim();return res})})})});
+}
+function arcFind(b,k){return arcOf(b).filter(function(a){return a.key===k})[0]}
+function arcFotoView(bwId,k){var b=S.bw[bwId],a=arcFind(b,k);if(!a)return;blobUrl(k).then(function(u){if(!u){toast("Foto nicht verfügbar");return}
+  openModal('<div class="mbar"><b>'+esc(b.nr)+" · Foto "+esc(a.jahr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="cmp"><img src="'+u+'" alt="Foto '+esc(a.jahr)+'"></div>'+
+    '<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn soft sm" data-act="arcRef" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">'+(b.refKey===k?"Ist Vergleichsbild ✓":"Als Vergleichsbild für die Kamera")+'</button><button type="button" class="btn danger sm" data-act="arcDel" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">Foto löschen</button></div>')})}
+
 /* ---------- PDF (Protokoll, Fotos, Sammel-PDF) ---------- */
 var PDFLIB=null;
 function loadPdf(){if(window.jspdf)return Promise.resolve(window.jspdf.jsPDF);if(PDFLIB)return PDFLIB;
@@ -1146,7 +1214,7 @@ function pdfProt(doc,x,b){
   function ck(xx,yy,on){box(xx,yy,7,5);if(on){doc.setFont("helvetica","bold");doc.setFontSize(10);txt("X",xx+3.5,yy+4,{align:"center"});doc.setFont("helvetica","normal")}}
   doc.setFont("helvetica","normal");doc.setTextColor(0);
   doc.setFontSize(9);[ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).forEach(function(t,i){txt(t,L,16+i*4.2)});
-  if(/kassel/i.test(ORG.kommune||"")){doc.setFont("helvetica","bold");doc.setFontSize(18);txt("Kassel",R,19,{align:"right"});doc.setFont("helvetica","normal");doc.setFontSize(7.5);txt("documenta Stadt",R,23,{align:"right"})}
+  if(/kassel/i.test(ORG.kommune||"")&&LOGO)doc.addImage(LOGO,"JPEG",R-62,10,62,62*115/478);
   var nrP=String(b.nr).match(/^([A-Za-zÄÖÜ]+)\s*(.*)$/)||[null,"",b.nr];
   doc.setFontSize(10);y=40;
   txt("BW-Nr.:",L,y+5);box(L+15,y,24,7);txt((nrP[1]+" "+nrP[2]).trim(),L+16.5,y+5);
@@ -1181,8 +1249,10 @@ function pdfFotos(doc,x,b){
     var top=slot?156:24,mh=118,k=Math.min(W/im.w,mh/im.h),w=im.w*k,h=im.h*k,xx=L+(W-w)/2;
     doc.addImage(im.d,"JPEG",xx,top,w,h);doc.setFontSize(9.5);doc.text("Foto "+(i+1)+(f.tag?": "+f.tag:"")+(f.zeit?" · "+f.zeit:""),L,top+h+5)})})},Promise.resolve());
 }
+var LOGO=null;
+function loadLogo(){if(LOGO||!/kassel/i.test(ORG.kommune||""))return Promise.resolve();return fetch("logo-kassel.jpg").then(function(r){return r.ok?r.blob():null}).then(function(bl){if(!bl)return;return new Promise(function(res){var fr=new FileReader();fr.onload=function(){LOGO=fr.result;res()};fr.onerror=function(){res()};fr.readAsDataURL(bl)})}).catch(function(){})}
 function buildPdf(list,mitFotos){
-  return loadPdf().then(function(J){var doc=new J({unit:"mm",format:"a4"});
+  return Promise.all([loadPdf(),loadLogo()]).then(function(r){var J=r[0];var doc=new J({unit:"mm",format:"a4"});
     return list.reduce(function(p,x,i){return p.then(function(){var b=S.bw[x.bw]||{nr:x.bw,name:""};if(i)doc.addPage();pdfProt(doc,x,b);if(mitFotos)return pdfFotos(doc,x,b)})},Promise.resolve())
       .then(function(){return doc.output("blob")})})}
 function dlPdf(x,mitFotos){toast("PDF wird erstellt …",8000);var b=S.bw[x.bw];
@@ -1379,8 +1449,13 @@ document.addEventListener("click",function(ev){
   if(a==="delBw"){if(!confirmTap(el,"Wirklich löschen? Alle Besichtigungen und Fotos dazu gehen verloren. Nochmal tippen"))return;deleteBw(el.dataset.id).then(function(){toast("Bauwerk gelöscht");location.hash="#liste"});return}
   if(a==="setCoord"&&S.pos){var bb=S.bw[el.dataset.bw];bb.lat=S.pos.lat;bb.lon=S.pos.lon;saveB(bb);toast("Position gespeichert (± "+Math.round(S.pos.acc)+" m)");render();return}
   if(a==="viewRef"){viewRef(el.dataset.bw);return}
-  if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&!/^foto_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
-  if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&!/^foto_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
+  if(a==="arcFoto"){arcFotoView(el.dataset.bw,el.dataset.key);return}
+  if(a==="arcOpen"){var ab=S.bw[el.dataset.bw],aa=arcFind(ab,el.dataset.key);ensureBlob(el.dataset.key).then(function(bl){if(!bl){toast("Datei nicht verfügbar");return}download(new File([bl],aa.name,{type:aa.mime||bl.type||""}))});return}
+  if(a==="arcRef"){var rb=S.bw[el.dataset.bw],rk=el.dataset.key,ra=arcFind(rb,rk);if(rb.refKey&&/^ref_/.test(rb.refKey)){queueTrash(rb.refDriveId);delBlob(rb.refKey)}rb.refKey=rk;rb.refHeading=null;rb.refDriveId=ra&&ra.driveId||null;saveB(rb);S.arcOpen=rb.id;toast("Als Vergleichsbild gespeichert");closeModal();render();return}
+  if(a==="arcDel"){if(!confirmTap(el,"Wirklich löschen?"))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
+    if(da.driveId)queueTrash(da.driveId);delete SY.ob.blobs[dk];saveOb();delBlob(dk);saveB(db);S.arcOpen=db.id;closeModal();render();toast("Gelöscht");return}
+  if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&/^ref_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
+  if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&/^ref_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
   if(a==="closeModal"){closeModal();return}
   if(a==="camOpen"){camOpen(id);return}
   if(a==="camClose"){camClose();return}
@@ -1427,6 +1502,8 @@ document.addEventListener("change",function(ev){
   if(el.dataset.org!=null){ORG[el.dataset.org]=el.value.trim();saveOrg();toast("Gespeichert");return}
   if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
   if(el.id==="impFile"&&el.files[0]){impFile(el.files[0]);el.value="";return}
+  if(el.id==="arcJahr"){S.arcJahr=el.value;return}
+  if((el.dataset.arcfoto||el.dataset.arcdoc)&&el.files.length){var arb=S.bw[el.dataset.arcfoto||el.dataset.arcdoc],fl=Array.prototype.slice.call(el.files);el.value="";S.arcOpen=arb.id;arcAdd(arb,fl,el.dataset.arcfoto?"foto":"datei");return}
   if(el.dataset.map&&S.imp){S.imp.map[el.dataset.map]=+el.value;render();return}
   if(el.dataset.imp==="art"&&S.imp){S.imp.art=el.value;render();return}
   if(el.dataset.imp==="letter"&&S.imp){S.imp.letter=el.checked;render();return}
@@ -1434,7 +1511,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
   if(el.dataset.gal&&el.files.length){var x2=S.visits[el.dataset.gal],fs=Array.from(el.files);el.value="";toast("Fotos werden übernommen …");
     fs.reduce(function(p,f){return p.then(function(){return fileToJpeg(f).then(function(bl){return addFoto(x2,bl,{quelle:"Galerie"})})})},Promise.resolve()).then(render);return}
-  if(el.dataset.ref&&el.files[0]){var bw=S.bw[el.dataset.ref],f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw.id+"_"+Date.now();return putBlob(k,bl).then(function(){if(bw.refKey&&!/^foto_/.test(bw.refKey)){queueTrash(bw.refDriveId);delBlob(bw.refKey)}bw.refKey=k;bw.refHeading=null;bw.refDriveId=null;queueBlob(k,"bw:"+bw.id,bw.id,bw.nr+"_Vergleichsbild.jpg");return saveB(bw)})}).then(function(){toast("Altes Bild gespeichert");render()});return}
+  if(el.dataset.ref&&el.files[0]){var bw=S.bw[el.dataset.ref],f=el.files[0];el.value="";fileToJpeg(f).then(function(bl){var k="ref_"+bw.id+"_"+Date.now();return putBlob(k,bl).then(function(){if(bw.refKey&&/^ref_/.test(bw.refKey)){queueTrash(bw.refDriveId);delBlob(bw.refKey)}bw.refKey=k;bw.refHeading=null;bw.refDriveId=null;queueBlob(k,"bw:"+bw.id,bw.id,bw.nr+"_Vergleichsbild.jpg");return saveB(bw)})}).then(function(){toast("Altes Bild gespeichert");render()});return}
 });
 document.addEventListener("input",function(ev){
   var el=ev.target;
