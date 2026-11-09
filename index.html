@@ -356,7 +356,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.13";
+var APPVER="0.14";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -831,7 +831,8 @@ function fld(x,k,label,done){
 function exportPanel(x){
   var b=S.bw[x.bw],n=x.fotos.length;
   return '<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll",'<span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span>")+
-    '<button type="button" class="btn soft block" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
+    '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
+    (n?'<button type="button" class="btn soft" style="flex:1" data-act="preview" data-f="1" data-visit="'+esc(x.id)+'">Mit Schadensbildern</button>':"")+"</div>"+
     '<button type="button" class="btn block big" data-act="dlPdf" data-f="'+(n?1:0)+'" data-visit="'+esc(x.id)+'">PDF speichern'+(n?" (mit "+n+" Foto"+(n>1?"s":"")+")":"")+"</button>"+
     '<div class="row">'+(n?'<button type="button" class="btn soft sm" style="flex:1" data-act="dlPdf" data-f="0" data-visit="'+esc(x.id)+'">PDF ohne Fotos</button>':"")+
     '<button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Excel-Vorlage (.'+protExt(x)+')</button></div>'+
@@ -969,7 +970,7 @@ function viewFoto(id,i){
 function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openModal('<div class="mbar"><b>Vergleichsbild '+esc(b.nr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="cmp"><img src="'+u+'" alt="Vergleichsbild"></div><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn danger sm" data-act="clearRef" data-bw="'+esc(bwId)+'">Vergleichsbild entfernen</button></div>')})}
 
 /* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
-function preview(x){
+function preview(x,mitFotos){
   var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x),pts=ppOf(x),kas=isKassel(x);
   var d=x.datum.split("-"),dt=d[2]+" / "+d[1]+" / "+d[0],t2=today().split("-"),dt2=t2[2]+" / "+t2[1]+" / "+t2[0];
   var nrParts=String(b.nr).match(/^([A-Za-zÄÖÜ]+)\s*(.*)$/)||[null,"",b.nr];
@@ -987,8 +988,8 @@ function preview(x){
     '<div class="lbl">Beschreibung sonstiger Mängel / Auffälligkeiten:</div><div class="tb" style="min-height:50px">'+esc(x.sonstige||"")+"</div>"+
     '<div class="sp"><span class="lbl" style="margin:0">Sonderprüfung nach DIN 1076 veranlasst</span>'+ck(x.sonder)+ck(!x.sonder)+"</div>"+
     '<div class="ft"><div>'+esc(ORG.ort||"")+(ORG.ort?",":"")+"<span>"+dt2+"</span></div><div>Gesehen"+esc(ortSuffix())+"<span></span></div></div></div>"+
-    (x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'">'}).join("")+"</div>":"")+"</div>";
-  openModal('<div class="mbar"><b>Protokoll</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="pwrap" id="pwrap">'+html+"</div>");
+    (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'">'}).join("")+"</div>":"")+"</div>";
+  openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="pwrap" id="pwrap">'+html+"</div>");
   fitProt();hydrate();
 }
 function fitProt(){var w=$("pwrap"),p=$("prot");if(!w||!p)return;var sc=Math.min(1,w.clientWidth/640);p.style.transform="scale("+sc+")";w.style.height=(p.offsetHeight*sc)+"px"}
@@ -1486,7 +1487,7 @@ document.addEventListener("click",function(ev){
   if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
   if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var f=x.fotos.splice(+el.dataset.i,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];saveOb();var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}saveV(x);closeModal();render();return}
   if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);x.del=(x.del||[]).concat(au.key);queueTrash(au.driveId);delete SY.ob.blobs[au.key];saveOb();saveV(x);render();return}
-  if(a==="preview"){preview(x);return}
+  if(a==="preview"){preview(x,el.dataset.f==="1");return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
   if(a==="ppSet"){var i2=+el.dataset.i,nv=el.dataset.v==="1";if(x.ja[i2]!==nv){x.ja[i2]=nv;saveV(x);render()}return}
   if(a==="sonderSet"){var sv=el.dataset.v==="1";if(x.sonder!==sv){x.sonder=sv;saveV(x);render()}return}
