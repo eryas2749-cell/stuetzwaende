@@ -360,7 +360,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.17";
+var APPVER="0.18";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -724,7 +724,7 @@ function resultsHtml(){
   return '<div class="glass tlist"><div class="thead"><span>Nr.</span><span>Bauwerk</span><span style="text-align:right">Letzte</span></div>'+list.map(function(o){var b=o.b,t=typeOf(b);
     var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?fmtDist(o.d):""].filter(Boolean).join(" · ");
     return '<a class="trow" href="#bw-'+esc(b.id)+'"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
-    '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px"><a class="btn soft sm" href="#neu">+ Bauwerke hinzufügen</a>'+(doneVisits().length?'<button type="button" class="btn soft sm" data-act="sammel">Protokolle drucken (PDF)</button>':"")+"</div>";
+    '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px"><a class="btn soft sm" href="#neu">+ Bauwerke hinzufügen</a>'+(bwList().length?'<button type="button" class="btn soft sm" data-act="sammel">Drucken &amp; Jahresübersicht</button>':"")+"</div>";
 }
 
 /* Bauwerk anlegen / bearbeiten */
@@ -1287,15 +1287,15 @@ function dlPdf(x,mitFotos){toast("PDF wird erstellt …",8000);var b=S.bw[x.bw];
 function doneVisits(){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"&&S.bw[v.bw]}).sort(function(a,b){return b.datum.localeCompare(a.datum)||natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)})}
 function openSammel(){
   var vs=doneVisits(),t=today();
-  if(!vs.length){toast("Noch keine abgeschlossenen Besichtigungen.");return}
   var anyToday=vs.some(function(v){return v.datum===t});
-  openModal('<div class="mbar"><b>Protokolle drucken</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
-    '<div class="glass panel" style="max-width:560px;margin:0 auto"><span class="small muted">Ausgewählte Protokolle werden zu einer PDF-Datei zusammengefasst – einmal drucken statt einzeln.</span>'+
-    '<div class="row"><button type="button" class="btn soft sm" data-act="sammelAll" data-v="1">Alle</button><button type="button" class="btn soft sm" data-act="sammelAll" data-v="0">Keine</button></div>'+
+  openModal('<div class="mbar"><b>Drucken &amp; Übersicht</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+    '<div class="glass panel" style="max-width:560px;margin:0 auto">'+(vs.length?'<h3>Sammel-PDF</h3><span class="small muted">Ausgewählte Protokolle werden zu einer PDF-Datei zusammengefasst – einmal drucken statt einzeln.</span>'+
+    '<div class="row"><button type="button" class="btn soft sm" data-act="sammelAll" data-v="1">Alle</button><button type="button" class="btn soft sm" data-act="sammelAll" data-v="0">Keine</button></div>':'<span class="small muted">Noch keine abgeschlossenen Besichtigungen für ein Sammel-PDF.</span>')+
     '<div id="sammelList">'+vs.map(function(v){var b=S.bw[v.bw];return '<label style="display:flex;align-items:center;border-top:1px solid var(--line);padding:8px 0;gap:10px;cursor:pointer"><input type="checkbox" data-sammel="'+esc(v.id)+'" '+((anyToday?v.datum===t:v.datum.slice(0,4)===year())?"checked":"")+' style="width:22px;height:22px"><span style="flex:1"><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="small muted">'+deDate(v.datum)+"</span></label>"}).join("")+"</div>"+
-    '<button type="button" class="btn block big" data-act="sammelPdf" data-f="0">Sammel-PDF (Protokolle)</button>'+
-    '<button type="button" class="btn soft block" data-act="sammelPdf" data-f="1">Sammel-PDF mit Fotos</button>'+
-    '<button type="button" class="btn soft block" data-act="jahresXlsx">Jahresübersicht '+year()+' (Excel)</button></div>');
+    (vs.length?'<button type="button" class="btn block big" data-act="sammelPdf" data-f="0">Sammel-PDF (Protokolle)</button>'+
+    '<button type="button" class="btn soft block" data-act="sammelPdf" data-f="1">Sammel-PDF mit Fotos</button>':"")+
+    '<h3 style="margin-top:6px">Jahresübersicht '+year()+'</h3><span class="small muted">Alle Bauwerke mit Stand der Besichtigung '+year()+' – auch die noch offenen.</span>'+
+    '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="jahresPdf">PDF</button><button type="button" class="btn soft" style="flex:1" data-act="jahresXlsx">Excel</button></div></div>');
 }
 function sammelSel(){return Array.prototype.slice.call(document.querySelectorAll("[data-sammel]:checked")).map(function(c){return S.visits[c.dataset.sammel]}).filter(Boolean)}
 function simpleXlsx(rows,widths,name){
@@ -1312,14 +1312,40 @@ function simpleXlsx(rows,widths,name){
   z.file("xl/styles.xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE5E7EB"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFBFBFBF"/></left><right style="thin"><color rgb="FFBFBFBF"/></right><top style="thin"><color rgb="FFBFBFBF"/></top><bottom style="thin"><color rgb="FFBFBFBF"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>');
   return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:MIME.xlsx});
 }
-function jahresXlsx(){
-  var y=year(),rows=[["Nr.","Bezeichnung","Bauwerksart","Einteilung","Besichtigt am","Prüfer","Ergebnis","Verkehrssicher","Sonderprüfung","Schäden / Bemerkungen"]];
+function jahresRows(){
+  var y=year(),rows=[];
   bwList().slice().sort(function(a,b){return natCmp(a.nr,b.nr)}).forEach(function(b){var t=typeOf(b);
     var v=visitsOf(b.id).filter(function(z){return z.status==="abgeschlossen"&&z.datum.slice(0,4)===y})[0];
     if(v){var pts=ppOf(v),pi=-1;pts.forEach(function(p,i){if(p.pos&&pi<0)pi=i});
-      rows.push([b.nr,b.name,t.name,b.bezirk||"",deDate(v.datum),v.pruefer||"",v.befund||"",pi<0?"":(v.ja[pi]?"ja":"NEIN"),v.sonder?"ja":"nein",[v.schaden,v.sonstige].filter(Boolean).join("; ")])}
-    else rows.push([b.nr,b.name,t.name,b.bezirk||"",b.letzte&&b.letzte.datum?"zuletzt "+deDate(b.letzte.datum):"","", "noch offen","","",""])});
+      rows.push({nr:b.nr,name:b.name,art:t.name,grp:b.bezirk||"",datum:deDate(v.datum),pruefer:v.pruefer||"",erg:v.befund||"",vs:pi<0?"":(v.ja[pi]?"ja":"NEIN"),sp:v.sonder?"ja":"nein",txt:[v.schaden,v.sonstige].filter(Boolean).join("; "),offen:false})}
+    else rows.push({nr:b.nr,name:b.name,art:t.name,grp:b.bezirk||"",datum:b.letzte&&b.letzte.datum?"zuletzt "+deDate(b.letzte.datum):"",pruefer:"",erg:"noch offen",vs:"",sp:"",txt:"",offen:true})});
+  return rows;
+}
+function jahresXlsx(){
+  var y=year(),rows=[["Nr.","Bezeichnung","Bauwerksart","Einteilung","Besichtigt am","Prüfer","Ergebnis","Verkehrssicher","Sonderprüfung","Schäden / Bemerkungen"]].concat(jahresRows().map(function(r){return [r.nr,r.name,r.art,r.grp,r.datum,r.pruefer,r.erg,r.vs,r.sp,r.txt]}));
   simpleXlsx(rows,[10,34,14,12,14,14,26,13,13,60],"Übersicht "+y).then(function(bl){download(new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.xlsx"),{type:MIME.xlsx}))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
+}
+function jahresPdf(){
+  toast("PDF wird erstellt …",8000);var y=year(),rows=jahresRows();
+  Promise.all([loadPdf(),loadLogo()]).then(function(r){var J=r[0],doc=new J({unit:"mm",format:"a4",orientation:"landscape"});
+    var L=10,R=287,cols=[["Nr.",16],["Bezeichnung",52],["Art",24],["Einteilung",20],["Besichtigt",24],["Prüfer",20],["Ergebnis",34],["Verk.-sicher",20],["Sonderpr.",18],["Schäden / Bemerkungen",49]],seite=1;
+    var done=rows.filter(function(z){return !z.offen}).length,bef=rows.filter(function(z){return z.erg==="Veränderung festgestellt"}).length,nv=rows.filter(function(z){return z.vs==="NEIN"}).length;
+    function kopf(){doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(0);[ORG.kommune,ORG.amt,ORG.abteilung,ORG.kennung].filter(Boolean).forEach(function(t,i){doc.text(t,L,10+i*3.8)});
+      if(/kassel/i.test(ORG.kommune||"")&&LOGO)doc.addImage(LOGO,"JPEG",R-52,6,52,52*115/478);
+      doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text("Besichtigungen nach DIN 1076 – Übersicht "+y,L,32);
+      doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(rows.length+" Bauwerke · "+done+" besichtigt · "+(rows.length-done)+" noch offen · "+bef+" mit Veränderung"+(nv?" · "+nv+" nicht verkehrssicher":"")+" · Stand "+deDate(today()),L,38);
+      var x=L;doc.setFillColor(229,231,235);doc.rect(L,42,R-L,7,"F");doc.setFont("helvetica","bold");doc.setFontSize(8.5);cols.forEach(function(c){doc.text(c[0],x+1.5,46.8);x+=c[1]});doc.setFont("helvetica","normal");return 49}
+    function fuss(){doc.setFontSize(7.5);doc.setTextColor(110);doc.text("Übersicht "+y+" · Seite "+seite,148.5,203,{align:"center"});doc.setTextColor(0)}
+    var yy=kopf();
+    rows.forEach(function(rw,ri){var vals=[rw.nr,rw.name,rw.art,rw.grp,rw.datum,rw.pruefer,rw.erg,rw.vs,rw.sp,rw.txt];doc.setFontSize(8.5);
+      var lines=vals.map(function(v,i){return doc.splitTextToSize(String(v||""),cols[i][1]-3)}),n=Math.max.apply(null,lines.map(function(l){return l.length||1})),h=Math.max(6.5,n*3.6+2.6);
+      if(yy+h>196){fuss();doc.addPage();seite++;yy=kopf()}
+      if(ri%2){doc.setFillColor(248,248,248);doc.rect(L,yy,R-L,h,"F")}
+      var x=L;lines.forEach(function(l,i){if(i===6)doc.setTextColor.apply(doc,rw.offen?[120,120,120]:rw.erg==="Veränderung festgestellt"?[180,83,9]:[22,101,52]);else if(i===7&&rw.vs==="NEIN"){doc.setTextColor(185,28,28);doc.setFont("helvetica","bold")}
+        l.forEach(function(t,k){doc.text(t,x+1.5,yy+4.3+k*3.6)});doc.setTextColor(0);doc.setFont("helvetica","normal");x+=cols[i][1]});
+      doc.setDrawColor(220);doc.setLineWidth(.1);doc.line(L,yy+h,R,yy+h);yy+=h});
+    fuss();return doc.output("blob")})
+  .then(function(bl){download(new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.pdf"),{type:"application/pdf"}));toast("PDF gespeichert.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});
 }
 
 /* ---------- Bauwerke anlegen: einzeln oder als Liste ---------- */
@@ -1461,6 +1487,7 @@ document.addEventListener("click",function(ev){
   if(a==="sammelPdf"){var sel=sammelSel();if(!sel.length){toast("Bitte mindestens ein Protokoll wählen.");return}var mf=el.dataset.f==="1";toast("Sammel-PDF wird erstellt ("+sel.length+") …",15000);
     buildPdf(sel.slice().sort(function(a,b){return natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)}),mf).then(function(bl){download(new File([bl],fsafe("Besichtigungsprotokolle "+today()+(mf?" mit Fotos":"")+".pdf"),{type:"application/pdf"}));toast("Sammel-PDF gespeichert.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});return}
   if(a==="jahresXlsx"){jahresXlsx();return}
+  if(a==="jahresPdf"){jahresPdf();return}
   if(a==="impPaste"){var tp=$("impPaste");var rr=parseDelim(tp?tp.value:"");if(rr.length<2){toast("Bitte Überschrift und mindestens eine Zeile einfügen.");return}impStart(rr);return}
   if(a==="impDo"){impDo();return}
   if(a==="openArten"){S.einstOpen=true;setTimeout(function(){var e=document.querySelector('a[href="#art-neu"]');if(e)e.scrollIntoView({block:"center"})},150);return}
