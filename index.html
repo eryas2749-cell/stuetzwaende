@@ -245,6 +245,14 @@ details.glass>.panel{padding-top:0}
 .pp-t{flex:1;min-width:0;font-size:15px}
 .pp-chg{display:block;font:600 11px var(--f);color:var(--warn);letter-spacing:.02em}
 .stepn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:12px;background:var(--accent);color:var(--on-accent);font:700 13px var(--f);margin-right:8px;vertical-align:2px}
+.vf-head{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.vf-names{color:#e5e7eb;font-size:13px;overflow-wrap:anywhere}.vf-names span{color:#9ca3af}
+.vf-acts{display:flex;gap:8px;flex-wrap:wrap}.vf-acts .btn{flex:1;min-width:140px}
+.vf-body{display:flex;flex-direction:column;align-items:center;gap:10px;padding-bottom:30px}
+.vf-page{background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.4);max-width:100%;height:auto}
+.vf-none{color:#e5e7eb;font-size:14px;padding:20px;text-align:center}
+.vf-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;width:100%}.vf-imgs figure{margin:0}.vf-imgs img{width:100%;border-radius:6px;display:block}.vf-imgs figcaption{color:#ddd;font-size:11px;overflow-wrap:anywhere}
+.vf-table{width:100%;overflow-x:auto;background:#fff;color:#111;border-radius:6px}.vf-table table{border-collapse:collapse;font-size:12px;min-width:760px}.vf-table th,.vf-table td{border-bottom:1px solid #e5e7eb;padding:5px 6px;text-align:left;vertical-align:top}.vf-table th{background:#e5e7eb}
 .finbar{position:sticky;bottom:0;z-index:6;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:8px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .finbar .btn{flex-direction:column;gap:2px;line-height:1.15;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .finbar .btn small{font-weight:500;font-size:13px;opacity:.85}
@@ -360,7 +368,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.18";
+var APPVER="0.19";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -845,7 +853,7 @@ function exportPanel(x){
   return '<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll",'<span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span>")+
     '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
     (n?'<button type="button" class="btn soft" style="flex:1" data-act="preview" data-f="1" data-visit="'+esc(x.id)+'">Mit Schadensbildern</button>':"")+"</div>"+
-    '<button type="button" class="btn block big" data-act="dlPdf" data-f="'+(n?1:0)+'" data-visit="'+esc(x.id)+'">PDF speichern'+(n?" (mit "+n+" Foto"+(n>1?"s":"")+")":"")+"</button>"+
+    '<button type="button" class="btn block big" data-act="dlPdf" data-f="'+(n?1:0)+'" data-visit="'+esc(x.id)+'">PDF'+(n?" mit "+n+" Foto"+(n>1?"s":""):"")+"</button>"+
     '<div class="row">'+(n?'<button type="button" class="btn soft sm" style="flex:1" data-act="dlPdf" data-f="0" data-visit="'+esc(x.id)+'">PDF ohne Fotos</button>':"")+
     '<button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Excel-Vorlage (.'+protExt(x)+')</button></div>'+
     '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Per Outlook / Mail senden (PDF + Excel)</button>'+
@@ -984,6 +992,9 @@ function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openM
 
 /* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
 function preview(x,mitFotos){
+  openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+protWrap(x,mitFotos));fitProt();hydrate();
+}
+function protWrap(x,mitFotos){
   var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x),pts=ppOf(x),kas=isKassel(x);
   var d=x.datum.split("-"),dt=d[2]+" / "+d[1]+" / "+d[0],t2=today().split("-"),dt2=t2[2]+" / "+t2[1]+" / "+t2[0];
   var nrParts=String(b.nr).match(/^([A-Za-zÄÖÜ]+)\s*(.*)$/)||[null,"",b.nr];
@@ -1002,8 +1013,7 @@ function preview(x,mitFotos){
     '<div class="sp"><span class="lbl" style="margin:0">Sonderprüfung nach DIN 1076 veranlasst</span>'+ck(x.sonder)+ck(!x.sonder)+"</div>"+
     '<div class="ft"><div>'+esc(ORG.ort||"")+(ORG.ort?",":"")+"<span>"+dt2+"</span></div><div>Gesehen"+esc(ortSuffix())+"<span></span></div></div></div>"+
     (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f,i){return '<figure><div class="fi"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="fd">'+fotoDatum(x,f)+"</span></div><figcaption>Foto "+(i+1)+(f.tag?": "+esc(f.tag):"")+"</figcaption></figure>"}).join("")+"</div>":"")+"</div>";
-  openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="pwrap" id="pwrap">'+html+"</div>");
-  fitProt();hydrate();
+  return '<div class="pwrap" id="pwrap">'+html+"</div>";
 }
 function fitProt(){var w=$("pwrap"),p=$("prot");if(!w||!p)return;var sc=Math.min(1,w.clientWidth/640);p.style.transform="scale("+sc+")";w.style.height=(p.offsetHeight*sc)+"px"}
 window.addEventListener("resize",fitProt);
@@ -1145,7 +1155,7 @@ function share(x){
     dlAll(files);toast("Teilen hier nicht möglich – PDF und Excel werden heruntergeladen, bitte an die Mail anhängen.",5000);
   }).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
 }
-function dlZip(x){var b=S.bw[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"})}).then(function(bl){download(new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip",{type:"application/zip"}))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
+function dlZip(x){var b=S.bw[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"}).then(function(bl){showFiles([new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip",{type:"application/zip"})],{title:"ZIP-Datei",note:"Enthält: "+files.map(function(f){return f.name}).join(", ")})})}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
 
 /* ---------- Archiv: frühere Besichtigungen (alte Protokolle und Fotos) ---------- */
 function arcOf(b){return b.archiv||(b.archiv=[])}
@@ -1283,7 +1293,7 @@ function buildPdf(list,mitFotos){
     return list.reduce(function(p,x,i){return p.then(function(){var b=S.bw[x.bw]||{nr:x.bw,name:""};if(i)doc.addPage();pdfProt(doc,x,b);if(mitFotos)return pdfFotos(doc,x,b)})},Promise.resolve())
       .then(function(){return doc.output("blob")})})}
 function dlPdf(x,mitFotos){toast("PDF wird erstellt …",8000);var b=S.bw[x.bw];
-  buildPdf([x],mitFotos).then(function(bl){download(new File([bl],pdfName(x,b,mitFotos),{type:"application/pdf"}));toast("PDF gespeichert.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)})}
+  buildPdf([x],mitFotos).then(function(bl){showFiles([new File([bl],pdfName(x,b,mitFotos),{type:"application/pdf"})],{title:"PDF "+(mitFotos?"mit Fotos":"Protokoll")})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)})}
 function doneVisits(){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"&&S.bw[v.bw]}).sort(function(a,b){return b.datum.localeCompare(a.datum)||natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)})}
 function openSammel(){
   var vs=doneVisits(),t=today();
@@ -1323,7 +1333,7 @@ function jahresRows(){
 }
 function jahresXlsx(){
   var y=year(),rows=[["Nr.","Bezeichnung","Bauwerksart","Einteilung","Besichtigt am","Prüfer","Ergebnis","Verkehrssicher","Sonderprüfung","Schäden / Bemerkungen"]].concat(jahresRows().map(function(r){return [r.nr,r.name,r.art,r.grp,r.datum,r.pruefer,r.erg,r.vs,r.sp,r.txt]}));
-  simpleXlsx(rows,[10,34,14,12,14,14,26,13,13,60],"Übersicht "+y).then(function(bl){download(new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.xlsx"),{type:MIME.xlsx}))}).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
+  simpleXlsx(rows,[10,34,14,12,14,14,26,13,13,60],"Übersicht "+y).then(function(bl){showFiles([new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.xlsx"),{type:MIME.xlsx})],{title:"Jahresübersicht "+y+" (Excel)",html:jahresHtml()})}).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
 }
 function jahresPdf(){
   toast("PDF wird erstellt …",8000);var y=year(),rows=jahresRows();
@@ -1345,7 +1355,7 @@ function jahresPdf(){
         l.forEach(function(t,k){doc.text(t,x+1.5,yy+4.3+k*3.6)});doc.setTextColor(0);doc.setFont("helvetica","normal");x+=cols[i][1]});
       doc.setDrawColor(220);doc.setLineWidth(.1);doc.line(L,yy+h,R,yy+h);yy+=h});
     fuss();return doc.output("blob")})
-  .then(function(bl){download(new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.pdf"),{type:"application/pdf"}));toast("PDF gespeichert.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});
+  .then(function(bl){showFiles([new File([bl],fsafe("Besichtigungen "+y+" Uebersicht.pdf"),{type:"application/pdf"})],{title:"Jahresübersicht "+y})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});
 }
 
 /* ---------- Bauwerke anlegen: einzeln oder als Liste ---------- */
@@ -1434,6 +1444,37 @@ function impFile(file){
     .then(impStart).catch(function(e){toast("Import fehlgeschlagen: "+(e&&e.message||e),6000)});
 }
 
+
+/* ---------- Dateivorschau: erst ansehen, dann herunterladen ---------- */
+var PDFJS=null;
+function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);if(PDFJS)return PDFJS;
+  PDFJS=new Promise(function(res,rej){var s=document.createElement("script");s.src="pdfjs.min.js";
+    s.onload=function(){if(!window.pdfjsLib)return rej(new Error("PDF-Anzeige fehlt"));window.pdfjsLib.GlobalWorkerOptions.workerSrc="pdfjs.worker.min.js";res(window.pdfjsLib)};
+    s.onerror=function(){PDFJS=null;rej(new Error("PDF-Anzeige konnte nicht geladen werden – Internet prüfen"))};document.head.appendChild(s)});return PDFJS}
+function fmtSize(n){return n>1048576?(n/1048576).toFixed(1).replace(".",",")+" MB":Math.max(1,Math.round(n/1024))+" KB"}
+function showFiles(files,opt){opt=opt||{};S.vf=files;var tt=$("toast");if(tt)tt.hidden=true;
+  var canShare=false;try{canShare=!!(navigator.canShare&&navigator.canShare({files:files}))}catch(e){}
+  openModal('<div class="mbar"><b>'+esc(opt.title||"Vorschau")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+    '<div class="vf-head"><div class="vf-names">'+files.map(function(f){return esc(f.name)+' <span>· '+fmtSize(f.size)+"</span>"}).join("<br>")+"</div>"+
+    '<div class="vf-acts"><button type="button" class="btn" data-act="vfDl">Herunterladen'+(files.length>1?" ("+files.length+")":"")+"</button>"+(canShare?'<button type="button" class="btn soft" data-act="vfShare">Teilen / Mail</button>':"")+"</div></div>"+
+    '<div id="vfBody" class="vf-body"></div>');
+  var el=$("vfBody"),pdfs=files.filter(function(f){return /\.pdf$/i.test(f.name)}),imgs=files.filter(function(f){return /^image\//.test(f.type)||/\.(jpe?g|png)$/i.test(f.name)});
+  if(opt.html){el.innerHTML=opt.html;fitProt();hydrate();return}
+  if(pdfs.length===1&&files.length===1){renderPdf(pdfs[0],el);return}
+  if(imgs.length&&imgs.length===files.length){el.innerHTML='<div class="vf-imgs">'+imgs.map(function(f,i){return '<figure><img alt="'+esc(f.name)+'" data-vf="'+i+'"><figcaption>'+esc(f.name)+"</figcaption></figure>"}).join("")+"</div>";
+    imgs.forEach(function(f,i){var im=el.querySelector('[data-vf="'+i+'"]');im.src=URL.createObjectURL(f)});return}
+  el.innerHTML='<div class="vf-none">'+esc(opt.note||"Für diesen Dateityp gibt es keine Vorschau. Zum Öffnen herunterladen.")+"</div>";
+}
+function renderPdf(file,el){el.innerHTML='<div class="vf-none">PDF wird angezeigt …</div>';
+  loadPdfJs().then(function(lib){return file.arrayBuffer().then(function(buf){return lib.getDocument({data:buf}).promise})}).then(function(pdf){
+    el.innerHTML="";var w=Math.min(el.clientWidth||360,900),dpr=Math.min(2,window.devicePixelRatio||1),chain=Promise.resolve();
+    for(var i=1;i<=pdf.numPages;i++)(function(n){chain=chain.then(function(){return pdf.getPage(n).then(function(pg){var v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*dpr}),c=document.createElement("canvas");
+      c.width=Math.round(vp.width);c.height=Math.round(vp.height);c.style.width=w+"px";c.className="vf-page";el.appendChild(c);return pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise})})})(i);
+    return chain}).catch(function(e){el.innerHTML='<div class="vf-none">Vorschau nicht möglich ('+esc(e&&e.message||e)+'). Zum Öffnen herunterladen.</div>'});
+}
+function jahresHtml(){var r=jahresRows();return '<div class="vf-table"><table><thead><tr><th>Nr.</th><th>Bezeichnung</th><th>Art</th><th>Einteilung</th><th>Besichtigt</th><th>Prüfer</th><th>Ergebnis</th><th>Verk.-sicher</th><th>Sonderpr.</th><th>Schäden / Bemerkungen</th></tr></thead><tbody>'+
+  r.map(function(z){return "<tr><td>"+[z.nr,z.name,z.art,z.grp,z.datum,z.pruefer,z.erg,z.vs,z.sp,z.txt].map(esc).join("</td><td>")+"</td></tr>"}).join("")+"</tbody></table></div>"}
+
 /* ---------- Datensicherung, Import ---------- */
 function backup(){
   toast("Sicherung wird erstellt …",8000);
@@ -1485,7 +1526,7 @@ document.addEventListener("click",function(ev){
   if(a==="sammel"){openSammel();return}
   if(a==="sammelAll"){document.querySelectorAll("[data-sammel]").forEach(function(c){c.checked=el.dataset.v==="1"});return}
   if(a==="sammelPdf"){var sel=sammelSel();if(!sel.length){toast("Bitte mindestens ein Protokoll wählen.");return}var mf=el.dataset.f==="1";toast("Sammel-PDF wird erstellt ("+sel.length+") …",15000);
-    buildPdf(sel.slice().sort(function(a,b){return natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)}),mf).then(function(bl){download(new File([bl],fsafe("Besichtigungsprotokolle "+today()+(mf?" mit Fotos":"")+".pdf"),{type:"application/pdf"}));toast("Sammel-PDF gespeichert.")}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});return}
+    buildPdf(sel.slice().sort(function(a,b){return natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)}),mf).then(function(bl){showFiles([new File([bl],fsafe("Besichtigungsprotokolle "+today()+(mf?" mit Fotos":"")+".pdf"),{type:"application/pdf"})],{title:"Sammel-PDF ("+sel.length+")"})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});return}
   if(a==="jahresXlsx"){jahresXlsx();return}
   if(a==="jahresPdf"){jahresPdf();return}
   if(a==="impPaste"){var tp=$("impPaste");var rr=parseDelim(tp?tp.value:"");if(rr.length<2){toast("Bitte Überschrift und mindestens eine Zeile einfügen.");return}impStart(rr);return}
@@ -1509,12 +1550,14 @@ document.addEventListener("click",function(ev){
   if(a==="setCoord"&&S.pos){var bb=S.bw[el.dataset.bw];bb.lat=S.pos.lat;bb.lon=S.pos.lon;saveB(bb);toast("Position gespeichert (± "+Math.round(S.pos.acc)+" m)");render();return}
   if(a==="viewRef"){viewRef(el.dataset.bw);return}
   if(a==="arcFoto"){arcFotoView(el.dataset.bw,el.dataset.key);return}
-  if(a==="arcOpen"){var ab=S.bw[el.dataset.bw],aa=arcFind(ab,el.dataset.key);ensureBlob(el.dataset.key).then(function(bl){if(!bl){toast("Datei nicht verfügbar");return}download(new File([bl],aa.name,{type:aa.mime||bl.type||""}))});return}
+  if(a==="arcOpen"){var ab=S.bw[el.dataset.bw],aa=arcFind(ab,el.dataset.key);ensureBlob(el.dataset.key).then(function(bl){if(!bl){toast("Datei nicht verfügbar");return}showFiles([new File([bl],aa.name,{type:aa.mime||bl.type||""})],{title:"Archiv "+aa.jahr})});return}
   if(a==="arcRef"){var rb=S.bw[el.dataset.bw],rk=el.dataset.key,ra=arcFind(rb,rk);if(rb.refKey&&/^ref_/.test(rb.refKey)){queueTrash(rb.refDriveId);delBlob(rb.refKey)}rb.refKey=rk;rb.refHeading=null;rb.refDriveId=ra&&ra.driveId||null;saveB(rb);S.arcOpen=rb.id;toast("Als Vergleichsbild gespeichert");closeModal();render();return}
   if(a==="arcDel"){if(!confirmTap(el,"Wirklich löschen?"))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
     if(da.driveId)queueTrash(da.driveId);delete SY.ob.blobs[dk];saveOb();delBlob(dk);saveB(db);S.arcOpen=db.id;closeModal();render();toast("Gelöscht");return}
   if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&/^ref_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
   if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&/^ref_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
+  if(a==="vfDl"){if(S.vf)dlAll(S.vf);return}
+  if(a==="vfShare"){if(S.vf&&navigator.share)navigator.share({files:S.vf}).catch(function(e){if(e&&e.name!=="AbortError")toast("Teilen nicht möglich")});return}
   if(a==="closeModal"){closeModal();return}
   if(a==="camOpen"){camOpen(id);return}
   if(a==="camClose"){camClose();return}
@@ -1545,8 +1588,8 @@ document.addEventListener("click",function(ev){
   if(a==="editLast"){if(S.show)delete S.show[x.bw];reopenVisit(x).then(function(){closeModal&&$("modal")&&!$("modal").hidden&&closeModal();location.hash="#bw-"+x.bw;render();scrollTo(0,0);toast("Besichtigung vom "+deDate(x.datum)+" wieder geöffnet")});return}
   if(a==="share"){share(x);return}
   if(a==="dlPdf"){dlPdf(x,el.dataset.f==="1");return}
-  if(a==="dlProt"){exportFiles(x,"prot").then(dlAll).catch(function(e){toast("Fehler: "+e.message)});return}
-  if(a==="dlFotos"){exportFiles(x,"fotos").then(dlAll);return}
+  if(a==="dlProt"){exportFiles(x,"prot").then(function(fs){showFiles(fs,{title:"Excel-Protokoll",html:protWrap(x,false)})}).catch(function(e){toast("Fehler: "+e.message)});return}
+  if(a==="dlFotos"){exportFiles(x,"fotos").then(function(fs){showFiles(fs,{title:"Fotos ("+fs.length+")"})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlZip"){dlZip(x);return}
   if(a==="delVisit"){if(!confirmTap(el,"Wirklich löschen? Nochmal tippen"))return;
     var bv=S.bw[x.bw];if(x.status==="abgeschlossen"&&bv.letzte&&bv.letzte.datum===x.datum){bv.letzte=x.basisLetzte||null;saveB(bv)}
