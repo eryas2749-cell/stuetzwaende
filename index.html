@@ -253,6 +253,13 @@ details.glass>.panel{padding-top:0}
 .vf-none{color:#e5e7eb;font-size:14px;padding:20px;text-align:center}
 .vf-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;width:100%}.vf-imgs figure{margin:0}.vf-imgs img{width:100%;border-radius:6px;display:block}.vf-imgs figcaption{color:#ddd;font-size:11px;overflow-wrap:anywhere}
 .vf-table{width:100%;overflow-x:auto;background:#fff;color:#111;border-radius:6px}.vf-table table{border-collapse:collapse;font-size:12px;min-width:760px}.vf-table th,.vf-table td{border-bottom:1px solid #e5e7eb;padding:5px 6px;text-align:left;vertical-align:top}.vf-table th{background:#e5e7eb}
+.fvwrap{position:relative;max-width:900px;margin:0 auto;width:100%}
+.fvnav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;border-radius:12px;background:rgba(0,0,0,.35);color:#fff;font:400 34px/1 var(--f);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fvnav.l{left:6px}.fvnav.r{right:6px}
+.pv-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:900px;margin:0 auto 12px;width:100%}
+.pv-acts>span{color:#e5e7eb;font-size:13px;font-weight:600;width:100%}
+.pv-acts .btn{flex:1 1 auto}
+.pwrap+.pv-acts{margin-top:14px}
 .finbar{position:sticky;bottom:0;z-index:6;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:8px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .finbar .btn{flex-direction:column;gap:2px;line-height:1.15;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .finbar .btn small{font-weight:500;font-size:13px;opacity:.85}
@@ -368,7 +375,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.20";
+var APPVER="0.21";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -849,19 +856,12 @@ function fld(x,k,label,done){
     (S.speech&&!done?'<button type="button" class="mic" data-act="dict" data-visit="'+esc(x.id)+'" data-k="'+k+'" aria-pressed="'+!!on+'" aria-label="'+label+' diktieren"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>':"")+"</span></label>";
 }
 function exportPanel(x){
-  var b=S.bw[x.bw],n=x.fotos.length;
+  var n=x.fotos.length;
   return '<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll",'<span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span>")+
-    '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
-    (n?'<button type="button" class="btn soft" style="flex:1" data-act="preview" data-f="1" data-visit="'+esc(x.id)+'">Mit Schadensbildern</button>':"")+"</div>"+
-    '<button type="button" class="btn block big" data-act="dlPdf" data-f="'+(n?1:0)+'" data-visit="'+esc(x.id)+'">PDF'+(n?" mit "+n+" Foto"+(n>1?"s":""):"")+"</button>"+
-    '<div class="row">'+(n?'<button type="button" class="btn soft sm" style="flex:1" data-act="dlPdf" data-f="0" data-visit="'+esc(x.id)+'">PDF ohne Fotos</button>':"")+
-    '<button type="button" class="btn soft sm" style="flex:1" data-act="dlProt" data-visit="'+esc(x.id)+'">Excel-Vorlage (.'+protExt(x)+')</button></div>'+
-    '<button type="button" class="btn soft block" data-act="share" data-visit="'+esc(x.id)+'">Per Outlook / Mail senden (PDF + Excel)</button>'+
-    '<details class="sub"><summary>Fotos einzeln, ZIP, wieder öffnen, löschen</summary><div>'+
-    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="dlFotos" data-visit="'+esc(x.id)+'" '+(n?"":"disabled")+">Fotos ("+n+")</button>"+
-    '<button type="button" class="btn soft sm" style="flex:1" data-act="dlZip" data-visit="'+esc(x.id)+'">Alles als ZIP</button></div>'+
-    '<span class="muted small mono">'+esc(pdfName(x,b,n>0))+"<br>"+esc(protName(x,b))+"</span>"+
-    '<div class="row between"><button type="button" class="btn soft sm" data-act="reopen" data-visit="'+esc(x.id)+'">Wieder öffnen</button><button type="button" class="btn danger sm" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung löschen</button></div></div></details></section>';
+    '<div class="row"><button type="button" class="btn big" style="flex:1" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
+    (n?'<button type="button" class="btn soft big" style="flex:1" data-act="preview" data-f="1" data-visit="'+esc(x.id)+'">Mit Schadensbildern</button>':"")+"</div>"+
+    '<span class="small muted">In der Ansicht: herunterladen als PDF oder Excel, Fotos speichern oder per Outlook senden.</span>'+
+    '<details class="sub"><summary>Besichtigung löschen</summary><div><button type="button" class="btn danger sm" style="align-self:flex-start" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung endgültig löschen</button></div></details></section>';
 }
 
 /* Darstellung (Tropfen) */
@@ -976,24 +976,40 @@ function addFoto(x,blob,meta){
 
 /* ---------- Foto-Ansicht mit Vergleich alt / neu ---------- */
 function openModal(html){var m=$("modal");m.innerHTML=html;m.hidden=false;document.body.style.overflow="hidden"}
-function closeModal(){var m=$("modal");m.hidden=true;m.innerHTML="";document.body.style.overflow=""}
+function closeModal(){S.fv=null;var m=$("modal");m.hidden=true;m.innerHTML="";document.body.style.overflow=""}
 function viewFoto(id,i){
   var x=S.visits[id],f=x.fotos[i],b=S.bw[x.bw],done=x.status==="abgeschlossen";
   Promise.all([blobUrl(f.key),b.refKey&&b.refKey!==f.key?blobUrl(b.refKey):Promise.resolve(null)]).then(function(u){
     var cmp=u[1]?'<div class="cmp"><img src="'+u[0]+'" alt="Neues Foto"><div class="over" id="cmpOver"><img src="'+u[1]+'" alt="Altes Foto"></div><div class="line" id="cmpLine"></div><span class="lbl" style="left:8px">Neu</span><span class="lbl" style="right:8px">Alt</span></div><input type="range" id="cmpR" min="0" max="100" value="50" aria-label="Vergleich alt / neu" style="max-width:900px;margin:10px auto 0">':
       '<div class="cmp"><img src="'+u[0]+'" alt="Foto"></div>';
-    openModal('<div class="mbar"><b>'+esc(f.tag)+" · "+fotoDatum(x,f)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+cmp+
+    var n=x.fotos.length;S.fv={id:id,i:i};
+    openModal('<div class="mbar"><b>Foto '+(i+1)+" / "+n+" · "+esc(f.tag)+" · "+fotoDatum(x,f)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+      '<div class="fvwrap">'+cmp+(n>1?'<button type="button" class="fvnav l" data-act="fvNav" data-d="-1" aria-label="Vorheriges Foto">‹</button><button type="button" class="fvnav r" data-act="fvNav" data-d="1" aria-label="Nächstes Foto">›</button>':"")+"</div>"+
+      (n>1?'<p class="small" style="color:#ddd;text-align:center;margin:8px 0 0">Wischen oder Pfeile zum Blättern</p>':"")+
       '<div class="row" style="justify-content:center;margin-top:12px">'+
       '<button type="button" class="btn soft sm" data-act="setRef" data-bw="'+esc(b.id)+'" data-key="'+esc(f.key)+'">'+(b.refKey===f.key?"Ist Vergleichsbild ✓":"Als Vergleichsbild für nächstes Mal")+"</button>"+
-      (done?"":'<button type="button" class="btn danger sm" data-act="delFoto" data-visit="'+esc(id)+'" data-i="'+i+'">Foto löschen</button>')+"</div>"+
+      '<button type="button" class="btn danger sm" data-act="delFoto" data-visit="'+esc(id)+'" data-i="'+i+'">Foto löschen</button>'+"</div>"+
       (u[1]?'<p class="small" style="color:#ddd;text-align:center">Regler ziehen: links neues, rechts altes Bild.</p>':""));
   });
 }
+function fvStep(d){if(!S.fv)return;var x=S.visits[S.fv.id];if(!x||!x.fotos.length)return;var n=x.fotos.length,i=(S.fv.i+d+n)%n;viewFoto(x.id,i)}
+(function(){var sx=null,sy=0;
+  document.addEventListener("touchstart",function(e){if(!S.fv||$("modal").hidden||e.target.closest("input,button"))return sx=null;sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+  document.addEventListener("touchend",function(e){if(sx==null||!S.fv)return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)fvStep(dx<0?1:-1)},{passive:true});
+  document.addEventListener("keydown",function(e){if(!S.fv||$("modal").hidden)return;if(e.key==="ArrowRight")fvStep(1);else if(e.key==="ArrowLeft")fvStep(-1);else if(e.key==="Escape")closeModal()});
+})();
 function viewRef(bwId){var b=S.bw[bwId];blobUrl(b.refKey).then(function(u){openModal('<div class="mbar"><b>Vergleichsbild '+esc(b.nr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="cmp"><img src="'+u+'" alt="Vergleichsbild"></div><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn danger sm" data-act="clearRef" data-bw="'+esc(bwId)+'">Vergleichsbild entfernen</button></div>')})}
 
 /* ---------- Protokoll-Vorschau (am Handy statt Excel) ---------- */
+function pvActs(x,mitFotos){var n=x.fotos.length,id=esc(x.id);
+  return '<div class="pv-acts"><span>Herunterladen:</span>'+
+    '<button type="button" class="btn'+(mitFotos?" soft":"")+' sm" data-act="pvDl" data-k="pdf" data-visit="'+id+'">PDF</button>'+
+    (n?'<button type="button" class="btn'+(mitFotos?"":" soft")+' sm" data-act="pvDl" data-k="pdfF" data-visit="'+id+'">PDF mit Bildern</button>':"")+
+    '<button type="button" class="btn soft sm" data-act="pvDl" data-k="xlsx" data-visit="'+id+'">Excel</button>'+
+    (n?'<button type="button" class="btn soft sm" data-act="pvDl" data-k="fotos" data-visit="'+id+'">Fotos ('+n+')</button>':"")+
+    '<button type="button" class="btn soft sm" data-act="share" data-visit="'+id+'">Per Outlook senden</button></div>'}
 function preview(x,mitFotos){
-  openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+protWrap(x,mitFotos));fitProt();hydrate();
+  openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+pvActs(x,mitFotos)+protWrap(x,mitFotos)+pvActs(x,mitFotos));fitProt();hydrate();
 }
 function protWrap(x,mitFotos){
   var b=S.bw[x.bw]||{nr:x.bw,name:"",eigentum:""},sch=schadenText(x),pts=ppOf(x),kas=isKassel(x);
@@ -1524,6 +1540,7 @@ document.addEventListener("click",function(ev){var p=$("lookPop");if(p&&!p.hidde
 document.addEventListener("click",function(ev){
   var el=ev.target.closest("[data-act]");if(!el)return;var a=el.dataset.act,id=el.dataset.visit,x=id&&S.visits[id];
   if(a==="look"){lookOpen($("lookPop").hidden);return}
+  if(a==="fvNav"){fvStep(+el.dataset.d);return}
   if(a==="sammel"){openSammel();return}
   if(a==="sammelAll"){document.querySelectorAll("[data-sammel]").forEach(function(c){c.checked=el.dataset.v==="1"});return}
   if(a==="sammelPdf"){var sel=sammelSel();if(!sel.length){toast("Bitte mindestens ein Protokoll wählen.");return}var mf=el.dataset.f==="1";toast("Sammel-PDF wird erstellt ("+sel.length+") …",15000);
@@ -1574,7 +1591,9 @@ document.addEventListener("click",function(ev){
   if(a==="wipe"){if(!confirmTap(el,"Wirklich ALLES löschen? Nochmal tippen"))return;wipe();return}
   if(!x)return;
   if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
-  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var f=x.fotos.splice(+el.dataset.i,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];saveOb();var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}saveV(x);closeModal();render();return}
+  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var di=+el.dataset.i,f=x.fotos.splice(di,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];
+    if(x.status==="abgeschlossen")SY.ob.prot[x.id]=1;saveOb();if(S.files)delete S.files[x.id];var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}
+    saveV(x);render();toast("Foto gelöscht");if(x.fotos.length)viewFoto(x.id,Math.min(di,x.fotos.length-1));else closeModal();return}
   if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);x.del=(x.del||[]).concat(au.key);queueTrash(au.driveId);delete SY.ob.blobs[au.key];saveOb();saveV(x);render();return}
   if(a==="preview"){preview(x,el.dataset.f==="1");return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
@@ -1589,6 +1608,9 @@ document.addEventListener("click",function(ev){
   if(a==="editLast"){if(S.show)delete S.show[x.bw];reopenVisit(x).then(function(){closeModal&&$("modal")&&!$("modal").hidden&&closeModal();location.hash="#bw-"+x.bw;render();scrollTo(0,0);toast("Besichtigung vom "+deDate(x.datum)+" wieder geöffnet")});return}
   if(a==="share"){share(x);return}
   if(a==="dlPdf"){dlPdf(x,el.dataset.f==="1");return}
+  if(a==="pvDl"){var k=el.dataset.k,pb=S.bw[x.bw];toast("Datei wird erstellt …",8000);
+    (k==="pdf"||k==="pdfF"?buildPdf([x],k==="pdfF").then(function(bl){return [new File([bl],pdfName(x,pb,k==="pdfF"),{type:"application/pdf"})]}):exportFiles(x,k==="xlsx"?"prot":"fotos"))
+      .then(function(fs){dlAll(fs);toast(fs.length>1?fs.length+" Dateien heruntergeladen.":"Heruntergeladen: "+fs[0].name,4000)}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});return}
   if(a==="dlProt"){exportFiles(x,"prot").then(function(fs){showFiles(fs,{title:"Excel-Protokoll",html:protWrap(x,false)})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlFotos"){exportFiles(x,"fotos").then(function(fs){showFiles(fs,{title:"Fotos ("+fs.length+")"})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlZip"){dlZip(x);return}
