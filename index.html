@@ -260,6 +260,8 @@ details.glass>.panel{padding-top:0}
 .pv-acts>span{color:#e5e7eb;font-size:13px;font-weight:600;width:100%}
 .pv-acts .btn{flex:1 1 auto}
 .pwrap+.pv-acts{margin-top:14px}
+.phw{position:relative}.phw .ph{width:100%}
+.phx{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:15px;border:0;background:rgba(0,0,0,.55);color:#fff;font:600 14px/1 var(--f);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .finbar{position:sticky;bottom:0;z-index:6;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:8px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .finbar .btn{flex-direction:column;gap:2px;line-height:1.15;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .finbar .btn small{font-weight:500;font-size:13px;opacity:.85}
@@ -375,7 +377,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.21";
+var APPVER="0.22";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -817,7 +819,7 @@ function viewBw(b){
   h+='<section class="glass panel">'+stepH(1,"Fotos",'<span class="muted small">'+x.fotos.length+"</span>");
   if(!done)h+='<button type="button" class="btn block big" data-act="camOpen" data-visit="'+id+'">Foto aufnehmen</button>';
   if(x.fotos.length){h+='<div class="photos">';x.fotos.forEach(function(f,i){
-    h+='<button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+"</span></button>"});h+="</div>"}
+    h+='<div class="phw"><button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+'</span></button><button type="button" class="phx" data-act="delFoto" data-visit="'+id+'" data-i="'+i+'" aria-label="Foto '+(i+1)+' löschen">✕</button></div>'});h+="</div>"}
   if(!done)h+='<label class="btn soft sm" style="align-self:flex-start">Fotos vom Gerät hinzufügen<input type="file" accept="image/*" multiple data-gal="'+id+'"></label>';
   h+="</section>";
   /* 2 Prüfpunkte */
@@ -992,7 +994,7 @@ function viewFoto(id,i){
       (u[1]?'<p class="small" style="color:#ddd;text-align:center">Regler ziehen: links neues, rechts altes Bild.</p>':""));
   });
 }
-function fvStep(d){if(!S.fv)return;var x=S.visits[S.fv.id];if(!x||!x.fotos.length)return;var n=x.fotos.length,i=(S.fv.i+d+n)%n;viewFoto(x.id,i)}
+function fvStep(d){if(!S.fv)return;if(S.fv.arc){var ab=S.bw[S.fv.bw],ks=arcFotoList(ab);if(!ks.length)return;arcFotoView(ab.id,ks[(S.fv.i+d+ks.length)%ks.length]);return}var x=S.visits[S.fv.id];if(!x||!x.fotos.length)return;var n=x.fotos.length,i=(S.fv.i+d+n)%n;viewFoto(x.id,i)}
 (function(){var sx=null,sy=0;
   document.addEventListener("touchstart",function(e){if(!S.fv||$("modal").hidden||e.target.closest("input,button"))return sx=null;sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
   document.addEventListener("touchend",function(e){if(sx==null||!S.fv)return;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)fvStep(dx<0?1:-1)},{passive:true});
@@ -1237,9 +1239,13 @@ function readKasselProt(file){
           res.schaden=res.schaden.replace(/^\s*Keine Schadenserweiterung gegenüber.*$/gim,"").trim();return res})})})});
 }
 function arcFind(b,k){return arcOf(b).filter(function(a){return a.key===k})[0]}
-function arcFotoView(bwId,k){var b=S.bw[bwId],a=arcFind(b,k);if(!a)return;blobUrl(k).then(function(u){if(!u){toast("Foto nicht verfügbar");return}
-  openModal('<div class="mbar"><b>'+esc(b.nr)+" · Foto "+esc(a.jahr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="cmp"><img src="'+u+'" alt="Foto '+esc(a.jahr)+'"></div>'+
-    '<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn soft sm" data-act="arcRef" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">'+(b.refKey===k?"Ist Vergleichsbild ✓":"Als Vergleichsbild für die Kamera")+'</button><button type="button" class="btn danger sm" data-act="arcDel" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">Foto löschen</button></div>')})}
+function arcFotoList(b){var out=[];arcYears(b).forEach(function(y){arcOf(b).forEach(function(a){if(a.jahr===y&&a.art==="foto")out.push(a.key)})});return out}
+function arcFotoView(bwId,k){var b=S.bw[bwId],a=arcFind(b,k);if(!a)return;var keys=arcFotoList(b),i=Math.max(0,keys.indexOf(k)),n=keys.length;
+  blobUrl(k).then(function(u){if(!u){toast("Foto nicht verfügbar");return}S.fv={arc:true,bw:bwId,i:i};
+  openModal('<div class="mbar"><b>Foto '+(i+1)+" / "+n+" · "+esc(b.nr)+" · "+esc(a.jahr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+    '<div class="fvwrap"><div class="cmp"><img src="'+u+'" alt="Foto '+esc(a.jahr)+'"></div>'+(n>1?'<button type="button" class="fvnav l" data-act="fvNav" data-d="-1" aria-label="Vorheriges Foto">‹</button><button type="button" class="fvnav r" data-act="fvNav" data-d="1" aria-label="Nächstes Foto">›</button>':"")+"</div>"+
+    (n>1?'<p class="small" style="color:#ddd;text-align:center;margin:8px 0 0">Wischen oder Pfeile zum Blättern</p>':"")+
+    '<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="btn soft sm" data-act="arcRef" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">'+(b.refKey===k?"Ist Vergleichsbild ✓":"Als Vergleichsbild für die Kamera")+'</button><button type="button" class="btn danger sm" data-act="arcDel" data-foto="1" data-bw="'+esc(bwId)+'" data-key="'+esc(k)+'">Foto löschen</button></div>')})}
 
 /* ---------- PDF (Protokoll, Fotos, Sammel-PDF) ---------- */
 var PDFLIB=null;
@@ -1570,8 +1576,9 @@ document.addEventListener("click",function(ev){
   if(a==="arcFoto"){arcFotoView(el.dataset.bw,el.dataset.key);return}
   if(a==="arcOpen"){var ab=S.bw[el.dataset.bw],aa=arcFind(ab,el.dataset.key);ensureBlob(el.dataset.key).then(function(bl){if(!bl){toast("Datei nicht verfügbar");return}showFiles([new File([bl],aa.name,{type:aa.mime||bl.type||""})],{title:"Archiv "+aa.jahr})});return}
   if(a==="arcRef"){var rb=S.bw[el.dataset.bw],rk=el.dataset.key,ra=arcFind(rb,rk);if(rb.refKey&&/^ref_/.test(rb.refKey)){queueTrash(rb.refDriveId);delBlob(rb.refKey)}rb.refKey=rk;rb.refHeading=null;rb.refDriveId=ra&&ra.driveId||null;saveB(rb);S.arcOpen=rb.id;toast("Als Vergleichsbild gespeichert");closeModal();render();return}
-  if(a==="arcDel"){if(!confirmTap(el,"Wirklich löschen?"))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
-    if(da.driveId)queueTrash(da.driveId);delete SY.ob.blobs[dk];saveOb();delBlob(dk);saveB(db);S.arcOpen=db.id;closeModal();render();toast("Gelöscht");return}
+  if(a==="arcDel"){if(!confirm(el.dataset.foto?"Dieses Foto löschen?":"Diese Datei löschen?"))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
+    if(da.driveId)queueTrash(da.driveId);delete SY.ob.blobs[dk];saveOb();delBlob(dk);saveB(db);S.arcOpen=db.id;render();toast("Gelöscht");
+    var rest=arcFotoList(db);if(da.art==="foto"&&S.fv&&S.fv.arc&&rest.length)arcFotoView(db.id,rest[Math.min(S.fv.i,rest.length-1)]);else closeModal();return}
   if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&/^ref_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
   if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&/^ref_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
   if(a==="vfDl"){if(S.vf)dlAll(S.vf);return}
@@ -1591,9 +1598,9 @@ document.addEventListener("click",function(ev){
   if(a==="wipe"){if(!confirmTap(el,"Wirklich ALLES löschen? Nochmal tippen"))return;wipe();return}
   if(!x)return;
   if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
-  if(a==="delFoto"){if(!confirmTap(el,"Wirklich löschen?"))return;var di=+el.dataset.i,f=x.fotos.splice(di,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];
+  if(a==="delFoto"){if(!confirm("Dieses Foto löschen?"))return;var di=+el.dataset.i,f=x.fotos.splice(di,1)[0];delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];
     if(x.status==="abgeschlossen")SY.ob.prot[x.id]=1;saveOb();if(S.files)delete S.files[x.id];var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}
-    saveV(x);render();toast("Foto gelöscht");if(x.fotos.length)viewFoto(x.id,Math.min(di,x.fotos.length-1));else closeModal();return}
+    saveV(x);render();toast("Foto gelöscht");if(S.fv&&!S.fv.arc&&x.fotos.length)viewFoto(x.id,Math.min(di,x.fotos.length-1));else closeModal();return}
   if(a==="delAudio"){if(!confirmTap(el,"Sicher?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);x.del=(x.del||[]).concat(au.key);queueTrash(au.driveId);delete SY.ob.blobs[au.key];saveOb();saveV(x);render();return}
   if(a==="preview"){preview(x,el.dataset.f==="1");return}
   if(a==="pp"){var i=+el.dataset.i;x.ja[i]=!x.ja[i];saveV(x);render();return}
