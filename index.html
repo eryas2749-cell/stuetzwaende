@@ -279,7 +279,10 @@ details.sub>div{display:flex;flex-direction:column;gap:10px}
 .prot .ft{display:flex;justify-content:space-between;margin-top:26px}
 .prot .ft span{border-bottom:1px solid #333;min-width:150px;display:inline-block;margin-left:6px}
 .prot .fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
-.prot .fotos img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.prot .fotos figure{margin:0;position:relative}
+.prot .fotos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.prot .fotos .fd{position:absolute;left:4px;top:4px;background:#fff;color:#000;font:700 10px Arial,sans-serif;padding:1px 4px}
+.prot .fotos figcaption{font-size:10px;margin-top:2px}
 .empty{padding:22px 16px;text-align:center;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;padding:12px 18px;border-radius:22px;font-size:14px;max-width:90vw}
 /* Modal (Foto, Protokoll-Vorschau) */
@@ -356,7 +359,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.14";
+var APPVER="0.15";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -960,7 +963,7 @@ function viewFoto(id,i){
   Promise.all([blobUrl(f.key),b.refKey&&b.refKey!==f.key?blobUrl(b.refKey):Promise.resolve(null)]).then(function(u){
     var cmp=u[1]?'<div class="cmp"><img src="'+u[0]+'" alt="Neues Foto"><div class="over" id="cmpOver"><img src="'+u[1]+'" alt="Altes Foto"></div><div class="line" id="cmpLine"></div><span class="lbl" style="left:8px">Neu</span><span class="lbl" style="right:8px">Alt</span></div><input type="range" id="cmpR" min="0" max="100" value="50" aria-label="Vergleich alt / neu" style="max-width:900px;margin:10px auto 0">':
       '<div class="cmp"><img src="'+u[0]+'" alt="Foto"></div>';
-    openModal('<div class="mbar"><b>'+esc(f.tag)+" · "+esc(f.zeit)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+cmp+
+    openModal('<div class="mbar"><b>'+esc(f.tag)+" · "+fotoDatum(x,f)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+cmp+
       '<div class="row" style="justify-content:center;margin-top:12px">'+
       '<button type="button" class="btn soft sm" data-act="setRef" data-bw="'+esc(b.id)+'" data-key="'+esc(f.key)+'">'+(b.refKey===f.key?"Ist Vergleichsbild ✓":"Als Vergleichsbild für nächstes Mal")+"</button>"+
       (done?"":'<button type="button" class="btn danger sm" data-act="delFoto" data-visit="'+esc(id)+'" data-i="'+i+'">Foto löschen</button>')+"</div>"+
@@ -988,7 +991,7 @@ function preview(x,mitFotos){
     '<div class="lbl">Beschreibung sonstiger Mängel / Auffälligkeiten:</div><div class="tb" style="min-height:50px">'+esc(x.sonstige||"")+"</div>"+
     '<div class="sp"><span class="lbl" style="margin:0">Sonderprüfung nach DIN 1076 veranlasst</span>'+ck(x.sonder)+ck(!x.sonder)+"</div>"+
     '<div class="ft"><div>'+esc(ORG.ort||"")+(ORG.ort?",":"")+"<span>"+dt2+"</span></div><div>Gesehen"+esc(ortSuffix())+"<span></span></div></div></div>"+
-    (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f){return '<img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'">'}).join("")+"</div>":"")+"</div>";
+    (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f,i){return '<figure><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="fd">'+fotoDatum(x,f)+"</span><figcaption>Foto "+(i+1)+(f.tag?": "+esc(f.tag):"")+"</figcaption></figure>"}).join("")+"</div>":"")+"</div>";
   openModal('<div class="mbar"><b>Protokoll'+(mitFotos?" mit Schadensbildern":"")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="pwrap" id="pwrap">'+html+"</div>");
   fitProt();hydrate();
 }
@@ -1249,6 +1252,7 @@ function pdfProt(doc,x,b){
   txt((ORG.ort?ORG.ort+", ":"")+deDate(today()),L,y);txt("Gesehen"+ortSuffix(),R-70,y);
   doc.setLineWidth(.2);doc.line(L,y+13,L+70,y+13);doc.line(R-70,y+13,R,y+13);doc.setFontSize(7.5);doc.setTextColor(90);txt("Unterschrift Prüfer",L,y+17);txt("Unterschrift Vorgesetzte/r",R-70,y+17);doc.setTextColor(0);
 }
+function fotoDatum(x,f){return deDate((f&&f.ts||"").slice(0,10)||x.datum)}
 function pdfFotos(doc,x,b){
   var L=15,W=180,n=x.fotos.length;if(!n)return Promise.resolve();
   var seiten=Math.ceil(n/2);
@@ -1256,7 +1260,9 @@ function pdfFotos(doc,x,b){
     var slot=i%2;if(slot===0){doc.addPage();doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text("Schadensbilder "+b.nr+" – "+b.name.slice(0,60),L,16);doc.setFont("helvetica","normal");
       doc.setFontSize(8);doc.setTextColor(90);doc.text(deDate(x.datum)+" · Schadensbilder "+b.nr+" · Seite "+(Math.floor(i/2)+1)+" von "+seiten,105,289,{align:"center"});doc.setTextColor(0)}
     var top=slot?156:24,mh=118,k=Math.min(W/im.w,mh/im.h),w=im.w*k,h=im.h*k,xx=L+(W-w)/2;
-    doc.addImage(im.d,"JPEG",xx,top,w,h);doc.setFontSize(9.5);doc.text("Foto "+(i+1)+(f.tag?": "+f.tag:"")+(f.zeit?" · "+f.zeit:""),L,top+h+5)})})},Promise.resolve());
+    doc.addImage(im.d,"JPEG",xx,top,w,h);
+    var dt=fotoDatum(x,f);doc.setFont("helvetica","bold");doc.setFontSize(10);var tw=doc.getTextWidth(dt)+4;doc.setFillColor(255,255,255);doc.rect(xx+2,top+2,tw,6,"F");doc.setTextColor(0);doc.text(dt,xx+4,top+6.3);doc.setFont("helvetica","normal");
+    doc.setFontSize(9.5);doc.text("Foto "+(i+1)+(f.tag?": "+f.tag:""),L,top+h+5)})})},Promise.resolve());
 }
 var LOGO=null;
 function loadLogo(){if(LOGO||!/kassel/i.test(ORG.kommune||""))return Promise.resolve();return fetch("logo-kassel.jpg").then(function(r){return r.ok?r.blob():null}).then(function(bl){if(!bl)return;return new Promise(function(res){var fr=new FileReader();fr.onload=function(){LOGO=fr.result;res()};fr.onerror=function(){res()};fr.readAsDataURL(bl)})}).catch(function(){})}
