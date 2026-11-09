@@ -368,7 +368,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.19";
+var APPVER="0.20";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -416,7 +416,7 @@ function fmtDist(m){return m<1000?Math.round(m/10)*10+" m":(m/1000).toFixed(1).r
 function natCmp(a,b){return String(a).localeCompare(String(b),"de",{numeric:true})}
 
 /* ---------- Einstellungen ---------- */
-var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true,look:"papier"},ls("settings",{}));
+var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true,look:"papier",tilt:false},ls("settings",{}));
 function saveSet(){lss("settings",SET)}
 
 /* ---------- Synchronisierung über Google Drive ----------
@@ -650,11 +650,11 @@ function startReflex(fromTap){
   window.addEventListener("pointermove",onPointer,{passive:true});
   if(!window.DeviceOrientationEvent||LX.on)return;
   if(typeof DeviceOrientationEvent.requestPermission==="function"){
-    if(!fromTap)return; // iOS: Erlaubnis nur nach Antippen
+    if(!fromTap||!SET.tilt)return; // iOS: nur wenn „Neigung nutzen“ eingeschaltet ist, und nur nach Antippen
     DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted"){LX.on=true;window.addEventListener("deviceorientation",onTilt,{passive:true})}}).catch(function(){});
   }else{LX.on=true;window.addEventListener("deviceorientation",onTilt,{passive:true})}
 }
-document.addEventListener("click",function once(){startReflex(true);document.removeEventListener("click",once,true)},true);
+document.addEventListener("click",function once(){if(SET.tilt){startReflex(true);document.removeEventListener("click",once,true)}},true);
 
 /* ---------- GPS ---------- */
 function startGps(){
@@ -875,7 +875,8 @@ function lookHtml(inl){
     seg("glas",[["klar","Klar"],["milchig","Milchig"]])+
     '<div class="seg" role="group"><button type="button" data-act="hg" data-v="farben" aria-pressed="'+!SET.hgFoto+'">Farbverlauf</button><button type="button" data-act="hg" data-v="foto" aria-pressed="'+!!SET.hgFoto+'">Eigenes Foto</button></div>'+
     (SET.hgFoto?'<label class="btn soft sm">Foto wählen<input type="file" accept="image/*" id="hgIn"></label>':"")+
-    '<div class="setrow"><span class="small">Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>');
+    '<div class="setrow"><span class="small">Lichtreflex folgt der Neigung</span><button type="button" class="sw on" data-act="reflex" aria-pressed="'+!!SET.reflex+'" aria-label="Lichtreflex"></button></div>'+
+    (SET.reflex?'<label style="display:flex;gap:10px;align-items:center;cursor:pointer"><input type="checkbox" data-opt-tilt '+(SET.tilt?"checked":"")+' style="width:22px;height:22px;margin:0"><span class="small">Lichtreflex folgt der Handy-Neigung (iPhone fragt dann bei jedem Öffnen nach „Bewegung“)</span></label>':""));
 }
 function lookOpen(open){var p=$("lookPop");if(!$("lookBtn"))open=false;if(open){p.innerHTML=lookHtml();p.hidden=false}else{p.hidden=true;p.innerHTML=""}if($("lookBtn"))$("lookBtn").setAttribute("aria-expanded",String(!!open))}
 function lookRefresh(){if(!$("lookPop").hidden)$("lookPop").innerHTML=lookHtml();var d=$("lookIn");if(d)d.innerHTML=lookHtml(true)}
@@ -1031,14 +1032,14 @@ function camOpen(id){
   $("refBtn").hidden=!b.refKey;$("refimg").hidden=true;$("opWrap").hidden=true;
   if(b.refKey)blobUrl(b.refKey).then(function(u){if(!u)return;$("refimg").src=u;$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
   startGps();
-  try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==="function")DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted")listenOri()}).catch(function(){});else listenOri()}catch(e){}
+  try{if(!CAM.oriOk){if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==="function"){if(!CAM.oriAsked){CAM.oriAsked=true;DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted")listenOri()}).catch(function(){})}}else listenOri()}}catch(e){}
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast("Kamera nicht verfügbar – bitte „Fotos aus Galerie“ nutzen.");return}
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(st){CAM.stream=st;$("vid").srcObject=st;updHud()})
     .catch(function(){toast("Kamera nicht erlaubt. In den Einstellungen des Handys freigeben oder „Fotos aus Galerie“ nutzen.",4000);camClose()});
 }
 function camClose(){if(CAM.stream)CAM.stream.getTracks().forEach(function(t){t.stop()});CAM.stream=null;$("cam").hidden=true;document.body.style.overflow="";render()}
 function setOp(){$("refimg").style.opacity=$("op").value/100}
-function listenOri(){if(CAM.listening)return;CAM.listening=true;
+function listenOri(){if(CAM.oriOk)return;CAM.oriOk=true;if(CAM.listening)return;CAM.listening=true;
   window.addEventListener("deviceorientation",function(e){CAM.ori={beta:e.beta,gamma:e.gamma};if(e.webkitCompassHeading!=null)CAM.heading=e.webkitCompassHeading;updLevel();updHud()});
   window.addEventListener("deviceorientationabsolute",function(e){if(e.alpha!=null)CAM.heading=(360-e.alpha)%360;updHud()});
 }
@@ -1606,6 +1607,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="csvIn"&&el.files[0]){importCsv(el.files[0]);el.value="";return}
   if(el.id==="impFile"&&el.files[0]){impFile(el.files[0]);el.value="";return}
   if(el.id==="arcJahr"){S.arcJahr=el.value;return}
+  if(el.hasAttribute&&el.hasAttribute("data-opt-tilt")){SET.tilt=el.checked;saveSet();if(SET.tilt)startReflex(true);return}
   if((el.dataset.arcfoto||el.dataset.arcdoc)&&el.files.length){var arb=S.bw[el.dataset.arcfoto||el.dataset.arcdoc],fl=Array.prototype.slice.call(el.files);el.value="";S.arcOpen=arb.id;arcAdd(arb,fl,el.dataset.arcfoto?"foto":"datei");return}
   if(el.dataset.map&&S.imp){S.imp.map[el.dataset.map]=+el.value;render();return}
   if(el.dataset.imp==="art"&&S.imp){if(el.value==="__neu"){S.retImport=true;location.hash="#art-neu";return}S.imp.art=el.value;render();return}
