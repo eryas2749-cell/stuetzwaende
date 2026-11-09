@@ -356,7 +356,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.12";
+var APPVER="0.13";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -868,7 +868,7 @@ function viewEinst(){
     '<span class="muted small">Handy und Büro-PC mit demselben Google-Konto anmelden. Daten, Fotos und Protokolle liegen dann im Drive-Ordner „BauwerkCheck“.</span>'+
     (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
   function oi(k,label,ph){return '<label class="fld">'+label+'<input type="text" data-org="'+k+'" value="'+esc(ORG[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
-  h+='<details class="glass"><summary>Weitere Einstellungen</summary><div class="panel">'+
+  h+='<details class="glass"'+(S.einstOpen?" open":"")+'><summary>Weitere Einstellungen</summary><div class="panel">'+
     '<div id="lookIn" style="display:flex;flex-direction:column;gap:10px">'+lookHtml(true)+'</div>'+
     '<div class="row between" style="margin-top:8px"><h3>Bauwerksarten</h3><a class="btn soft sm" href="#art-neu">+ Neu</a></div>'+ORG.types.map(function(t){var n=bwList().filter(function(b){return typeOf(b).id===t.id}).length;
     return '<a class="row between" href="#art-'+esc(t.id)+'" style="text-decoration:none;color:inherit;border-top:1px solid var(--line);padding-top:8px"><span><b>'+esc(t.name)+'</b><br><span class="muted small">Einteilung: '+esc(grp(t))+" · "+t.pp.length+' Prüfpunkte</span></span><span class="muted small">'+n+" ›</span></a>"}).join("")+
@@ -892,7 +892,7 @@ function viewArt(id){
   var n=id==="neu",t=n?{id:"",name:"",gruppe:"Stadtteil",protokoll:"standard",pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","sonstige Mängel / Auffälligkeiten"],[1]),tags:TAGS_STD}:typeById(id);
   if(!t)return '<div class="glass empty">Bauwerksart nicht gefunden.</div>';
   var used=n?0:bwList().filter(function(b){return typeOf(b).id===t.id}).length;
-  return '<a class="btn soft sm back" href="#einst" style="align-self:flex-start">‹ Einstellungen</a><section class="glass panel"><h2>'+(n?"Neue Bauwerksart":esc(t.name))+'</h2>'+
+  return (S.retImport&&S.imp?'<a class="btn soft sm back" href="#import" style="align-self:flex-start">‹ Zurück zur Liste</a>':'<a class="btn soft sm back" href="#einst" style="align-self:flex-start">‹ Einstellungen</a>')+'<section class="glass panel"><h2>'+(n?"Neue Bauwerksart":esc(t.name))+'</h2>'+
     '<div class="grid2"><label class="fld">Name *<input type="text" id="a_name" value="'+esc(t.name)+'" placeholder="z. B. Treppenanlage"></label>'+
     '<label class="fld">Einteilung nach<input type="text" id="a_grp" list="grpList" value="'+esc(grp(t))+'" placeholder="z. B. Bezirk"></label></div>'+
     '<datalist id="grpList"><option value="Bezirk"><option value="Stadtteil"><option value="Fluss"><option value="Gruppe"><option value="Buchstabe"></datalist>'+
@@ -903,6 +903,9 @@ function viewArt(id){
     '<button type="button" class="btn block" data-act="saveArt" data-id="'+esc(t.id)+'">Speichern</button>'+
     (!n&&ORG.types.length>1?(used?'<span class="muted small">Löschen nicht möglich: '+used+" Bauwerk(e) dieser Art vorhanden.</span>":'<button type="button" class="btn danger block" data-act="delArt" data-id="'+esc(t.id)+'">Bauwerksart löschen</button>'):"")+"</section>";
 }
+function typeIdFor(name){var base=name.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"art",nid=base,k=2;while(typeById(nid))nid=base+"-"+(k++);return nid}
+function newType(name){var t={id:typeIdFor(name),name:name,gruppe:"Stadtteil",protokoll:"standard",pp:P(["Außergewöhnliche Veränderungen","Verkehrssicherheit gegeben","sonstige Mängel / Auffälligkeiten"],[1]),tags:TAGS_STD};ORG.types.push(t);return t}
+function matchType(v){v=String(v||"").toLowerCase().trim();if(!v)return null;return ORG.types.filter(function(t){var n=t.name.toLowerCase();return t.id===v||n===v||n.indexOf(v)===0||v.indexOf(n.replace(/n$/,""))===0})[0]||null}
 function saveArt(id){
   var name=$("a_name").value.trim(),lines=$("a_pp").value.split("\n").map(function(l){return l.trim()}).filter(Boolean);
   if(!name||!lines.length){toast("Bitte Name und mindestens einen Prüfpunkt angeben.");return}
@@ -911,7 +914,8 @@ function saveArt(id){
   var tags=$("a_tags").value.split("\n").map(function(l){return l.trim()}).filter(Boolean);
   var t=id?typeById(id):null;
   if(!t){var base=name.toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"art",nid=base,k=2;while(typeById(nid))nid=base+"-"+(k++);t={id:nid};ORG.types.push(t)}
-  Object.assign(t,{name:name,gruppe:$("a_grp").value.trim()||"Stadtteil",pp:pp,protokoll:prot,tags:tags.length?tags:TAGS_STD});saveOrg();toast("Gespeichert");location.hash="#einst";
+  Object.assign(t,{name:name,gruppe:$("a_grp").value.trim()||"Stadtteil",pp:pp,protokoll:prot,tags:tags.length?tags:TAGS_STD});saveOrg();toast("Gespeichert");
+  if(S.retImport&&S.imp){S.retImport=false;if(!id)S.imp.art=t.id;location.hash="#import"}else location.hash="#einst";
 }
 
 /* Bilder/Audio aus IndexedDB nachladen */
@@ -1312,6 +1316,7 @@ function viewNeu(){
     '<span class="small muted">In Excel die Zeilen mit Überschrift markieren, kopieren (Strg+C) und hier einfügen.</span>'+
     '<textarea id="impPaste" rows="6" placeholder="Nr.&#9;Bezeichnung&#9;Bezirk&#10;M 301&#9;Am Hange 56&#9;3"></textarea>'+
     '<button type="button" class="btn soft" data-act="impPaste">Übernehmen</button></div></details>'+
+    '<a class="btn soft sm" href="#einst" data-act="openArten" style="align-self:flex-start">Bauwerksarten verwalten (z. B. Bunker anlegen)</a>'+
     '<div class="small muted" style="border-top:1px solid var(--line);padding-top:10px"><b>Format:</b> erste Zeile = Überschriften, Pflicht sind nur <b>Nummer</b> und <b>Bezeichnung</b>. Die Spalten werden automatisch erkannt und können in der Vorschau zugeordnet werden. Die Reihenfolge der Zeilen ist egal – die Liste wird automatisch sortiert (A 2 vor A 10). Vorhandene Nummern werden aktualisiert, nicht doppelt angelegt.</div></section>';
 }
 function parseDelim(t){
@@ -1349,9 +1354,10 @@ function impStart(rows){
 function impRows(){var I=S.imp,M=I.map;
   return I.data.map(function(r){function g(k){return M[k]>=0?String(r[M[k]]||"").trim():""}
     var nr=g("nr"),name=g("name");if(!nr||!name)return null;
-    var art=I.art,av=g("art").toLowerCase();if(av){var ta=ORG.types.filter(function(t){var n=t.name.toLowerCase();return t.id===av||n===av||n.indexOf(av)===0||av.indexOf(n.replace(/n$/,""))===0})[0];if(ta)art=ta.id}
+    var art=I.art,ta=matchType(g("art"));if(ta)art=ta.id;
     var bez=g("bezirk");if(!bez&&I.letter){var m=nr.match(/^([A-Za-zÄÖÜ]+)/);if(m)bez=m[1].toUpperCase()}
     return {nr:nr,name:name,art:art,bezirk:bez,adresse:g("adresse"),eigentum:g("eigentum"),laenge:g("laenge"),hoehe:g("hoehe"),flaeche:g("flaeche"),hinweise:g("hinweise")}}).filter(Boolean)}
+function impUnknown(){var I=S.imp,M=I.map,u={};if(M.art<0)return [];I.data.forEach(function(r){var v=String(r[M.art]||"").trim();if(v&&!matchType(v))u[v]=1});return Object.keys(u)}
 function bwIdOf(nr){return nr.replace(/[^A-Za-z0-9]/g,"")||("bw"+Date.now())}
 function viewImport(){
   var I=S.imp;if(!I)return viewNeu();
@@ -1359,7 +1365,8 @@ function viewImport(){
   var opts=function(sel){return '<option value="-1">– nicht vorhanden –</option>'+I.head.map(function(h,i){return '<option value="'+i+'" '+(sel===i?"selected":"")+">"+esc(h||("Spalte "+(i+1)))+"</option>"}).join("")};
   var h='<a class="btn soft sm back" href="#neu" style="align-self:flex-start">‹ Zurück</a><section class="glass panel"><h2>Liste prüfen</h2>'+
     '<span class="small muted">'+I.data.length+" Zeilen gelesen · "+rows.length+" gültig · "+neu+" neu · "+(rows.length-neu)+" werden aktualisiert</span>"+
-    '<label class="fld">Bauwerksart (wenn nicht in der Liste)<select data-imp="art">'+ORG.types.map(function(t){return '<option value="'+esc(t.id)+'" '+(I.art===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+"</select></label>"+
+    '<label class="fld">'+(I.map.art>=0?"Bauwerksart für Zeilen ohne Angabe":"Welche Bauwerke sind das?")+'<select data-imp="art">'+ORG.types.map(function(t){return '<option value="'+esc(t.id)+'" '+(I.art===t.id?"selected":"")+">"+esc(t.name)+"</option>"}).join("")+'<option value="__neu">+ Neue Bauwerksart anlegen …</option></select></label>'+
+    (impUnknown().length?'<div class="alert warn" style="margin:0"><b>Unbekannte Bauwerksart in der Liste:</b> '+esc(impUnknown().join(", "))+'. Diese Zeilen werden sonst der Auswahl oben zugeordnet.<div class="row" style="margin-top:8px"><button type="button" class="btn soft sm" data-act="impNewTypes">Als neue Bauwerksart'+(impUnknown().length>1?"en":"")+" anlegen</button></div></div>":"")+
     '<details class="sub"'+(I.map.nr<0||I.map.name<0?" open":"")+'><summary>Spalten zuordnen</summary><div>'+IMPF.filter(function(f){return f[0]!=="art"||true}).map(function(f){return '<label class="fld">'+esc(f[1])+'<select data-map="'+f[0]+'">'+opts(I.map[f[0]])+"</select></label>"}).join("")+"</div></details>"+
     '<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" data-imp="letter" '+(I.letter?"checked":"")+' style="width:22px;height:22px;flex:none;margin:0"><span class="small" style="flex:1;min-width:0">Einteilung aus dem Buchstaben der Nummer bilden (A 12 → Gruppe A), wenn keine Einteilung angegeben ist</span></label></section>';
   var pv=rows.slice().sort(function(a,b){return natCmp(a.nr,b.nr)});
@@ -1437,6 +1444,8 @@ document.addEventListener("click",function(ev){
   if(a==="jahresXlsx"){jahresXlsx();return}
   if(a==="impPaste"){var tp=$("impPaste");var rr=parseDelim(tp?tp.value:"");if(rr.length<2){toast("Bitte Überschrift und mindestens eine Zeile einfügen.");return}impStart(rr);return}
   if(a==="impDo"){impDo();return}
+  if(a==="openArten"){S.einstOpen=true;setTimeout(function(){var e=document.querySelector('a[href="#art-neu"]');if(e)e.scrollIntoView({block:"center"})},150);return}
+  if(a==="impNewTypes"){var nu=impUnknown();nu.forEach(function(nm){newType(nm)});saveOrg();toast(nu.length+" Bauwerksart(en) angelegt – Prüfpunkte später in den Einstellungen anpassen.",5000);render();return}
   if(a==="lookClose"){lookOpen(false);return}
   if(a==="setArtF"){S.art=el.dataset.v;S.bez="";render();return}
   if(a==="setGrp"){S.bez=el.dataset.v;render();return}
@@ -1509,7 +1518,7 @@ document.addEventListener("change",function(ev){
   if(el.id==="arcJahr"){S.arcJahr=el.value;return}
   if((el.dataset.arcfoto||el.dataset.arcdoc)&&el.files.length){var arb=S.bw[el.dataset.arcfoto||el.dataset.arcdoc],fl=Array.prototype.slice.call(el.files);el.value="";S.arcOpen=arb.id;arcAdd(arb,fl,el.dataset.arcfoto?"foto":"datei");return}
   if(el.dataset.map&&S.imp){S.imp.map[el.dataset.map]=+el.value;render();return}
-  if(el.dataset.imp==="art"&&S.imp){S.imp.art=el.value;render();return}
+  if(el.dataset.imp==="art"&&S.imp){if(el.value==="__neu"){S.retImport=true;location.hash="#art-neu";return}S.imp.art=el.value;render();return}
   if(el.dataset.imp==="letter"&&S.imp){S.imp.letter=el.checked;render();return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
