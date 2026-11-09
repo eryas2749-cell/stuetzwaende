@@ -245,6 +245,10 @@ details.glass>.panel{padding-top:0}
 .pp-t{flex:1;min-width:0;font-size:15px}
 .pp-chg{display:block;font:600 11px var(--f);color:var(--warn);letter-spacing:.02em}
 .stepn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:12px;background:var(--accent);color:var(--on-accent);font:700 13px var(--f);margin-right:8px;vertical-align:2px}
+.finbar{position:sticky;bottom:0;z-index:6;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:8px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.finbar .btn{flex-direction:column;gap:2px;line-height:1.15;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.finbar .btn small{font-weight:500;font-size:13px;opacity:.85}
+[data-look="papier"] .finbar{padding-left:16px;padding-right:16px;border-top:1px solid var(--line);background:var(--bg)}
 details.sub>summary{cursor:pointer;list-style:none;font:600 14px var(--f);color:var(--accent);padding:4px 0}
 details.sub>summary::-webkit-details-marker{display:none}
 details.sub[open]>summary{margin-bottom:8px}
@@ -352,7 +356,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.11";
+var APPVER="0.12";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -808,11 +812,11 @@ function viewBw(b){
   h+="</div></details></section>";
   /* 4 Protokoll */
   if(!done){h+='<section class="glass panel" id="protPanel">'+stepH(4,"Protokoll")+
-    '<span class="small muted">Erstellt das Protokoll mit Fotos und Prüfpunkten. Danach: ansehen, als Excel speichern zum Drucken oder per Outlook senden.</span>'+
-    (diff?'<button type="button" class="btn block big" data-act="finish" data-visit="'+id+'">Abschließen ('+diff+(diff>1?" Änderungen":" Änderung")+')</button>':
-    '<button type="button" class="btn block big ok" data-act="finish" data-visit="'+id+'">Unverändert bestätigen &amp; abschließen</button>')+"</section>"}
+    '<span class="small muted">Mit „Besichtigung abschließen“ (unten) wird das Protokoll erstellt. Danach: ansehen, als PDF oder Excel speichern, per Outlook senden.</span></section>'}
   else h+=exportPanel(x);
-  return h+moreHtml(b);
+  h+=moreHtml(b);
+  if(!done)h+='<div class="finbar"><button type="button" class="btn block big'+(diff?"":" ok")+'" data-act="finish" data-visit="'+id+'">Besichtigung abschließen<small>'+(diff?diff+(diff>1?" Änderungen":" Änderung")+" gegenüber zuletzt":"alles unverändert wie zuletzt")+"</small></button></div>";
+  return h;
 }
 function historyHtml(b){
   var vs=visitsOf(b.id).filter(function(v){return v.datum!==today()});
