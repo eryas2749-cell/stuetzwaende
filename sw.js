@@ -1,7 +1,7 @@
 /* Offline-Cache für die App-Hülle. Daten liegen in IndexedDB, nicht im Cache. */
-const CACHE = "besichtigung-v2";
+const CACHE = "besichtigung-v3";
 const CDN = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-const FILES = ["./", "./index.html", "./vorlage.xlsm", "./manifest.webmanifest",
+const FILES = ["./", "./index.html", "./vorlage.xlsm", "./jszip.min.js", "./jspdf.min.js", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
