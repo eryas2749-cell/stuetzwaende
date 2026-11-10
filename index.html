@@ -377,7 +377,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.22";
+var APPVER="0.23";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -892,6 +892,10 @@ function viewEinst(){
     '<span class="muted small">Handy und Büro-PC mit demselben Google-Konto anmelden. Daten, Fotos und Protokolle liegen dann im Drive-Ordner „BauwerkCheck“.</span>'+
     (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
   function oi(k,label,ph){return '<label class="fld">'+label+'<input type="text" data-org="'+k+'" value="'+esc(ORG[k]||"")+'" placeholder="'+esc(ph||"")+'"></label>'}
+  h+='<section class="glass panel"><h3>Speicher auf diesem Gerät</h3><div class="small" id="speicherInfo">…</div>'+
+    '<span class="small muted">Fotos von abgeschlossenen Besichtigungen, die schon in Google Drive liegen, können vom Gerät entfernt werden. Sie bleiben in Drive und werden beim Ansehen oder für PDF/Excel automatisch wieder geladen.</span>'+
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="freeSpace" data-m="12">Älter als 1 Jahr</button><button type="button" class="btn soft sm" style="flex:1" data-act="freeSpace" data-m="3">Älter als 3 Monate</button></div></section>';
+  setTimeout(speicherInfo,0);
   h+='<details class="glass"'+(S.einstOpen?" open":"")+'><summary>Weitere Einstellungen</summary><div class="panel">'+
     '<div id="lookIn" style="display:flex;flex-direction:column;gap:10px">'+lookHtml(true)+'</div>'+
     '<div class="row between" style="margin-top:8px"><h3>Bauwerksarten</h3><a class="btn soft sm" href="#art-neu">+ Neu</a></div>'+ORG.types.map(function(t){var n=bwList().filter(function(b){return typeOf(b).id===t.id}).length;
@@ -1498,6 +1502,28 @@ function renderPdf(file,el){el.innerHTML='<div class="vf-none">PDF wird angezeig
 function jahresHtml(){var r=jahresRows();return '<div class="vf-table"><table><thead><tr><th>Nr.</th><th>Bezeichnung</th><th>Art</th><th>Einteilung</th><th>Besichtigt</th><th>Prüfer</th><th>Ergebnis</th><th>Verk.-sicher</th><th>Sonderpr.</th><th>Schäden / Bemerkungen</th></tr></thead><tbody>'+
   r.map(function(z){return "<tr><td>"+[z.nr,z.name,z.art,z.grp,z.datum,z.pruefer,z.erg,z.vs,z.sp,z.txt].map(esc).join("</td><td>")+"</td></tr>"}).join("")+"</tbody></table></div>"}
 
+
+/* ---------- Speicher: Belegung anzeigen und Platz freigeben ---------- */
+function freeCands(mon){
+  var cut=new Date();cut.setMonth(cut.getMonth()-mon);var cs=cut.toISOString().slice(0,10),out=[],noDrive=0;
+  Object.keys(S.visits).forEach(function(k){var v=S.visits[k];if(v.status!=="abgeschlossen"||v.datum>=cs)return;
+    v.fotos.forEach(function(f){if(f.driveId)out.push(f.key);else noDrive++})});
+  bwList().forEach(function(b){(b.archiv||[]).forEach(function(a){if(String(a.jahr)+"-12-31">=cs||b.refKey===a.key)return;if(a.driveId)out.push(a.key);else noDrive++})});
+  return {keys:out,noDrive:noDrive}}
+function blobSizes(keys){return Promise.all(keys.map(function(k){return getBlob(k).then(function(b){return b?b.size:0}).catch(function(){return 0})}))}
+function speicherInfo(){var el=$("speicherInfo");if(!el)return;
+  var est=navigator.storage&&navigator.storage.estimate?navigator.storage.estimate():Promise.resolve(null);
+  var cnt=0;Object.keys(S.visits).forEach(function(k){cnt+=S.visits[k].fotos.length});bwList().forEach(function(b){cnt+=(b.archiv||[]).length});
+  est.then(function(e){if(!$("speicherInfo"))return;var mb=function(n){return (n/1048576).toFixed(n<1048576*10?1:0).replace(".",",")+" MB"};
+    $("speicherInfo").innerHTML=(e?"<b>Belegt: "+mb(e.usage)+"</b>"+(e.quota?' <span class="muted">von ca. '+(e.quota>1073741824*2?(e.quota/1073741824).toFixed(0)+" GB":mb(e.quota))+" verfügbar</span>":""):"")+"<br>"+cnt+" Fotos und Dateien auf diesem Gerät"}).catch(function(){})}
+function freeSpace(mon){
+  if(!SY.on||!SY.email){toast("Nur mit Synchronisierung möglich – sonst vorher „Sicherung herunterladen (ZIP)“ und dann Besichtigungen löschen.",6000);return}
+  var c=freeCands(mon);if(!c.keys.length){toast(c.noDrive?"Noch nichts frei: "+c.noDrive+" Fotos sind noch nicht in Google Drive (erst synchronisieren).":"Nichts zu entfernen.",5000);return}
+  blobSizes(c.keys).then(function(sz){var present=c.keys.filter(function(k,i){return sz[i]>0}),tot=sz.reduce(function(a,b){return a+b},0);
+    if(!present.length){toast("Diese Fotos sind bereits nur noch in Google Drive.",4000);return}
+    if(!confirm(present.length+" Fotos/Dateien ("+(tot/1048576).toFixed(1).replace(".",",")+" MB) vom Gerät entfernen?\n\nSie bleiben in Google Drive und werden beim Ansehen automatisch wieder geladen (Internet nötig)."))return;
+    return Promise.all(present.map(delBlob)).then(function(){toast(present.length+" Dateien entfernt – "+(tot/1048576).toFixed(1).replace(".",",")+" MB frei.",5000);speicherInfo()})})}
+
 /* ---------- Datensicherung, Import ---------- */
 function backup(){
   toast("Sicherung wird erstellt …",8000);
@@ -1555,6 +1581,7 @@ document.addEventListener("click",function(ev){
   if(a==="jahresPdf"){jahresPdf();return}
   if(a==="impPaste"){var tp=$("impPaste");var rr=parseDelim(tp?tp.value:"");if(rr.length<2){toast("Bitte Überschrift und mindestens eine Zeile einfügen.");return}impStart(rr);return}
   if(a==="impDo"){impDo();return}
+  if(a==="freeSpace"){freeSpace(+el.dataset.m);return}
   if(a==="openArten"){S.einstOpen=true;setTimeout(function(){var e=document.querySelector('a[href="#art-neu"]');if(e)e.scrollIntoView({block:"center"})},150);return}
   if(a==="impNewTypes"){var nu=impUnknown();nu.forEach(function(nm){newType(nm)});saveOrg();toast(nu.length+" Bauwerksart(en) angelegt – Prüfpunkte später in den Einstellungen anpassen.",5000);render();return}
   if(a==="lookClose"){lookOpen(false);return}
