@@ -377,7 +377,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.23";
+var APPVER="0.24";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -1097,15 +1097,23 @@ function recToggle(id){
 
 /* ---------- Diktat ---------- */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition;S.speech=!!SR;
+function dictJoin(base,t){t=t.trim();if(!t)return base;t=t.charAt(0).toUpperCase()+t.slice(1);base=(base||"").replace(/\s+$/,"");return base?base+(/[.;:!?,]$/.test(base)?" ":". ")+t:t}
 function dictToggle(id,k){
-  if(S.dict){var same=S.dict.visit===id&&S.dict.k===k;S.dict.rec.stop();S.dict=null;render();if(same)return}
-  var x=S.visits[id],r=new SR();r.lang="de-DE";r.continuous=true;r.interimResults=false;
-  r.onresult=function(e){for(var i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal){var t=e.results[i][0].transcript.trim();if(!t)continue;
-    t=t.charAt(0).toUpperCase()+t.slice(1);x[k]=(x[k]?x[k].replace(/\s+$/,"")+(/[.;:!?]$/.test(x[k].trim())?" ":"; "):"")+t;saveV(x);var ta=$("t_"+k);if(ta)ta.value=x[k]}};
-  r.onend=function(){if(S.dict&&S.dict.rec===r){S.dict=null;render()}};
-  r.onerror=function(e){toast(e.error==="not-allowed"?"Mikrofon nicht erlaubt.":"Diktat beendet.")};
-  S.dict={visit:id,k:k,rec:r};r.start();render();
+  if(S.dict){var same=S.dict.visit===id&&S.dict.k===k;dictStop();if(same)return}
+  var x=S.visits[id];if(!x)return;
+  var D={visit:id,k:k,on:true,base:x[k]||"",errs:0,last:Date.now()};S.dict=D;
+  function show(txt){var ta=$("t_"+k);if(ta){ta.value=txt;ta.scrollTop=ta.scrollHeight}}
+  function run(){if(!D.on||S.dict!==D)return;
+    var r=new SR();D.rec=r;r.lang="de-DE";r.continuous=false;r.interimResults=true;r.maxAlternatives=1;var fin="",live="";
+    r.onresult=function(e){fin="";live="";for(var i=0;i<e.results.length;i++){var t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else live+=t}D.last=Date.now();show(dictJoin(D.base,fin+live))};
+    r.onerror=function(e){D.err=e.error;if(e.error==="not-allowed"||e.error==="service-not-allowed"){D.on=false;toast("Diktat hier nicht erlaubt. Tipp: ins Feld tippen und das Mikrofon der Tastatur benutzen.",6000)}else if(e.error!=="no-speech"&&e.error!=="aborted")D.errs++};
+    r.onend=function(){var t=(fin||live).trim();if(t){D.base=dictJoin(D.base,t);x[k]=D.base;saveV(x);show(D.base)}
+      if(D.on&&S.dict===D&&Date.now()-D.last>30000){D.on=false;S.dict=null;render();toast("Diktat beendet (keine Sprache erkannt).");return}
+      if(D.on&&S.dict===D&&D.errs<3)setTimeout(run,150);else if(S.dict===D){S.dict=null;render();if(D.errs>=3)toast("Diktat unterbrochen – bitte erneut starten oder das Mikrofon der Tastatur nutzen.",6000)}};
+    try{r.start()}catch(e){D.on=false;S.dict=null;render();toast("Diktat konnte nicht starten.")}}
+  render();run();toast("Diktat läuft – sprechen. Zum Beenden das Mikrofon erneut tippen.",3500);
 }
+function dictStop(){var D=S.dict;if(!D)return;D.on=false;S.dict=null;try{D.rec&&D.rec.stop()}catch(e){}render()}
 
 /* ---------- Protokoll (.xlsx / .xlsm) aus Vorlage ---------- */
 function fotoName(x,i){return fsafe(x.datum+"_Besichtigung"+(i>0?" ("+(i+1)+")":"")+".jpg")}
@@ -1637,7 +1645,7 @@ document.addEventListener("click",function(ev){
   if(a==="reset"){x.ja=x.ref.slice();x.sonder=false;saveV(x);render();return}
   if(a==="rec"){recToggle(id);return}
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
-  if(a==="finish"){if(S.dict){S.dict.rec.stop();S.dict=null}S.show=S.show||{};S.show[x.bw]=x.id;finishVisit(x).then(function(){render();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
+  if(a==="finish"){if(S.dict)dictStop();S.show=S.show||{};S.show[x.bw]=x.id;finishVisit(x).then(function(){render();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
   if(a==="reopen"){reopenVisit(x).then(render);return}
   if(a==="editLast"){if(S.show)delete S.show[x.bw];reopenVisit(x).then(function(){closeModal&&$("modal")&&!$("modal").hidden&&closeModal();location.hash="#bw-"+x.bw;render();scrollTo(0,0);toast("Besichtigung vom "+deDate(x.datum)+" wieder geöffnet")});return}
   if(a==="share"){share(x);return}
