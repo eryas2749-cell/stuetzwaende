@@ -264,6 +264,8 @@ details.glass>.panel{padding-top:0}
 .phx{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:15px;border:0;background:rgba(0,0,0,.55);color:#fff;font:600 14px/1 var(--f);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .vermerk{color:var(--muted);border-left:3px solid var(--line);padding-left:8px}
 .vl{border-top:1px solid var(--line);padding-top:6px;font-size:13px}
+.ppcam{position:relative;flex:none;width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-right:6px}
+.ppcam i{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--accent);color:var(--on-accent);font:700 11px/18px var(--f);text-align:center;font-style:normal;padding:0 4px;box-sizing:border-box}
 .finbar{position:sticky;bottom:0;z-index:6;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:8px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .finbar .btn{flex-direction:column;gap:2px;line-height:1.15;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .finbar .btn small{font-weight:500;font-size:13px;opacity:.85}
@@ -379,7 +381,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.26";
+var APPVER="0.27";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -706,6 +708,7 @@ function filtered(){
     if(q&&(b.nr+" "+b.name+" "+(b.adresse||"")+" "+grp(t)+" "+(b.bezirk||"")+" "+t.name).toLowerCase().indexOf(q)<0)return false;
     if(S.art&&t.id!==S.art)return false;
     if(S.art&&S.bez&&String(b.bezirk||"")!==S.bez)return false;
+    if(S.filter==="heute"&&!S.planEdit)return inPlan(b.id);
     if(S.filter==="offen")return !doneThisYear(b);
     return true;
   }).map(function(b){return {b:b,d:S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null}})
@@ -714,11 +717,13 @@ function filtered(){
 function viewListe(){
   var all=bwList(),y=year(),done=all.filter(doneThisYear).length,arten=ORG.types.map(function(t){return {t:t,n:all.filter(function(b){return typeOf(b).id===t.id}).length}}).filter(function(o){return o.n});
   if(S.art&&!arten.some(function(o){return o.t.id===S.art})){S.art="";S.bez=""}
-  if(S.filter!=="offen")S.filter="alle";
+  if(S.filter!=="offen"&&S.filter!=="heute")S.filter="alle";if(S.filter!=="heute")S.planEdit=false;
   var run=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"&&S.bw[v.bw]});
   var h="";
   if(SY.on&&SY.needLogin)h+='<button type="button" class="alert bad" data-act="login" style="text-align:left;font:inherit;cursor:pointer"><b>Synchronisierung angehalten</b> – Google-Anmeldung abgelaufen. Hier tippen zum Anmelden.</button>';
   else if(SY.on&&SY.err)h+='<a class="alert warn" href="#einst" style="text-decoration:none;color:inherit"><b>Synchronisierung gestört:</b> '+esc(SY.err)+'</a>';
+  all.forEach(function(b){var m=massnOf(b);if(m)h+='<a class="alert bad" href="#bw-'+esc(b.id)+'" style="display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:inherit"><span><b>Offen: '+esc(b.nr)+"</b> · "+esc(m)+'</span><span aria-hidden="true">›</span></a>'});
+  if(backupDue())h+='<button type="button" class="alert warn" data-act="backup" style="text-align:left;font:inherit;cursor:pointer;color:inherit"><b>Daten liegen nur auf diesem Gerät.</b> Letzte Sicherung '+(ls("lastBackup",0)?"vor mehr als 7 Tagen":"noch nie")+'. Hier tippen: Sicherung (ZIP) erstellen.</button>';
   if(run.length)h+=run.map(function(v){var b=S.bw[v.bw];return '<a class="alert warn" href="#bw-'+esc(b.id)+'" style="display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:inherit"><span><b>Weiter: '+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span aria-hidden="true">›</span></a>'}).join("");
   h+='<section class="glass panel">'+
     '<div class="srow"><input type="search" id="q" placeholder="Nummer, Name oder Straße …" value="'+esc(S.q)+'" aria-label="Bauwerke suchen" autocomplete="off"></div>';
@@ -727,7 +732,8 @@ function viewListe(){
   if(ta){if(!S.art)S.art=ta.id;var gs=Array.from(new Set(all.filter(function(b){return typeOf(b).id===ta.id}).map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
     if(gs.length>1)h+='<div class="chiprow" role="group" aria-label="'+esc(grp(ta))+'"><button type="button" data-act="setGrp" data-v="" aria-pressed="'+!S.bez+'">Alle</button>'+gs.map(function(g){return '<button type="button" data-act="setGrp" data-v="'+esc(g)+'" aria-pressed="'+(S.bez===g)+'">'+(g.length<=3?esc(grp(ta))+" ":"")+esc(g)+"</button>"}).join("")+"</div>"}
   h+='<div class="count"><span class="small muted">'+done+" von "+all.length+" in "+y+' besichtigt</span>'+
-    '<div class="seg" role="group" aria-label="Filter"><button type="button" data-act="filt" data-f="alle" aria-pressed="'+(S.filter!=="offen")+'">Alle</button><button type="button" data-act="filt" data-f="offen" aria-pressed="'+(S.filter==="offen")+'">Noch offen</button></div></div></section>';
+    '<div class="seg" role="group" aria-label="Filter"><button type="button" data-act="filt" data-f="alle" aria-pressed="'+(S.filter!=="offen")+'">Alle</button><button type="button" data-act="filt" data-f="offen" aria-pressed="'+(S.filter==="offen")+'">Noch offen</button><button type="button" data-act="filt" data-f="heute" aria-pressed="'+(S.filter==="heute")+'">Heute'+(plan().ids.length?" ("+plan().ids.filter(function(i){return doneToday(S.bw[i])}).length+"/"+plan().ids.length+")":"")+'</button></div></div>'+
+    (S.filter==="heute"?'<button type="button" class="btn '+(S.planEdit?"":"soft ")+'sm" data-act="planEdit" style="align-self:flex-start">'+(S.planEdit?"Auswahl fertig":"Bauwerke für heute auswählen")+"</button>":"")+"</section>";
   h+='<div id="results">'+resultsHtml()+"</div>";
   return h;
 }
@@ -742,9 +748,10 @@ function tstat(b){var x=curVisit(b);if(x&&x.status==="abgeschlossen"&&x.datum!==
   return '<span class="ts '+c+'">'+w+"<small>"+deDate(b.letzte.datum)+"</small></span>"}
 function resultsHtml(){
   var list=filtered();
-  if(!list.length)return '<div class="glass empty">'+(!bwList().length?"Noch keine Bauwerke angelegt.":S.filter==="offen"&&!S.q?"Alles erledigt – alle Bauwerke für "+year()+" besichtigt.":"Keine Bauwerke gefunden.")+'</div><a class="btn soft sm" href="#neu" style="align-self:center">+ Bauwerke hinzufügen</a>';
+  if(!list.length)return '<div class="glass empty">'+(!bwList().length?"Noch keine Bauwerke angelegt.":S.filter==="offen"&&!S.q?"Alles erledigt – alle Bauwerke für "+year()+" besichtigt.":S.filter==="heute"&&!S.q?"Noch nichts für heute eingeplant. Oben „Bauwerke für heute auswählen“ tippen.":"Keine Bauwerke gefunden.")+'</div><a class="btn soft sm" href="#neu" style="align-self:center">+ Bauwerke hinzufügen</a>';
   return '<div class="glass tlist"><div class="thead"><span>Nr.</span><span>Bauwerk</span><span style="text-align:right">Letzte</span></div>'+list.map(function(o){var b=o.b,t=typeOf(b);
     var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?fmtDist(o.d):""].filter(Boolean).join(" · ");
+    if(S.planEdit)return '<button type="button" class="trow" data-act="planToggle" data-bw="'+esc(b.id)+'" style="width:100%;border:0;border-bottom:1px solid var(--line);background:'+(inPlan(b.id)?"var(--okbg)":"transparent")+';font:inherit;text-align:left;cursor:pointer;color:inherit"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+'</span><span class="ts '+(inPlan(b.id)?"ok":"")+'">'+(inPlan(b.id)?"✓ heute":"+")+"</span></button>";
     return '<a class="trow" href="#bw-'+esc(b.id)+'"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
     '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px"><a class="btn soft sm" href="#neu">+ Bauwerke hinzufügen</a>'+(bwList().length?'<button type="button" class="btn soft sm" data-act="sammel">Drucken &amp; Jahresübersicht</button>':"")+"</div>";
 }
@@ -783,6 +790,8 @@ function headHtml(b,mid){var t=typeOf(b);
   return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+
   '<section class="glass panel"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
   '<a class="btn soft sm" style="align-self:flex-start" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation starten</a></section>'+
+  (massnOf(b)?'<div class="alert bad"><b>Offen: '+esc(massnOf(b))+'</b> (Besichtigung vom '+deDate(b.letzte.datum)+').<div class="row" style="margin-top:8px"><button type="button" class="btn soft sm" data-act="massnOk" data-bw="'+esc(b.id)+'">Maßnahme erledigt</button></div></div>':
+    (b.massnLog&&b.letzte&&b.massnOk===b.letzte.datum?'<div class="small vermerk" style="margin:0 16px">Maßnahme erledigt am '+dtTxt(b.massnLog.t)+" von "+esc(wName(b.massnLog))+"</div>":""))+
   (mid||"")+
   (b.hinweise&&b.hinweise.length?'<section class="alert warn"><b>Hinweise</b><ul style="margin:6px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></section>":"")}
 function eigOf(b){return (b&&b.eigentum)||ORG.kommune||""}
@@ -818,11 +827,13 @@ function verlaufHtml(x){var l=(x.log||[]).slice().reverse();if(!l.length)return 
     l.map(function(e){return '<div class="vl"><span class="muted">'+dtTxt(e.t)+" · "+esc(wName(e))+"</span><br>"+esc(e.a)+(e.d?": "+esc(e.d):"")+"</div>"}).join("")+"</div></details>"}
 function viewBw(b){
   var x=curVisit(b);
-  if(!x)return headHtml(b,lastHtml(b)+'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung starten</button>')+moreHtml(b);
+  if(!x)return headHtml(b,lastHtml(b)+'<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung starten</button>'+
+    '<div style="padding:0 16px 12px"><button type="button" class="btn soft sm" data-act="planToggle" data-bw="'+esc(b.id)+'">'+(inPlan(b.id)?"✓ Für heute eingeplant (entfernen)":"Für heute einplanen")+"</button></div>")+moreHtml(b);
   var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);
   var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
   var h=headHtml(b,done?'<section class="glass panel"><div class="row between"><h3>Besichtigung vom '+deDate(x.datum)+'</h3><span class="chip ok">abgeschlossen</span></div>'+vermerkHtml(x)+
-    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+id+'">Bearbeiten</button><button type="button" class="btn soft sm" style="flex:1" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung</button></div></section>':
+    '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+id+'">Bearbeiten</button><button type="button" class="btn soft sm" style="flex:1" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung</button></div>'+
+    (function(){var nx=x.datum===today()?planNext(b.id):null;return nx?'<a class="btn block" href="#bw-'+esc(nx.id)+'">Nächstes im Tagesplan: '+esc(nx.nr)+" · "+esc(nx.name)+" ›</a>":(x.datum===today()&&inPlan(b.id)?'<div class="small" style="color:var(--ok);font-weight:600">Tagesplan erledigt ✓</div>':"")})()+"</section>":
     (x.datum!==today()||x.erledigt?'<div class="alert warn">Du bearbeitest die Besichtigung vom <b>'+deDate(x.datum)+'</b>. Änderungen werden im Verlauf festgehalten. Zum Schluss wieder „Besichtigung abschließen“ tippen.</div>':""));
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
@@ -836,7 +847,9 @@ function viewBw(b){
   fotos+="</section>";
   var pp='<div class="pp"><div class="pp-head"><span>Ja</span><span>Nein</span></div>';
   pts.forEach(function(pt,i){var on=x.ja[i],ch=on!==x.ref[i];
-    pp+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t">'+esc(pt.t)+(ch?'<span class="pp-chg">geändert</span>':"")+"</span>"+ynHtml("ppSet",i,id,on,pt.pos,done,(i+1)+" "+pt.t)+"</div>"});
+    pp+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t">'+esc(pt.t)+(ch?'<span class="pp-chg">geändert</span>':"")+"</span>"+
+      (!done&&(pt.pos?!on:on)?'<button type="button" class="ppcam" data-act="camOpen" data-visit="'+id+'" data-pp="'+i+'" aria-label="Foto zu Punkt '+(i+1)+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'+(ppFotos(x,i)?"<i>"+ppFotos(x,i)+"</i>":"")+"</button>":"")+
+      ynHtml("ppSet",i,id,on,pt.pos,done,(i+1)+" "+pt.t)+"</div>"});
   pp+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung veranlasst</span>'+ynHtml("sonderSet",0,id,x.sonder,false,done,"Sonderprüfung veranlasst")+"</div></div>";
   if(done){
     /* Abgeschlossen: Protokoll oben, darunter eine kurze Zusammenfassung */
@@ -1066,7 +1079,7 @@ function protWrap(x,mitFotos){
     '<div class="lbl">Beschreibung sonstiger Mängel / Auffälligkeiten:</div><div class="tb" style="min-height:50px">'+esc(x.sonstige||"")+"</div>"+
     '<div class="sp"><span class="lbl" style="margin:0">Sonderprüfung nach DIN 1076 veranlasst</span>'+ck(x.sonder)+ck(!x.sonder)+"</div>"+
     '<div class="ft"><div>'+esc(ORG.ort||"")+(ORG.ort?",":"")+"<span>"+dt2+"</span></div><div>Gesehen"+esc(ortSuffix())+"<span></span></div></div></div>"+
-    (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f,i){return '<figure><div class="fi"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="fd">'+fotoDatum(x,f)+"</span></div><figcaption>Foto "+(i+1)+(f.tag?": "+esc(f.tag):"")+"</figcaption></figure>"}).join("")+"</div>":"")+"</div>";
+    (mitFotos&&x.fotos.length?'<h4 style="margin-top:22px">Schadensbilder</h4><div class="fotos">'+x.fotos.map(function(f,i){return '<figure><div class="fi"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="fd">'+fotoDatum(x,f)+"</span></div><figcaption>"+esc(fotoCap(x,f,i))+"</figcaption></figure>"}).join("")+"</div>":"")+"</div>";
   return '<div class="pwrap" id="pwrap">'+html+"</div>";
 }
 function fitProt(){var w=$("pwrap"),p=$("prot");if(!w||!p)return;var sc=Math.min(1,w.clientWidth/640);p.style.transform="scale("+sc+")";w.style.height=(p.offsetHeight*sc)+"px"}
@@ -1078,10 +1091,10 @@ function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befun
 
 /* ---------- Kamera ---------- */
 var CAM={stream:null,visit:null,ori:null,heading:null};
-function camOpen(id){
-  CAM.visit=id;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;document.body.style.overflow="hidden";
+function camOpen(id,pp){
+  CAM.visit=id;CAM.pp=pp==null?null:pp;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;document.body.style.overflow="hidden";
   var tags=(typeById(x.typ)||typeOf(b)).tags||TAGS_STD;if(tags.indexOf(S.tag)<0)S.tag=tags[0];$("ctags").innerHTML=tags.map(function(t){return '<button type="button" data-act="ctag" data-t="'+esc(t)+'" aria-pressed="'+(S.tag===t)+'">'+esc(t)+"</button>"}).join("");
-  $("camCount").textContent=x.fotos.length+" Fotos";
+  $("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" "+ppOf(x)[CAM.pp].t+" · ":"")+x.fotos.length+" Fotos";$("ctags").hidden=CAM.pp!=null;
   $("refBtn").hidden=!b.refKey;$("refimg").hidden=true;$("opWrap").hidden=true;
   if(b.refKey)blobUrl(b.refKey).then(function(u){if(!u)return;$("refimg").src=u;$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
   startGps();
@@ -1105,9 +1118,9 @@ function updHud(){if($("cam").hidden)return;var p=[];
   $("hud").textContent=p.join(" · ")}
 function shoot(){
   var v=$("vid"),x=S.visits[CAM.visit];if(!CAM.stream||!v.videoWidth){toast("Kamera startet noch …");return}
-  var meta={lat:S.pos&&S.pos.lat||null,lon:S.pos&&S.pos.lon||null,acc:S.pos&&Math.round(S.pos.acc)||null,heading:CAM.heading!=null?Math.round(CAM.heading):null,neigung:roll()!=null?+roll().toFixed(1):null};
+  var meta={lat:S.pos&&S.pos.lat||null,lon:S.pos&&S.pos.lon||null,acc:S.pos&&Math.round(S.pos.acc)||null,heading:CAM.heading!=null?Math.round(CAM.heading):null,neigung:roll()!=null?+roll().toFixed(1):null};if(CAM.pp!=null){meta.pp=CAM.pp;meta.tag=ppOf(x)[CAM.pp].t}
   $("cam").style.opacity=.4;setTimeout(function(){$("cam").style.opacity=1},90);
-  toJpeg(v,v.videoWidth,v.videoHeight,SET.fotoMax,0.8).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=x.fotos.length+" Fotos"});
+  toJpeg(v,v.videoWidth,v.videoHeight,SET.fotoMax,0.8).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" · ":"")+x.fotos.length+" Fotos"});
 }
 
 /* ---------- Sprachaufnahme ---------- */
@@ -1351,7 +1364,7 @@ function pdfFotos(doc,x,b){
     var dt=fotoDatum(x,f);doc.setFont("helvetica","normal");doc.setFontSize(7);var tw=doc.getTextWidth(dt)+3;
     try{doc.saveGraphicsState();doc.setGState(new doc.GState({opacity:.35}));doc.setFillColor(0,0,0);doc.roundedRect(xx+w-tw-2,top+h-6,tw,4.2,.8,.8,"F");doc.restoreGraphicsState()}catch(e){}
     doc.setTextColor(255,255,255);doc.text(dt,xx+w-tw-0.5,top+h-2.9);doc.setTextColor(0);
-    doc.setFontSize(9.5);doc.text("Foto "+(i+1)+(f.tag?": "+f.tag:""),L,top+h+5)})})},Promise.resolve());
+    doc.setFontSize(9.5);doc.text(fotoCap(x,f,i),L,top+h+5)})})},Promise.resolve());
 }
 var LOGO=null;
 function loadLogo(){if(LOGO||!/kassel/i.test(ORG.kommune||""))return Promise.resolve();return fetch("logo-kassel.jpg").then(function(r){return r.ok?r.blob():null}).then(function(bl){if(!bl)return;return new Promise(function(res){var fr=new FileReader();fr.onload=function(){LOGO=fr.result;res()};fr.onerror=function(){res()};fr.readAsDataURL(bl)})}).catch(function(){})}
@@ -1566,6 +1579,23 @@ function freeSpace(mon){
     return Promise.all(present.map(delBlob)).then(function(){toast(present.length+" Dateien entfernt – "+(tot/1048576).toFixed(1).replace(".",",")+" MB frei.",5000);speicherInfo()})})}
 
 
+
+/* ---------- Tagesplan ---------- */
+function plan(){var p=ls("plan",null);if(!p||p.d!==today())p={d:today(),ids:[]};p.ids=p.ids.filter(function(i){return S.bw[i]});return p}
+function inPlan(id){return plan().ids.indexOf(id)>=0}
+function planToggle(id){var p=plan(),i=p.ids.indexOf(id);if(i>=0)p.ids.splice(i,1);else p.ids.push(id);lss("plan",p)}
+function doneToday(b){return visitsOf(b.id).some(function(v){return v.datum===today()&&v.status==="abgeschlossen"})}
+function planNext(curId){var ids=plan().ids.filter(function(i){return i!==curId&&!doneToday(S.bw[i])});if(!ids.length)return null;
+  if(S.pos)ids.sort(function(a,b){var A=S.bw[a],B=S.bw[b];return (A.lat==null)-(B.lat==null)||dist(S.pos.lat,S.pos.lon,A.lat,A.lon)-dist(S.pos.lat,S.pos.lon,B.lat,B.lon)});else ids.sort(function(a,b){return natCmp(S.bw[a].nr,S.bw[b].nr)});
+  return S.bw[ids[0]]}
+/* ---------- Offene Maßnahmen (nicht verkehrssicher / Sonderprüfung) ---------- */
+function massnOf(b){var l=b.letzte;if(!l||b.massnOk===l.datum)return null;var u=unsafe(b),sp=!!l.sonder;if(!u&&!sp)return null;return [u?"nicht verkehrssicher":"",sp?"Sonderprüfung veranlasst":""].filter(Boolean).join(" · ")}
+/* ---------- Foto-Beschriftung ---------- */
+function fotoCap(x,f,i){var pts=ppOf(x);return "Foto "+(i+1)+(f.pp!=null&&pts[f.pp]?" – Pkt. "+(f.pp+1)+" "+pts[f.pp].t:(f.tag?": "+f.tag:""))}
+function ppFotos(x,i){return x.fotos.filter(function(f){return f.pp===i}).length}
+/* ---------- Sicherungs-Erinnerung ---------- */
+function backupDue(){if(SY.on&&SY.email&&!SY.needLogin&&!SY.err)return false;var n=Object.keys(S.visits).length;if(!n)return false;var lb=ls("lastBackup",0);return Date.now()-lb>7*864e5}
+
 /* ---------- Wer / wann / Verlauf ---------- */
 function wer(){return {n:SET.pruefer||"",e:SY.email||""}}
 function wName(w){return w&&(w.n||w.e)||"unbekannt"}
@@ -1575,7 +1605,7 @@ function erledigtOf(x){return x.erledigt||(x.ende?{t:x.ende,n:x.pruefer,e:""}:nu
 function absDate(x){var e=x.geaendert||erledigtOf(x);return isoLocal(e?e.t:null)}
 function logV(x,a,d){x.log=x.log||[];var w=wer();x.log.push({t:new Date().toISOString(),n:w.n,e:w.e,a:a,d:d||""})}
 function logEdit(x,a,d){if(x.erledigt||x.ende)logV(x,a,d)}
-function letzteFrom(x){return {datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),pp:ppOf(x),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige}}
+function letzteFrom(x){return {datum:x.datum,pruefer:x.pruefer,ja:x.ja.slice(),pp:ppOf(x),verunreinigungen:x.verunreinigungen,schaden:x.schaden,sonstige:x.sonstige,sonder:!!x.sonder}}
 
 /* ---------- Papierkorb (30 Tage) ---------- */
 function papier(){return ls("papier",[])}
@@ -1608,7 +1638,7 @@ function papierHtml(){var l=papier();if(!l.length)return "";
 
 /* ---------- Datensicherung, Import ---------- */
 function backup(){
-  toast("Sicherung wird erstellt …",8000);
+  toast("Sicherung wird erstellt …",8000);lss("lastBackup",Date.now());
   var z=new JSZip();
   allBlobKeys().then(function(keys){
     return Promise.all(keys.map(function(k){return getBlob(k).then(function(bl){if(bl){z.file("blobs/"+encodeURIComponent(k),bl);return [k,bl.type]}})}));
@@ -1677,6 +1707,9 @@ document.addEventListener("click",function(ev){
   if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();if(k==="glas"||k==="look")lookRefresh();else render();return}
   if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();lookRefresh();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
   if(a==="reflex"){SET.reflex=!SET.reflex;saveSet();if(SET.reflex)startReflex(true);else setLight(25,0);lookRefresh();return}
+  if(a==="planEdit"){S.planEdit=!S.planEdit;render();return}
+  if(a==="planToggle"){planToggle(el.dataset.bw);render();return}
+  if(a==="massnOk"){var mb=S.bw[el.dataset.bw];if(!confirm("Maßnahme als erledigt eintragen?"))return;mb.massnOk=mb.letzte.datum;var mw=wer();mb.massnLog={t:new Date().toISOString(),n:mw.n,e:mw.e};saveB(mb);render();toast("Als erledigt eingetragen");return}
   if(a==="filt"){S.filter=el.dataset.f;if(view().name==="liste"){ev&&ev.preventDefault&&ev.preventDefault();render()}return}
   if(a==="gps"){startGps();toast("Standort wird ermittelt …");render();return}
   if(a==="start"){var tv=visitsOf(el.dataset.bw).filter(function(v){return v.datum===today()&&v.status==="abgeschlossen"})[0];
@@ -1697,7 +1730,7 @@ document.addEventListener("click",function(ev){
   if(a==="vfDl"){if(S.vf)dlAll(S.vf);return}
   if(a==="vfShare"){if(S.vf&&navigator.share)navigator.share({files:S.vf}).catch(function(e){if(e&&e.name!=="AbortError")toast("Teilen nicht möglich")});return}
   if(a==="closeModal"){closeModal();return}
-  if(a==="camOpen"){camOpen(id);return}
+  if(a==="camOpen"){camOpen(id,el.dataset.pp!=null?+el.dataset.pp:null);return}
   if(a==="camClose"){camClose();return}
   if(a==="shoot"){shoot();return}
   if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b2){b2.setAttribute("aria-pressed",String(b2.dataset.t===S.tag))});return}
