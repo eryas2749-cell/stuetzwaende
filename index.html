@@ -379,7 +379,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.25";
+var APPVER="0.26";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -1371,6 +1371,7 @@ function openSammel(){
     '<div id="sammelList">'+vs.map(function(v){var b=S.bw[v.bw];return '<label style="display:flex;align-items:center;border-top:1px solid var(--line);padding:8px 0;gap:10px;cursor:pointer"><input type="checkbox" data-sammel="'+esc(v.id)+'" '+((anyToday?v.datum===t:v.datum.slice(0,4)===year())?"checked":"")+' style="width:22px;height:22px"><span style="flex:1"><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="small muted">'+deDate(v.datum)+"</span></label>"}).join("")+"</div>"+
     (vs.length?'<button type="button" class="btn block big" data-act="sammelPdf" data-f="0">Sammel-PDF (Protokolle)</button>'+
     '<button type="button" class="btn soft block" data-act="sammelPdf" data-f="1">Sammel-PDF mit Fotos</button>':"")+
+    (function(){var oe=bwList().filter(function(b){return !b.eigentum}).map(function(b){return b.nr}).sort(natCmp);return oe.length?'<div class="alert warn" style="margin:0"><b>Eigentümer nicht hinterlegt bei '+oe.length+' Bauwerk(en):</b> '+esc(oe.slice(0,12).join(", "))+(oe.length>12?" …":"")+'. Im Protokoll steht dann automatisch „'+esc(ORG.kommune||"")+'“. Bei fremden Bauwerken bitte unter „Bauwerk bearbeiten“ eintragen.</div>':""})()+
     '<h3 style="margin-top:6px">Jahresübersicht '+year()+'</h3><span class="small muted">Alle Bauwerke mit Stand der Besichtigung '+year()+' – auch die noch offenen.</span>'+
     '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="jahresPdf">PDF</button><button type="button" class="btn soft" style="flex:1" data-act="jahresXlsx">Excel</button></div></div>');
 }
