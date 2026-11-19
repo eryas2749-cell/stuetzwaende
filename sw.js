@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Daten liegen in IndexedDB, nicht im Cache. */
-const CACHE = "besichtigung-v9";
+const CACHE = "besichtigung-v10";
 const CDN = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
 const FILES = ["./", "./index.html", "./vorlage.xlsm", "./jszip.min.js", "./jspdf.min.js", "./pdfjs.min.js", "./pdfjs.worker.min.js", "./logo-kassel.jpg", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];

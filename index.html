@@ -342,6 +342,18 @@ details.sub>div{display:flex;flex-direction:column;gap:10px}
 .ctags button[aria-pressed="true"]{background:#fff;color:#111}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .vdate input{max-width:220px}
+#cam video{transform-origin:center;transition:transform .08s linear}
+.zoombar{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.zoombar button{min-width:44px;height:36px;padding:0 10px;border-radius:18px;border:0;background:rgba(20,22,28,.55);color:#fff;font:600 13px var(--f);cursor:pointer}
+.zoombar button[aria-pressed="true"]{background:#fff;color:#111}
+#cam .shutRow{display:flex;align-items:center;justify-content:space-between}
+@media (orientation:landscape) and (max-height:600px){
+  #cam .shutRow{position:fixed;right:calc(12px + env(safe-area-inset-right,0px));top:0;bottom:0;flex-direction:column;justify-content:center;gap:22px;z-index:2}
+  #cam .bot,#cam .top{right:calc(112px + env(safe-area-inset-right,0px))}
+}
+.prot .fotos .fd:empty{display:none}
+.nx{display:flex;flex-direction:column;gap:6px}
+.nx .btn{text-align:left;justify-content:flex-start}
 .ts .sd{display:inline-block;width:9px;height:9px;border-radius:50%;background:currentColor;margin-right:7px;vertical-align:1px}
 .ts.neu{color:var(--muted)}
 @keyframes pgin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -381,20 +393,22 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <div class="bar2 bot">
     <div class="cglass" id="opWrap" style="padding:8px 14px" hidden><label class="small" style="display:flex;align-items:center;gap:10px">Altes Bild<input type="range" id="op" min="0" max="90" value="40"></label></div>
     <div class="ctags" id="ctags"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
+    <div class="zoombar" id="zoomBar"></div>
+    <div class="shutRow">
       <div class="cglass cbtn" id="camCount" style="min-width:64px">0 Fotos</div>
       <button class="shutter" type="button" data-act="shoot" aria-label="Foto aufnehmen"><span></span></button>
       <button class="cglass cbtn" type="button" data-act="camClose">Fertig</button>
     </div>
   </div>
 </div>
+<input type="file" id="sysCam" accept="image/*" capture="environment" hidden>
 <div id="modal" class="modal" hidden role="dialog" aria-modal="true"></div>
 <div class="toast glass" id="toast" hidden></div>
 
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.31";
+var APPVER="0.32";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -436,13 +450,18 @@ function hm(d){d=d||new Date();return pad(d.getHours())+":"+pad(d.getMinutes())}
 function ls(k,d){try{var v=localStorage.getItem("bb_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
 function lss(k,v){try{localStorage.setItem("bb_"+k,JSON.stringify(v))}catch(e){}}
 function toast(t,ms){var el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){el.hidden=true},ms||2600)}
+function navName(){return {google:"Google Maps",apple:"Apple Karten",waze:"Waze"}[SET.navApp||"google"]}
+function navUrl(b){var mode=SET.mode||"driving",ll=b.lat!=null&&b.lon!=null?(+b.lat).toFixed(6)+","+(+b.lon).toFixed(6):null,addr=b.adresse||b.name+ortSuffix(),app=SET.navApp||"google";
+  if(app==="waze")return ll?"https://waze.com/ul?ll="+ll+"&navigate=yes":"https://waze.com/ul?q="+encodeURIComponent(addr)+"&navigate=yes";
+  if(app==="apple")return "https://maps.apple.com/?daddr="+encodeURIComponent(ll||addr)+"&dirflg="+({driving:"d",walking:"w",transit:"r"}[mode]||"d");
+  return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(ll||addr)+"&travelmode="+mode}
 function maps(dest,mode){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest)+"&travelmode="+(mode||"driving")}
 function dist(a,b,c,d){var R=6371000,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)*Math.sin(x/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)*Math.sin(y/2);return 2*R*Math.asin(Math.sqrt(h))}
 function fmtDist(m){return m<1000?Math.round(m/10)*10+" m":(m/1000).toFixed(1).replace(".",",")+" km"}
 function natCmp(a,b){return String(a).localeCompare(String(b),"de",{numeric:true})}
 
 /* ---------- Einstellungen ---------- */
-var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",glas:"klar",hgFoto:false,reflex:true,look:"papier",tilt:false,font:"normal"},ls("settings",{}));
+var SET=Object.assign({pruefer:"Dogan",fotoName:"datum",protFormat:"xlsx",fotoMax:1920,mode:"driving",navApp:"google",stamp:"datum",cam:"app",glas:"klar",hgFoto:false,reflex:true,look:"papier",tilt:false,font:"normal"},ls("settings",{}));
 function saveSet(){lss("settings",SET)}
 
 /* ---------- Synchronisierung über Google Drive ----------
@@ -763,7 +782,7 @@ function resultsHtml(){
   var list=filtered();
   if(!list.length)return '<div class="glass empty">'+(!bwList().length?"Noch keine Bauwerke angelegt.":S.filter==="offen"&&!S.q?"Alles erledigt – alle Bauwerke für "+year()+" besichtigt.":S.filter==="heute"&&!S.q?"Noch nichts für heute eingeplant. Oben „Bauwerke für heute auswählen“ tippen.":"Keine Bauwerke gefunden.")+'</div><a class="btn soft sm" href="#neu" style="align-self:center">+ Bauwerke hinzufügen</a>';
   return '<div class="glass tlist"><div class="thead"><span>Nr.</span><span>Bauwerk</span><span style="text-align:right">Letzte</span></div>'+list.map(function(o){var b=o.b,t=typeOf(b);
-    var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?fmtDist(o.d):""].filter(Boolean).join(" · ");
+    var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?"≈ "+fmtDist(o.d)+" Luftlinie":""].filter(Boolean).join(" · ");
     if(S.planEdit)return '<button type="button" class="trow" data-act="planToggle" data-bw="'+esc(b.id)+'" style="width:100%;border:0;border-bottom:1px solid var(--line);background:'+(inPlan(b.id)?"var(--okbg)":"transparent")+';font:inherit;text-align:left;cursor:pointer;color:inherit"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+'</span><span class="ts '+(inPlan(b.id)?"ok":"")+'">'+(inPlan(b.id)?"✓ heute":"+")+"</span></button>";
     return '<a class="trow" href="#bw-'+esc(b.id)+'"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
     '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px"><a class="btn soft sm" href="#neu">+ Bauwerke hinzufügen</a>'+(bwList().length?'<button type="button" class="btn soft sm" data-act="sammel">Drucken &amp; Jahresübersicht</button>':"")+"</div>";
@@ -802,7 +821,7 @@ function deleteBw(id){var b=S.bw[id],vs=visitsOf(id);
 function headHtml(b,mid){var t=typeOf(b);
   return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+
   '<section class="glass panel"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
-  '<a class="btn soft sm" style="align-self:flex-start" href="'+esc(maps(b.adresse||b.name+ortSuffix(),SET.mode))+'" target="_blank" rel="noopener">Navigation starten</a></section>'+
+  '<a class="btn soft sm" style="align-self:flex-start" href="'+esc(navUrl(b))+'" target="_blank" rel="noopener">Navigation starten ('+navName()+')</a></section>'+
   (massnOf(b)?'<div class="alert bad"><b>Offen: '+esc(massnOf(b))+'</b> (Besichtigung vom '+deDate(b.letzte.datum)+').<div class="row" style="margin-top:8px"><button type="button" class="btn soft sm" data-act="massnOk" data-bw="'+esc(b.id)+'">Maßnahme erledigt</button></div></div>':
     (b.massnLog&&b.letzte&&b.massnOk===b.letzte.datum?'<div class="small vermerk" style="margin:0 16px">Maßnahme erledigt am '+dtTxt(b.massnLog.t)+" von "+esc(wName(b.massnLog))+"</div>":""))+
   (mid||"")+
@@ -846,7 +865,7 @@ function viewBw(b){
   var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
   var h=headHtml(b,done?'<section class="glass panel"><div class="row between"><h3>Besichtigung vom '+deDate(x.datum)+'</h3><span class="chip ok">abgeschlossen</span></div>'+vermerkHtml(x)+
     '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+id+'">Bearbeiten</button><button type="button" class="btn soft sm" style="flex:1" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung</button></div>'+
-    (function(){var nx=x.datum===today()?planNext(b.id):null;return nx?'<a class="btn block" href="#bw-'+esc(nx.id)+'">Nächstes im Tagesplan: '+esc(nx.nr)+" · "+esc(nx.name)+" ›</a>":(x.datum===today()&&inPlan(b.id)?'<div class="small" style="color:var(--ok);font-weight:600">Tagesplan erledigt ✓</div>':"")})()+"</section>":
+    (x.datum===today()?nextHtml(b):"")+"</section>":
     (x.erledigt?'<div class="alert warn">Du bearbeitest die Besichtigung vom <b>'+deDate(x.datum)+'</b>. Änderungen werden im Verlauf festgehalten. Zum Schluss wieder „Besichtigung abschließen“ tippen.</div>':""));
   if(!done)h+='<section class="glass panel"><label class="fld vdate">Besichtigt am<input type="date" data-vdate="'+id+'" value="'+esc(x.datum)+'" max="'+today()+'"></label><span class="small muted">Beim Nachtragen das echte Datum wählen. Bei Fotos vom Gerät wird das Aufnahmedatum automatisch übernommen.</span></section>';
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
@@ -915,7 +934,8 @@ function exportPanel(x){
   return '<section class="glass panel" id="protPanel">'+stepH(null,"Protokoll",'<span class="chip '+(x.befund==="keine Schadenserweiterung"?"ok":"warn")+'">'+esc(x.befund)+"</span>")+
     '<div class="row"><button type="button" class="btn big" style="flex:1" data-act="preview" data-visit="'+esc(x.id)+'">Protokoll ansehen</button>'+
     (n?'<button type="button" class="btn soft big" style="flex:1" data-act="preview" data-f="1" data-visit="'+esc(x.id)+'">Mit Schadensbildern</button>':"")+"</div>"+
-    '<span class="small muted">In der Ansicht: herunterladen als PDF oder Excel, Fotos speichern oder per Outlook senden.</span>'+
+    '<button type="button" class="btn soft block" data-act="sendZip" data-visit="'+esc(x.id)+'">An mich senden (WhatsApp, Mail …)</button>'+
+    '<span class="small muted">„An mich senden“: eine ZIP-Datei mit Protokoll (Excel) und allen Fotos, Dateinamen wie gewohnt. In WhatsApp an sich selbst schicken und im Büro über WhatsApp Web speichern. In der Protokoll-Ansicht: PDF oder Excel, Outlook.</span>'+
     '<details class="sub"><summary>Besichtigung löschen</summary><div><button type="button" class="btn danger sm" style="align-self:flex-start" data-act="delVisit" data-visit="'+esc(x.id)+'">Besichtigung endgültig löschen</button></div></details></section>';
 }
 
@@ -958,8 +978,13 @@ function viewEinst(){
     '<h3 style="margin-top:8px">Protokollkopf</h3>'+oi("kommune","Kommune","z. B. Stadt Musterstadt")+oi("amt","Amt / Dienststelle","z. B. Tiefbauamt")+
     '<div class="grid2">'+oi("abteilung","Abteilung","z. B. Ingenieurbauwerke")+oi("kennung","Kennung","z. B. 66.2")+"</div>"+oi("ort","Ort","z. B. Musterstadt")+
     '<h3 style="margin-top:8px">Fotos und Protokoll</h3><span class="muted small">Fotoqualität</span>'+seg("fotoMax",[[1600,"Klein"],[1920,"Standard"],[2560,"Hoch"]])+
+    '<span class="muted small">Datum auf Fotos (Protokoll, PDF und gespeicherte Fotos)</span>'+seg("stamp",[["aus","Kein Datum"],["datum","Datum"],["zeit","Datum + Uhrzeit"]])+
+    '<span class="muted small">Kamera</span>'+seg("cam",[["app","App-Kamera"],["system","Handy-Kamera"]])+
+    '<span class="muted small">App-Kamera: Wasserwaage, altes Bild, Zoom. Handy-Kamera: Kamera-App des Handys mit Autofokus und voller Auflösung (meist schärfer), ein Foto pro Aufnahme.</span>'+
 
     '<span class="muted small">Navigation</span>'+seg("mode",[["driving","Auto"],["transit","ÖPNV"],["walking","zu Fuß"]])+
+    '<span class="muted small">Navi-App</span>'+seg("navApp",[["google","Google Maps"],["apple","Apple Karten"],["waze","Waze"]])+
+    '<span class="muted small">Entfernungen in der App sind Luftlinie. Strecke, Fahrzeit, Stau und Sperrungen berechnet die Navi-App. Waze zeigt von Fahrern gemeldete Sperrungen meist am schnellsten (nur Auto).</span>'+
     '<h3 style="margin-top:8px">Bauwerksliste importieren</h3><a class="btn soft block" href="#neu">Liste laden (Excel, CSV oder Einfügen)</a>'+
     '<span class="muted small">Kopfzeile z. B. <span class="mono">Nr;Bezeichnung;Art;Einteilung;Adresse;Eigentümer</span>. Vorhandene Nummern werden aktualisiert.</span>'+
     '<h3 style="margin-top:8px">Datensicherung</h3><button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
@@ -1032,6 +1057,12 @@ function reopenVisit(x){x.status="in Arbeit";logV(x,"wieder geöffnet");var b=S.
 /* ---------- Bilder ---------- */
 function toJpeg(src,w,h,max,q){var s=Math.min(1,max/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);
   c.getContext("2d").drawImage(src,0,0,c.width,c.height);return new Promise(function(r){c.toBlob(r,"image/jpeg",q)})}
+function toJpegCrop(src,sx,sy,sw,sh,max,q){var s=Math.min(1,max/Math.max(sw,sh)),c=document.createElement("canvas");c.width=Math.round(sw*s);c.height=Math.round(sh*s);
+  c.getContext("2d").drawImage(src,sx,sy,sw,sh,0,0,c.width,c.height);return new Promise(function(r){c.toBlob(r,"image/jpeg",q)})}
+function stampJpeg(bl,txt){if(!txt)return Promise.resolve(bl);return createImageBitmap(bl).then(function(bm){var c=document.createElement("canvas");c.width=bm.width;c.height=bm.height;var g=c.getContext("2d");g.drawImage(bm,0,0);
+  var fs=Math.max(14,Math.round(Math.min(c.width,c.height)*0.032)),pd=Math.round(fs*0.35);g.font="500 "+fs+"px Arial, sans-serif";var tw=g.measureText(txt).width;
+  var bx=c.width-tw-pd*2-Math.round(fs*0.6),by=c.height-fs-pd*2-Math.round(fs*0.6);g.fillStyle="rgba(0,0,0,.38)";g.fillRect(bx,by,tw+pd*2,fs+pd*2);
+  g.fillStyle="#fff";g.textBaseline="top";g.fillText(txt,bx+pd,by+pd*1.1);return new Promise(function(r){c.toBlob(function(o){r(o||bl)},"image/jpeg",0.9)})}).catch(function(){return bl})}
 function exifDate(file){
   return file.slice(0,196608).arrayBuffer().then(function(buf){var v=new DataView(buf),n=v.byteLength;
     if(n<4||v.getUint16(0)!==0xFFD8)return null;var o=2;
@@ -1063,7 +1094,7 @@ function viewFoto(id,i){
     var cmp=u[1]?'<div class="cmp"><img src="'+u[0]+'" alt="Neues Foto"><div class="over" id="cmpOver"><img src="'+u[1]+'" alt="Altes Foto"></div><div class="line" id="cmpLine"></div><span class="lbl" style="left:8px">Neu</span><span class="lbl" style="right:8px">Alt</span></div><input type="range" id="cmpR" min="0" max="100" value="50" aria-label="Vergleich alt / neu" style="max-width:900px;margin:10px auto 0">':
       '<div class="cmp"><img src="'+u[0]+'" alt="Foto"></div>';
     var n=x.fotos.length;S.fv={id:id,i:i};
-    openModal('<div class="mbar"><b>Foto '+(i+1)+" / "+n+" · "+esc(f.tag)+" · "+fotoDatum(x,f)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
+    openModal('<div class="mbar"><b>Foto '+(i+1)+" / "+n+" · "+esc(f.tag)+" · "+fotoDatumVoll(x,f)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
       '<div class="fvwrap">'+cmp+(n>1?'<button type="button" class="fvnav l" data-act="fvNav" data-d="-1" aria-label="Vorheriges Foto">‹</button><button type="button" class="fvnav r" data-act="fvNav" data-d="1" aria-label="Nächstes Foto">›</button>':"")+"</div>"+
       (n>1?'<p class="small" style="color:#ddd;text-align:center;margin:8px 0 0">Wischen oder Pfeile zum Blättern</p>':"")+
       '<div class="row" style="justify-content:center;margin-top:12px">'+
@@ -1121,19 +1152,33 @@ function schadenText(x){var sch=(x.schaden||"").replace(/;\s*/g,"\n");if(x.befun
 
 /* ---------- Kamera ---------- */
 var CAM={stream:null,visit:null,ori:null,heading:null};
+function sysCamOpen(id,pp){CAM.visit=id;CAM.pp=pp==null?null:pp;startGps();var i=$("sysCam");i.value="";i.click()}
+function camZoomInit(st){var tr=st.getVideoTracks()[0],caps={};try{caps=tr&&tr.getCapabilities?tr.getCapabilities():{}}catch(e){}
+  CAM.track=tr;CAM.hw=caps.zoom&&caps.zoom.max>1.05?caps.zoom:null;CAM.z=1;$("vid").style.transform="";
+  try{if(caps.focusMode&&caps.focusMode.indexOf("continuous")>=0)tr.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(function(){})}catch(e){}
+  var o=CAM.hw?[0.5,1,2,3,5].filter(function(z){return z>=CAM.hw.min-0.01&&z<=CAM.hw.max+0.01}):[1,2,3];if(o.indexOf(1)<0)o.unshift(1);CAM.zopts=o;zoomBar()}
+function zoomBar(){var el=$("zoomBar");if(!el)return;el.innerHTML=(CAM.zopts||[1]).map(function(z){return '<button type="button" data-act="zoom" data-z="'+z+'" aria-pressed="'+(Math.abs((CAM.z||1)-z)<0.05)+'">'+String(z).replace(".",",")+"×</button>"}).join("")+
+  ((CAM.z||1)>1.05&&!CAM.hw?'<span class="small" style="opacity:.85">'+String(Math.round(CAM.z*10)/10).replace(".",",")+"× digital</span>":"")+'<button type="button" data-act="sysCam">Handy-Kamera</button>'}
+function setZoom(z){var lo=CAM.hw?CAM.hw.min:1,hi=CAM.hw?Math.min(CAM.hw.max,10):4;z=Math.max(lo,Math.min(hi,z));CAM.z=z;
+  if(CAM.hw){try{CAM.track.applyConstraints({advanced:[{zoom:z}]}).catch(function(){})}catch(e){}}else $("vid").style.transform=z>1.01?"scale("+z.toFixed(2)+")":"";zoomBar()}
+function camPinch(){if(CAM.pinch)return;CAM.pinch=true;var c=$("cam"),d0=0,z0=1;function dd(t){return Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY)}
+  c.addEventListener("touchstart",function(e){if(e.touches.length===2){d0=dd(e.touches);z0=CAM.z||1}},{passive:true});
+  c.addEventListener("touchmove",function(e){if(e.touches.length===2&&d0)setZoom(z0*dd(e.touches)/d0)},{passive:true});
+  c.addEventListener("touchend",function(e){if(e.touches.length<2)d0=0},{passive:true})}
 function camOpen(id,pp){
-  CAM.visit=id;CAM.pp=pp==null?null:pp;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;document.body.style.overflow="hidden";
+  if(SET.cam==="system"){sysCamOpen(id,pp);return}
+  CAM.visit=id;CAM.pp=pp==null?null:pp;var x=S.visits[id],b=S.bw[x.bw];$("cam").hidden=false;camPinch();CAM.zopts=[1];CAM.z=1;zoomBar();document.body.style.overflow="hidden";
   var tags=(typeById(x.typ)||typeOf(b)).tags||TAGS_STD;if(tags.indexOf(S.tag)<0)S.tag=tags[0];$("ctags").innerHTML=tags.map(function(t){return '<button type="button" data-act="ctag" data-t="'+esc(t)+'" aria-pressed="'+(S.tag===t)+'">'+esc(t)+"</button>"}).join("");
-  $("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" "+ppOf(x)[CAM.pp].t+" · ":"")+x.fotos.length+" Fotos";$("ctags").hidden=CAM.pp!=null;
+  $("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" "+ppOf(x)[CAM.pp].t+" · ":"")+(x.fotos.length===1?"1 Foto":x.fotos.length+" Fotos");$("ctags").hidden=CAM.pp!=null;
   $("refBtn").hidden=!b.refKey;$("refimg").hidden=true;$("opWrap").hidden=true;
   if(b.refKey)blobUrl(b.refKey).then(function(u){if(!u)return;$("refimg").src=u;$("refimg").hidden=false;$("opWrap").hidden=false;setOp()});
   startGps();
   try{if(!CAM.oriOk){if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==="function"){if(!CAM.oriAsked){CAM.oriAsked=true;DeviceOrientationEvent.requestPermission().then(function(s){if(s==="granted")listenOri()}).catch(function(){})}}else listenOri()}}catch(e){}
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast("Kamera nicht verfügbar – bitte „Fotos aus Galerie“ nutzen.");return}
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440}},audio:false}).then(function(st){CAM.stream=st;$("vid").srcObject=st;updHud()})
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:3840},height:{ideal:2160}},audio:false}).then(function(st){CAM.stream=st;$("vid").srcObject=st;camZoomInit(st);updHud()})
     .catch(function(){toast("Kamera nicht erlaubt. In den Einstellungen des Handys freigeben oder „Fotos aus Galerie“ nutzen.",4000);camClose()});
 }
-function camClose(){if(CAM.stream)CAM.stream.getTracks().forEach(function(t){t.stop()});CAM.stream=null;$("cam").hidden=true;document.body.style.overflow="";render()}
+function camClose(){if(CAM.stream)CAM.stream.getTracks().forEach(function(t){t.stop()});CAM.stream=null;CAM.track=null;$("vid").style.transform="";$("cam").hidden=true;document.body.style.overflow="";render()}
 function setOp(){$("refimg").style.opacity=$("op").value/100}
 function listenOri(){if(CAM.oriOk)return;CAM.oriOk=true;if(CAM.listening)return;CAM.listening=true;
   window.addEventListener("deviceorientation",function(e){CAM.ori={beta:e.beta,gamma:e.gamma};if(e.webkitCompassHeading!=null)CAM.heading=e.webkitCompassHeading;updLevel();updHud()});
@@ -1150,7 +1195,8 @@ function shoot(){
   var v=$("vid"),x=S.visits[CAM.visit];if(!CAM.stream||!v.videoWidth){toast("Kamera startet noch …");return}
   var meta={lat:S.pos&&S.pos.lat||null,lon:S.pos&&S.pos.lon||null,acc:S.pos&&Math.round(S.pos.acc)||null,heading:CAM.heading!=null?Math.round(CAM.heading):null,neigung:roll()!=null?+roll().toFixed(1):null};if(CAM.pp!=null){meta.pp=CAM.pp;meta.tag=ppOf(x)[CAM.pp].t}
   $("cam").style.opacity=.4;setTimeout(function(){$("cam").style.opacity=1},90);
-  toJpeg(v,v.videoWidth,v.videoHeight,SET.fotoMax,0.8).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" · ":"")+x.fotos.length+" Fotos"});
+  var vw=v.videoWidth,vh=v.videoHeight,z=!CAM.hw&&CAM.z>1.01?CAM.z:1;if(z>1)meta.zoom=+z.toFixed(1);
+  (z>1?toJpegCrop(v,(vw-vw/z)/2,(vh-vh/z)/2,vw/z,vh/z,SET.fotoMax,0.85):toJpeg(v,vw,vh,SET.fotoMax,0.85)).then(function(bl){return addFoto(x,bl,meta)}).then(function(){$("camCount").textContent=(CAM.pp!=null?"Pkt. "+(CAM.pp+1)+" · ":"")+(x.fotos.length===1?"1 Foto":x.fotos.length+" Fotos")});
 }
 
 /* ---------- Sprachaufnahme ---------- */
@@ -1248,7 +1294,7 @@ function buildStandard(x,b){ // allgemeines Excel-Protokoll für alle Bauwerksar
 function exportFiles(x,what){
   var b=S.bw[x.bw],jobs=[];
   if(what!=="fotos")jobs.push(buildProtokoll(x,b).then(function(bl){return new File([bl],protName(x,b),{type:MIME[protExt(x)]})}));
-  if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(ensureBlob(f.key).then(function(bl){if(!bl)throw new Error("Foto "+(i+1)+" noch nicht geladen – bitte Internet prüfen");return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
+  if(what!=="prot")x.fotos.forEach(function(f,i){jobs.push(ensureBlob(f.key).then(function(bl){if(!bl)throw new Error("Foto "+(i+1)+" noch nicht geladen – bitte Internet prüfen");return stampJpeg(bl,fotoDatum(x,f))}).then(function(bl){return new File([bl],fotoName(x,i),{type:"image/jpeg"})}))});
   return Promise.all(jobs);
 }
 function download(file){var a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
@@ -1260,6 +1306,11 @@ function share(x){
     dlAll(files);toast("Teilen hier nicht möglich – PDF und Excel werden heruntergeladen, bitte an die Mail anhängen.",5000);
   }).catch(function(e){toast("Fehler: "+(e&&e.message||e))});
 }
+function zipVisits(vs){if(!vs.length)return;toast("ZIP wird erstellt ("+vs.length+") …",20000);var z=new JSZip(),n=0;
+  return vs.reduce(function(p,x){return p.then(function(){var b=S.bw[x.bw];return exportFiles(x,"alles").then(function(fs){var dir=z.folder(fsafe(b.nr+"_"+x.datum+"_Besichtigung"));fs.forEach(function(f){dir.file(f.name,f);n++})})})},Promise.resolve())
+  .then(function(){return z.generateAsync({type:"blob",mimeType:"application/zip"})}).then(function(bl){var x0=vs[0],b0=S.bw[x0.bw],nm=vs.length>1?"Besichtigungen "+today()+" ("+vs.length+" Bauwerke).zip":b0.nr+"_"+x0.datum+"_Besichtigung.zip";
+    showFiles([new File([bl],fsafe(nm),{type:"application/zip"})],{title:"An mich senden",note:"ZIP mit "+n+" Dateien ("+vs.map(function(v){return S.bw[v.bw].nr}).join(", ")+"). „Teilen“ tippen und WhatsApp wählen – an sich selbst oder einen Kollegen. Im Büro in WhatsApp Web herunterladen und entpacken."})})
+  .catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)})}
 function dlZip(x){var b=S.bw[x.bw];exportFiles(x,"alles").then(function(files){var z=new JSZip(),dir=z.folder(b.nr+"_"+x.datum+"_Besichtigung");files.forEach(function(f){dir.file(f.name,f)});return z.generateAsync({type:"blob"}).then(function(bl){showFiles([new File([bl],b.nr+"_"+x.datum+"_Besichtigung.zip",{type:"application/zip"})],{title:"ZIP-Datei",note:"Enthält: "+files.map(function(f){return f.name}).join(", ")})})}).catch(function(e){toast("Fehler: "+(e&&e.message||e))})}
 
 /* ---------- Archiv: frühere Besichtigungen (alte Protokolle und Fotos) ---------- */
@@ -1382,7 +1433,9 @@ function pdfProt(doc,x,b){
   doc.setLineWidth(.2);doc.line(L,y+13,L+70,y+13);doc.line(R-70,y+13,R,y+13);doc.setFontSize(7.5);doc.setTextColor(90);txt("Unterschrift Prüfer",L,y+17);txt("Unterschrift Vorgesetzte/r",R-70,y+17);
   var ev=erledigtOf(x);if(ev){doc.setFontSize(7);txt("Abgeschlossen am "+dtTxt(ev.t)+" von "+wName(ev)+(x.geaendert?" · geändert am "+dtTxt(x.geaendert.t)+" von "+wName(x.geaendert):""),L,y+23)}doc.setTextColor(0);
 }
-function fotoDatum(x,f){return deDate((f&&f.ts||"").slice(0,10)||x.datum)}
+function fotoZeit(f){if(!f||!f.ts||f.ts.length<16)return "";var t=new Date(f.ts);return isNaN(t)?"":pad(t.getHours())+":"+pad(t.getMinutes())}
+function fotoDatumVoll(x,f){var z=fotoZeit(f);return deDate((f&&f.ts?isoLocal(f.ts):"")||x.datum)+(z?" "+z:"")}
+function fotoDatum(x,f){var m=SET.stamp||"datum";if(m==="aus")return "";var d=deDate((f&&f.ts?isoLocal(f.ts):"")||x.datum);if(m==="zeit"){var z=fotoZeit(f);if(z)d+=" "+z}return d}
 function pdfFotos(doc,x,b){
   var L=15,W=180,n=x.fotos.length;if(!n)return Promise.resolve();
   var seiten=Math.ceil(n/2);
@@ -1391,9 +1444,9 @@ function pdfFotos(doc,x,b){
       doc.setFontSize(8);doc.setTextColor(90);doc.text(deDate(x.datum)+" · Schadensbilder "+b.nr+" · Seite "+(Math.floor(i/2)+1)+" von "+seiten,105,289,{align:"center"});doc.setTextColor(0)}
     var top=slot?156:24,mh=118,k=Math.min(W/im.w,mh/im.h),w=im.w*k,h=im.h*k,xx=L+(W-w)/2;
     doc.addImage(im.d,"JPEG",xx,top,w,h);
-    var dt=fotoDatum(x,f);doc.setFont("helvetica","normal");doc.setFontSize(7);var tw=doc.getTextWidth(dt)+3;
+    var dt=fotoDatum(x,f);if(dt){doc.setFont("helvetica","normal");doc.setFontSize(7);var tw=doc.getTextWidth(dt)+3;
     try{doc.saveGraphicsState();doc.setGState(new doc.GState({opacity:.35}));doc.setFillColor(0,0,0);doc.roundedRect(xx+w-tw-2,top+h-6,tw,4.2,.8,.8,"F");doc.restoreGraphicsState()}catch(e){}
-    doc.setTextColor(255,255,255);doc.text(dt,xx+w-tw-0.5,top+h-2.9);doc.setTextColor(0);
+    doc.setTextColor(255,255,255);doc.text(dt,xx+w-tw-0.5,top+h-2.9);doc.setTextColor(0)}
     doc.setFontSize(9.5);doc.text(fotoCap(x,f,i),L,top+h+5)})})},Promise.resolve());
 }
 var LOGO=null;
@@ -1413,7 +1466,8 @@ function openSammel(){
     '<div class="row"><button type="button" class="btn soft sm" data-act="sammelAll" data-v="1">Alle</button><button type="button" class="btn soft sm" data-act="sammelAll" data-v="0">Keine</button></div>':'<span class="small muted">Noch keine abgeschlossenen Besichtigungen für ein Sammel-PDF.</span>')+
     '<div id="sammelList">'+vs.map(function(v){var b=S.bw[v.bw];return '<label style="display:flex;align-items:center;border-top:1px solid var(--line);padding:8px 0;gap:10px;cursor:pointer"><input type="checkbox" data-sammel="'+esc(v.id)+'" '+((anyToday?v.datum===t:v.datum.slice(0,4)===year())?"checked":"")+' style="width:22px;height:22px"><span style="flex:1"><b>'+esc(b.nr)+"</b> · "+esc(b.name)+'</span><span class="small muted">'+deDate(v.datum)+"</span></label>"}).join("")+"</div>"+
     (vs.length?'<button type="button" class="btn block big" data-act="sammelPdf" data-f="0">Sammel-PDF (Protokolle)</button>'+
-    '<button type="button" class="btn soft block" data-act="sammelPdf" data-f="1">Sammel-PDF mit Fotos</button>':"")+
+    '<button type="button" class="btn soft block" data-act="sammelPdf" data-f="1">Sammel-PDF mit Fotos</button>'+
+    '<button type="button" class="btn soft block" data-act="sammelZip">An mich senden – ZIP (Protokolle + Fotos, WhatsApp)</button>':"")+
     (function(){var oe=bwList().filter(function(b){return !b.eigentum}).map(function(b){return b.nr}).sort(natCmp);return oe.length?'<div class="alert warn" style="margin:0"><b>Eigentümer nicht hinterlegt bei '+oe.length+' Bauwerk(en):</b> '+esc(oe.slice(0,12).join(", "))+(oe.length>12?" …":"")+'. Im Protokoll steht dann automatisch „'+esc(ORG.kommune||"")+'“. Bei fremden Bauwerken bitte unter „Bauwerk bearbeiten“ eintragen.</div>':""})()+
     '<h3 style="margin-top:6px">Jahresübersicht '+year()+'</h3><span class="small muted">Alle Bauwerke mit Stand der Besichtigung '+year()+' – auch die noch offenen.</span>'+
     '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="jahresPdf">PDF</button><button type="button" class="btn soft" style="flex:1" data-act="jahresXlsx">Excel</button></div></div>');
@@ -1567,7 +1621,7 @@ function showFiles(files,opt){opt=opt||{};S.vf=files;var tt=$("toast");if(tt)tt.
   var canShare=false;try{canShare=!!(navigator.canShare&&navigator.canShare({files:files}))}catch(e){}
   openModal('<div class="mbar"><b>'+esc(opt.title||"Vorschau")+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
     '<div class="vf-head"><div class="vf-names">'+files.map(function(f){return esc(f.name)+' <span>· '+fmtSize(f.size)+"</span>"}).join("<br>")+"</div>"+
-    '<div class="vf-acts"><button type="button" class="btn" data-act="vfDl">Herunterladen'+(files.length>1?" ("+files.length+")":"")+"</button>"+(canShare?'<button type="button" class="btn soft" data-act="vfShare">Teilen / Mail</button>':"")+"</div></div>"+
+    '<div class="vf-acts"><button type="button" class="btn" data-act="vfDl">Herunterladen'+(files.length>1?" ("+files.length+")":"")+"</button>"+(canShare?'<button type="button" class="btn soft" data-act="vfShare">Teilen (WhatsApp, Mail …)</button>':"")+"</div></div>"+
     '<div id="vfBody" class="vf-body"></div>');
   var el=$("vfBody"),pdfs=files.filter(function(f){return /\.pdf$/i.test(f.name)}),imgs=files.filter(function(f){return /^image\//.test(f.type)||/\.(jpe?g|png)$/i.test(f.name)});
   if(opt.html){el.innerHTML=opt.html;fitProt();hydrate();return}
@@ -1615,6 +1669,16 @@ function plan(){var p=ls("plan",null);if(!p||p.d!==today())p={d:today(),ids:[]};
 function inPlan(id){return plan().ids.indexOf(id)>=0}
 function planToggle(id){var p=plan(),i=p.ids.indexOf(id);if(i>=0)p.ids.splice(i,1);else p.ids.push(id);lss("plan",p)}
 function doneToday(b){return visitsOf(b.id).some(function(v){return v.datum===today()&&v.status==="abgeschlossen"})}
+function nextCands(b){var ids=plan().ids,y=year(),fromPlan=ids.length>0,c;
+  if(fromPlan)c=ids.filter(function(i){return i!==b.id&&S.bw[i]&&!doneToday(S.bw[i])}).map(function(i){return S.bw[i]});
+  else c=bwList().filter(function(o){return o.id!==b.id&&o.bezirk===b.bezirk&&o.art===b.art&&!(o.letzte&&String(o.letzte.datum||"").slice(0,4)===y)&&!doneToday(o)});
+  var ref=b.lat!=null?{lat:b.lat,lon:b.lon}:(S.pos?{lat:S.pos.lat,lon:S.pos.lon}:null);
+  c=c.map(function(o){return {b:o,d:ref&&o.lat!=null?dist(ref.lat,ref.lon,o.lat,o.lon):null}});
+  c.sort(function(p,q){return (p.d==null)-(q.d==null)||(p.d||0)-(q.d||0)||natCmp(p.b.nr,q.b.nr)});return {plan:fromPlan,list:c.slice(0,3)}}
+function nextHtml(b){var n=nextCands(b);
+  if(!n.list.length)return n.plan?'<div class="small" style="color:var(--ok);font-weight:600">Tagesplan erledigt ✓</div>':'<div class="small" style="color:var(--ok);font-weight:600">Alle Bauwerke dieser Einteilung sind '+year()+' besichtigt ✓</div>';
+  return '<div class="nx"><span class="muted small">'+(n.plan?"Als Nächstes im Tagesplan – nächstgelegene zuerst":"In der Nähe, "+year()+" noch offen – nächstgelegene zuerst")+(b.lat!=null?" (ab diesem Bauwerk, Luftlinie)":"")+"</span>"+
+    n.list.map(function(o,i){return '<a class="btn'+(i?" soft sm":" block")+'" href="#bw-'+esc(o.b.id)+'">'+(i?"":"Weiter: ")+esc(o.b.nr)+" · "+esc(o.b.name)+(o.d!=null?" · ≈ "+fmtDist(o.d):"")+" ›</a>"}).join("")+"</div>"}
 function planNext(curId){var ids=plan().ids.filter(function(i){return i!==curId&&!doneToday(S.bw[i])});if(!ids.length)return null;
   if(S.pos)ids.sort(function(a,b){var A=S.bw[a],B=S.bw[b];return (A.lat==null)-(B.lat==null)||dist(S.pos.lat,S.pos.lon,A.lat,A.lon)-dist(S.pos.lat,S.pos.lon,B.lat,B.lon)});else ids.sort(function(a,b){return natCmp(S.bw[a].nr,S.bw[b].nr)});
   return S.bw[ids[0]]}
@@ -1719,6 +1783,7 @@ document.addEventListener("click",function(ev){
   if(a==="sammelAll"){document.querySelectorAll("[data-sammel]").forEach(function(c){c.checked=el.dataset.v==="1"});return}
   if(a==="sammelPdf"){var sel=sammelSel();if(!sel.length){toast("Bitte mindestens ein Protokoll wählen.");return}var mf=el.dataset.f==="1";toast("Sammel-PDF wird erstellt ("+sel.length+") …",15000);
     buildPdf(sel.slice().sort(function(a,b){return natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)}),mf).then(function(bl){showFiles([new File([bl],fsafe("Besichtigungsprotokolle "+today()+(mf?" mit Fotos":"")+".pdf"),{type:"application/pdf"})],{title:"Sammel-PDF ("+sel.length+")"})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)});return}
+  if(a==="sammelZip"){var sz=sammelSel();if(!sz.length){toast("Bitte mindestens ein Protokoll wählen.");return}zipVisits(sz.slice().sort(function(a,b){return natCmp(S.bw[a.bw].nr,S.bw[b.bw].nr)}));return}
   if(a==="jahresXlsx"){jahresXlsx();return}
   if(a==="jahresPdf"){jahresPdf();return}
   if(a==="impPaste"){var tp=$("impPaste");var rr=parseDelim(tp?tp.value:"");if(rr.length<2){toast("Bitte Überschrift und mindestens eine Zeile einfügen.");return}impStart(rr);return}
@@ -1763,6 +1828,8 @@ document.addEventListener("click",function(ev){
   if(a==="camOpen"){camOpen(id,el.dataset.pp!=null?+el.dataset.pp:null);return}
   if(a==="camClose"){camClose();return}
   if(a==="shoot"){shoot();return}
+  if(a==="zoom"){setZoom(+el.dataset.z);return}
+  if(a==="sysCam"){var cv=CAM.visit,cp=CAM.pp;if(!$("cam").hidden)camClose();sysCamOpen(cv,cp);return}
   if(a==="ctag"){S.tag=el.dataset.t;document.querySelectorAll("#ctags button").forEach(function(b2){b2.setAttribute("aria-pressed",String(b2.dataset.t===S.tag))});return}
   if(a==="refToggle"){var ri=$("refimg");ri.hidden=!ri.hidden;$("opWrap").hidden=ri.hidden;return}
   if(a==="backup"){backup();return}
@@ -1797,6 +1864,7 @@ document.addEventListener("click",function(ev){
   if(a==="dlProt"){exportFiles(x,"prot").then(function(fs){showFiles(fs,{title:"Excel-Protokoll",html:protWrap(x,false)})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlFotos"){exportFiles(x,"fotos").then(function(fs){showFiles(fs,{title:"Fotos ("+fs.length+")"})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlZip"){dlZip(x);return}
+  if(a==="sendZip"){zipVisits([x]);return}
   if(a==="delVisit"){if(!confirm("Besichtigung vom "+deDate(x.datum)+" löschen?\n\nSie kommt in den Papierkorb und kann 30 Tage lang wiederhergestellt werden (Einstellungen → Papierkorb)."))return;
     var bv=S.bw[x.bw];if(x.status==="abgeschlossen"&&bv.letzte&&bv.letzte.datum===x.datum){bv.letzte=x.basisLetzte||null;saveB(bv)}
     x.fotos.concat(x.audios).forEach(function(f){delete SY.ob.blobs[f.key]});delete SY.ob.prot[x.id];saveOb();
@@ -1820,6 +1888,9 @@ document.addEventListener("change",function(ev){
   if(el.dataset.imp==="letter"&&S.imp){S.imp.letter=el.checked;render();return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
+  if(el.id==="sysCam"&&el.files.length){var xs=S.visits[CAM.visit],f0=el.files[0];el.value="";if(!xs)return;
+    var ms={quelle:"Handy-Kamera",lat:S.pos&&S.pos.lat||null,lon:S.pos&&S.pos.lon||null,acc:S.pos&&Math.round(S.pos.acc)||null};if(CAM.pp!=null){ms.pp=CAM.pp;ms.tag=ppOf(xs)[CAM.pp].t}
+    toast("Foto wird übernommen …");fileToJpeg(f0).then(function(bl){return addFoto(xs,bl,ms)}).then(function(){render();toast("Foto "+xs.fotos.length+" gespeichert. Nächstes Foto: wieder „Foto aufnehmen“.",3500)}).catch(function(e){toast("Fehler: "+(e&&e.message||e))});return}
   if(el.dataset.gal&&el.files.length){var x2=S.visits[el.dataset.gal],fs=Array.from(el.files);el.value="";toast("Fotos werden übernommen …");
     Promise.all(fs.map(fileDate)).then(function(ds){
       var tage={};ds.forEach(function(d){if(d)tage[d.slice(0,10)]=1});var tl=Object.keys(tage).sort(),hin="";
