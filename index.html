@@ -408,7 +408,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.40";
+var APPVER="0.41";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -681,7 +681,7 @@ function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.vi
 
 /* ---------- Liquid-Glass-Darstellung ---------- */
 function applyLook(){
-  var r=document.documentElement;r.setAttribute("data-glass",SET.glas);r.setAttribute("data-font",SET.font==="gross"?"gross":"normal");SET.look="papier";SET.hgFoto=false;r.setAttribute("data-look","papier");
+  var r=document.documentElement;r.setAttribute("data-glass",SET.glas);r.setAttribute("data-font",SET.font==="gross"?"gross":"normal");r.setAttribute("data-look",SET.look==="glas"?"glas":"papier");
   var tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.setAttribute("content",SET.look==="glas"?"#4D6A8C":(matchMedia("(prefers-color-scheme: dark)").matches&&r.getAttribute("data-theme")!=="light"||r.getAttribute("data-theme")==="dark"?"#0F1B2D":"#FFFFFF"));
   var fx=$("bgfx");
   if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl){fx.classList.remove("foto");fx.style.backgroundImage="";return}
@@ -936,7 +936,7 @@ function exportPanel(x){
 function seg(k,opts,small){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" data-act="setOpt" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(SET[k])===String(o[0]))+'"'+(small?' style="font-size:12px"':"")+">"+esc(o[1])+"</button>"}).join("")+"</div>"}
 function lookHtml(inl){
   var t=document.documentElement.getAttribute("data-theme")||"auto";
-  return (inl?'<h3 style="margin-top:8px">Darstellung</h3>':'<div class="row between"><h3>Darstellung</h3><button type="button" class="ibtn" data-act="lookClose" aria-label="Schließen" style="width:36px;height:36px">✕</button></div>')+
+  return (inl?'':'<div class="row between"><h3>Darstellung</h3><button type="button" class="ibtn" data-act="lookClose" aria-label="Schließen" style="width:36px;height:36px">✕</button></div>')+
     seg("look",[["papier","Schlicht"],["glas","Glas"]])+
     '<div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Auto"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div>"+
     seg("font",[["normal","Schrift normal"],["gross","Schrift groß"]])+
@@ -956,13 +956,13 @@ function viewEinst(){
   var h='<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a><section class="glass panel"><h2>Einstellungen</h2>'+
     '<label class="fld">Name (erscheint im Protokoll)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label>'+
     '<span class="muted small">Datum auf Fotos</span>'+seg("stamp",[["aus","Kein Datum"],["datum","Datum"],["zeit","Datum + Uhrzeit"]])+
-    '<span class="muted small">Schrift</span>'+seg("font",[["normal","Normal"],["gross","Groß"]])+
-    '<span class="muted small">Helligkeit</span><div class="seg" role="group" aria-label="Helligkeit">'+[["auto","Auto"],["light","Hell"],["dark","Dunkel"]].map(function(o){return '<button type="button" data-act="setTheme" data-v="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+"</button>"}).join("")+"</div></section>";
+    "</section>"+
+    '<details class="glass" id="lookDet"'+(S.lookDet?" open":"")+'><summary>Darstellung</summary><div class="panel" id="lookIn">'+lookHtml(true)+"</div></details>";
   h+='<section class="glass panel" id="sync"><h3>Synchronisierung (Google Drive)</h3><span class="small" id="syncStat">'+esc(syncText())+'</span>'+
     (!SY.on||SY.needLogin?'<button type="button" class="btn block" data-act="login">Mit Google anmelden</button>':'<button type="button" class="btn soft block" data-act="syncNow">Jetzt synchronisieren</button>')+
     '<span class="muted small">Handy und Büro-PC mit demselben Google-Konto anmelden.</span>'+
     (SY.on?'<button type="button" class="btn danger sm" data-act="logout" style="align-self:flex-start">Abmelden</button>':"")+"</section>";
-  h+='<details class="glass"'+(S.einstOpen?" open":"")+'><summary>Verwaltung</summary><div class="panel">'+
+  h+='<details class="glass" id="verwDet"'+(S.einstOpen?" open":"")+'><summary>Verwaltung</summary><div class="panel">'+
     '<a class="btn soft block" href="#neu">Bauwerke hinzufügen / Liste importieren</a>'+
     '<button type="button" class="btn soft block" data-act="sammel">Mehrere Protokolle: Sammel-PDF, ZIP, Jahresübersicht</button>'+
     '<h3 style="margin-top:8px">Datensicherung</h3><button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
@@ -1779,7 +1779,7 @@ document.addEventListener("click",function(ev){
   if(a==="setArtF"){S.art=el.dataset.v;S.bez="";render();return}
   if(a==="setGrp"){S.bez=el.dataset.v;render();return}
   if(a==="filtArt"){S.art=el.dataset.art;S.bez="";S.filter="alle";return}
-  if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}applyLook();lookRefresh();if(view().name==="einst")render();return}
+  if(a==="setTheme"){var v=el.dataset.v;if(v==="auto"){document.documentElement.removeAttribute("data-theme");lss("theme",null)}else{document.documentElement.setAttribute("data-theme",v);lss("theme",v)}applyLook();lookRefresh();return}
   if(a==="setbg"){S.bg=el.dataset.v;document.documentElement.setAttribute("data-bg",S.bg);lss("bg",S.bg);lookRefresh();return}
   if(a==="setOpt"){var k=el.dataset.k,val=el.dataset.v;SET[k]=k==="fotoMax"?+val:val;saveSet();S.files={};applyLook();if(k==="glas"||k==="look")lookRefresh();else render();return}
   if(a==="hg"){SET.hgFoto=el.dataset.v==="foto";saveSet();applyLook();lookRefresh();if(SET.hgFoto)getBlob("hintergrund").then(function(bl){if(!bl)toast("Jetzt „Foto wählen“ tippen.")});return}
@@ -1896,6 +1896,7 @@ function pgFx(){var ap=$("app");if(!ap)return;ap.classList.remove("pgin");void a
 function doneFx(){var d=document.createElement("div");d.className="donefx";d.setAttribute("aria-hidden","true");
   d.innerHTML='<div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><span>Abgeschlossen</span>';
   document.body.appendChild(d);setTimeout(function(){d.remove()},1400);if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}}
+document.addEventListener("toggle",function(e){var d=e.target;if(d.id==="lookDet")S.lookDet=d.open;if(d.id==="verwDet")S.einstOpen=d.open},true);
 window.addEventListener("hashchange",function(){lookOpen(false);if(!$("cam").hidden)camClose();closeModal();render();pgFx();scrollTo({top:0})});
 window.addEventListener("orientationchange",updLevel);
 
