@@ -466,7 +466,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.50";
+var APPVER="0.51";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -1221,6 +1221,7 @@ function planApply(){var p=S.planImp;if(!p)return;var n=0,neu=0,jobs=[];
 function viewBw(b){
   var x=curVisit(b);
   if(x&&x.status!=="abgeschlossen")return viewBwVisit(b,x,false);
+  if(!x){var ld=lastDone(b);if(ld&&ld.datum.slice(0,4)===year())x=ld}
   var massn=headHtml(b,"",true).replace(/^<a [^>]*>‹ Bauwerke<\/a>/,"").replace(/<section class="alert warn"><b>Hinweise<\/b>[\s\S]*$/,"");
   return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+sbTop(b)+docsHtml(b)+mapHtml(b)+massn+besKopf(b,x)+
     (x?viewBwVisit(b,x,true):(b.letzte?lastHtml(b):""))+fruehereHtml(b,x);
