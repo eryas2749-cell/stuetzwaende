@@ -399,6 +399,32 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @keyframes dfck{to{stroke-dashoffset:0}}
 :root[data-font="gross"] #app,:root[data-font="gross"] header.top,:root[data-font="gross"] #lookPop{zoom:1.14}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}.bgfx i{animation:none!important}#app.pgin{animation:none}.donefx,.donefx div,.donefx path{animation-duration:.01s!important;animation-delay:0s!important}}
+.sigrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sigbox{border:1px dashed var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:4px;min-height:92px;justify-content:space-between}
+.sigbox .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.sigbox img{max-height:48px;max-width:100%;object-fit:contain;align-self:flex-start;background:#fff;border-radius:4px;padding:2px 4px}
+.trl{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.trrow{display:flex;gap:10px;align-items:center}
+.trrow img{width:44px;height:44px;object-fit:cover;border-radius:6px;opacity:.75}
+.tn .mk{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;margin-right:6px;font-size:12px;font-weight:800;vertical-align:-4px;flex:none}
+.tn .mk.ok{background:var(--ok);color:#fff}.tn .mk.op{box-shadow:inset 0 0 0 2px var(--line)}.tn .mk.sk{background:var(--line);color:var(--muted)}
+.trow.dn{background:linear-gradient(90deg,var(--okbg),transparent 70%)}
+.trow.skp{opacity:.6}
+.trow.sel{background:var(--okbg)}
+.trow .self{font:600 12px var(--f);border-radius:999px;padding:3px 9px;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer}
+.trow .self[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.prog{height:8px;border-radius:999px;background:var(--line);overflow:hidden;flex:1;min-width:80px}.prog i{display:block;height:100%;background:var(--ok);border-radius:999px}
+.selbar{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;margin:8px 0;background:var(--field);box-shadow:0 4px 18px rgba(0,0,0,.18);border-radius:12px}
+.bigbar{height:14px;border-radius:999px;background:var(--line);overflow:hidden}.bigbar div{height:100%;background:var(--ok)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column}.kpi b{font-size:22px}.kpi span{font-size:12px;color:var(--muted)}
+.kpi.ok b{color:var(--ok)}.kpi.warn b{color:var(--warn)}.kpi.bad b{color:var(--bad)}
+.dashrow{display:flex;align-items:center;gap:10px;padding:8px 0;border:0;border-top:1px solid var(--line);background:transparent;color:inherit;font:inherit;cursor:pointer;width:100%}
+.minibar{flex:0 0 32%;height:8px;border-radius:999px;background:var(--line);overflow:hidden}.minibar i{display:block;height:100%;background:var(--ok)}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;height:130px;align-items:end}
+.months div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;color:var(--muted)}
+.months i{display:block;width:70%;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px}.months b{font-size:10px;color:var(--fg);height:12px}
+@media (max-width:420px){.kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -440,7 +466,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <script src="jszip.min.js"></script>
 <script>
 "use strict";
-var APPVER="0.43";
+var APPVER="0.50";
 var PP_SW=["Außergew. Veränderungen","Verschiebungen am Bauwerk","Verkehrssicherheit gegeben","Bewuchs","Risse","Schäden Stützwandfuß","Mauerwerk (Verband)","Mauerwerk (Steinschäden)","Mauerwerk (Fugenmörtel)","Beton (Abplatzungen)","Beton (Aussinterungen)","Beton (dauerelast. Fugen)","Beton (freiliegende Bew.)","Kopfbalken / Mauerkrone","Abdeckung","Absturzsicherung / Zaun","Treppen / -wangen","sonstige Mängel / Auffälligkeiten"];
 var TAGS_SW=["Übersicht","4 Bewuchs","5 Risse","6 Wandfuß","8 Steine","9 Fugen","14 Mauerkrone","15 Abdeckung","16 Zaun","17 Treppen","Graffiti","18 Sonstiges"];
 var BGS=[["nebel","Nebel","#7FA3D9","#B9A2E3","#3F6390"],["salbei","Salbei","#7DBF8E","#E3D27F","#3E6A52"],["sand","Sand","#F0A877","#E8938F","#8E4F37"],["lavendel","Lavendel","#A894EE","#EE9CC6","#5A4B93"],["graphit","Graphit","#9AA6B6","#C4BDB2","#36424F"]];
@@ -563,7 +589,8 @@ function queueBlob(key,owner,bw,name){SY.ob.blobs[key]={owner:owner,bw:bw,name:n
 function queueTrash(id){if(id){SY.ob.trash.push(id);saveOb();schedSync(3000)}}
 function pending(){return Object.keys(SY.ob.rec).length+Object.keys(SY.ob.blobs).length+Object.keys(SY.ob.prot).length+SY.ob.trash.length}
 function recOf(key){var t=key.split(":"),id=t.slice(1).join(":");return t[0]==="cfg"?ORG:t[0]==="bw"?S.bw[id]:S.visits[id]}
-function remoteIdOf(k){var id=null;Object.keys(S.visits).some(function(v){var x=S.visits[v];return (x.fotos||[]).concat(x.audios||[]).some(function(f){if(f.key===k&&f.driveId){id=f.driveId;return true}})});
+function remoteIdOf(k){var id=null;Object.keys(S.visits).some(function(v){var x=S.visits[v];return (x.fotos||[]).concat(x.audios||[]).concat((x.trash||[]).map(function(e){return e.f})).some(function(f){if(f.key===k&&f.driveId){id=f.driveId;return true}})});
+  if(!id)Object.keys(S.bw).some(function(b){return (S.bw[b].trash||[]).some(function(e){if(e.a.key===k&&e.a.driveId){id=e.a.driveId;return true}})});
   if(!id)Object.keys(S.bw).some(function(b){if(S.bw[b].refKey===k&&S.bw[b].refDriveId){id=S.bw[b].refDriveId;return true}return (S.bw[b].archiv||[]).some(function(a){if(a.key===k&&a.driveId){id=a.driveId;return true}})});return id}
 var fetching={};
 function ensureBlob(k){return getBlob(k).then(function(bl){if(bl)return bl;var id=remoteIdOf(k);if(!id||!tokOk())return null;
@@ -574,7 +601,9 @@ function mergeList(a,b,del){var seen={},out=[];a.concat(b).forEach(function(f){i
   return out.sort(function(x,y){return String(x.ts||x.zeit).localeCompare(String(y.ts||y.zeit))})}
 function applyRemote(d){
   var t=d.k.split(":"),typ=t[0],id=t.slice(1).join(":"),loc=recOf(d.k),lu=loc?(loc.upd||0):(SY.tomb[d.k]||0);
-  if(typ==="cfg"){if(!d.d||d.upd<=lu)return false;ORG=d.d;migrateOrg();lss("org",ORG);applyOrg();delete SY.ob.rec[d.k];saveOb();return true}
+  if(typ==="cfg"){if(!d.d)return false;var mu=mergeUsers(ORG.users,d.d.users),locU=JSON.stringify(ORG.users||[]);
+    if(d.upd<=lu){if(JSON.stringify(mu)!==locU&&JSON.stringify(mu)!==JSON.stringify(d.d.users||[])){ORG.users=mu;saveOrg();return true}if(JSON.stringify(mu)!==locU){ORG.users=mu;lss("org",ORG);return true}return false}
+    ORG=d.d;ORG.users=mu;migrateOrg();lss("org",ORG);applyOrg();if(JSON.stringify(mu)!==JSON.stringify(d.d.users||[]))saveOrg();else{delete SY.ob.rec[d.k];saveOb()}return true}
   if(d.deleted){if(!loc||d.upd<=lu)return false;SY.tomb[d.k]=d.upd;lss("tomb",SY.tomb);delete SY.ob.rec[d.k];saveOb();
     var von=d.by||{n:"anderes Gerät",e:""},am=new Date(d.upd).toISOString();
     if(typ==="bw"){var ob=S.bw[id];toPapier({typ:"bw",bw:ob,visits:[],nr:ob.nr,name:ob.name,am:am,von:von,remote:true});delete S.bw[id];del("bauwerke",id)}
@@ -583,6 +612,7 @@ function applyRemote(d){
   if(typ==="bw"){if(d.upd<=lu)return false;saveB(d.d,true);delete SY.ob.rec[d.k];saveOb();return true}
   var r=d.d,remoteWins=d.upd>lu,dl=(loc.del||[]).concat(r.del||[]).filter(function(k,i,a){return a.indexOf(k)===i});
   var base=Object.assign({},remoteWins?r:loc);base.del=dl;base.fotos=mergeList(base.fotos||[],(remoteWins?loc:r).fotos||[],dl);base.audios=mergeList(base.audios||[],(remoteWins?loc:r).audios||[],dl);
+  base.trash=mergeTrash(loc.trash,r.trash);
   var lg={};(loc.log||[]).concat(r.log||[]).forEach(function(e){lg[e.t+"|"+e.a+"|"+e.d]=e});base.log=Object.keys(lg).map(function(k){return lg[k]}).sort(function(a,b){return a.t<b.t?-1:1});
   if(base.protDriveId==null)base.protDriveId=loc.protDriveId||r.protDriveId;
   var same=function(a,b){return JSON.stringify(a)===JSON.stringify(b)};
@@ -609,9 +639,9 @@ function pushBlobs(){
     return getBlob(k).then(function(bl){if(!bl){delete SY.ob.blobs[k];saveOb();return}
       return ensureBwFolder(q.bw).then(function(fo){return dCreate({name:q.name,parents:[fo],appProperties:{bbBlob:k}},bl)}).then(function(j){
         var t=q.owner.split(":"),oid=t.slice(1).join(":"),hit=false;
-        if(t[0]==="v"&&S.visits[oid]){var x=S.visits[oid];(x.fotos||[]).concat(x.audios||[]).forEach(function(f){if(f.key===k){f.driveId=j.id;hit=true}});if(hit)saveV(x);
+        if(t[0]==="v"&&S.visits[oid]){var x=S.visits[oid];(x.fotos||[]).concat(x.audios||[]).concat((x.trash||[]).map(function(e){return e.f})).forEach(function(f){if(f.key===k){f.driveId=j.id;hit=true}});if(hit)saveV(x);
           Object.keys(S.bw).forEach(function(b){if(S.bw[b].refKey===k&&!S.bw[b].refDriveId){S.bw[b].refDriveId=j.id;saveB(S.bw[b])}})}
-        if(t[0]==="bw"&&S.bw[oid]){var ob=S.bw[oid],ch=false;if(ob.refKey===k){ob.refDriveId=j.id;ch=true}(ob.archiv||[]).forEach(function(a){if(a.key===k){a.driveId=j.id;ch=true}});
+        if(t[0]==="bw"&&S.bw[oid]){var ob=S.bw[oid],ch=false;if(ob.refKey===k){ob.refDriveId=j.id;ch=true}(ob.archiv||[]).concat((ob.trash||[]).map(function(e){return e.a})).forEach(function(a){if(a.key===k){a.driveId=j.id;ch=true}});
           Object.keys(S.bw).forEach(function(z){if(z!==oid&&S.bw[z].refKey===k&&!S.bw[z].refDriveId){S.bw[z].refDriveId=j.id;saveB(S.bw[z])}});if(ch){saveB(ob);hit=true}}
         if(!hit)SY.ob.trash.push(j.id);
         delete SY.ob.blobs[k];saveOb()})})}))},Promise.resolve())}
@@ -706,7 +736,7 @@ function saveV(v,remote){S.visits[v.id]=v;if(S.files)delete S.files[v.id];if(!re
 function saveB(b,remote){S.bw[b.id]=b;if(!remote){b.upd=Date.now();markDirty("bw:"+b.id)}return put("bauwerke",b).catch(function(){toast("Speichern fehlgeschlagen.")})}
 function bwList(){return Object.keys(S.bw).map(function(k){return S.bw[k]})}
 function year(){return today().slice(0,4)}
-function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())}
+function doneThisYear(b){return !!(b.letzte&&String(b.letzte.datum).slice(0,4)===year())||!!(b.plan&&planExt(b))}
 function hasMangel(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return x&&pp[i]&&!pp[i].pos}))}
 function unsafe(b){var l=b.letzte,pp=ppOf(l);return !!(l&&l.ja&&l.ja.some(function(x,i){return !x&&pp[i]&&pp[i].pos}))}
 function visitsOf(bwId){return Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.bw===bwId}).sort(function(a,b){return b.datum.localeCompare(a.datum)||String(b.ende||"~").localeCompare(String(a.ende||"~"))})}
@@ -751,13 +781,14 @@ function view(){var h=location.hash.replace("#","");
   if(h==="neu1")return {name:"edit",id:null};
   if(h==="import")return {name:"import"};
   if(h.indexOf("art-")===0)return {name:"art",id:h.slice(4)};
-  if(h==="einst")return {name:h};
+  if(h==="einst"||h==="wer"||h==="dash"||h==="papier")return {name:h};
   return {name:"liste"}}
 var rq=0;function renderSoon(){if(rq)return;rq=setTimeout(function(){rq=0;var a=document.activeElement;if(a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type!=="range"&&a.type!=="file"))){a.addEventListener("blur",renderSoon,{once:true});return}render()},40)}
 function render(){
   var v=view();
   $("gearBtn").setAttribute("aria-current",v.name==="einst"||v.name==="art"?"page":"false");
-  $("app").innerHTML=v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="einst"?viewEinst():v.name==="art"?viewArt(v.id):v.name==="neu"?viewNeu():v.name==="import"?viewImport():viewListe();
+  if(users().length&&!me()&&v.name!=="wer"&&v.name!=="einst"){v={name:"wer"}}
+  $("app").innerHTML=v.name==="wer"?viewWer():v.name==="dash"?viewDash():v.name==="papier"?viewPapier():v.name==="bw"?viewBw(S.bw[v.id]):v.name==="edit"?viewEdit(v.id?S.bw[v.id]:null):v.name==="einst"?viewEinst():v.name==="art"?viewArt(v.id):v.name==="neu"?viewNeu():v.name==="import"?viewImport():viewListe();
   hydrate();
   if(v.name==="bw"){var xv=S.bw[v.id]&&curVisit(S.bw[v.id]);if(xv&&xv.status==="abgeschlossen")prep(xv).catch(function(){})}
 }
@@ -773,14 +804,14 @@ function filtered(){
     if(S.art&&t.id!==S.art)return false;
     if(S.art&&S.bez&&String(b.bezirk||"")!==S.bez)return false;
     if(S.filter==="heute"&&!S.planEdit)return inPlan(b.id);
-    if(S.filter==="offen")return !doneThisYear(b);
+    if(S.filter==="offen")return !doneThisYear(b)&&!planSkip(b);
     return true;
   }).map(function(b){return {b:b,d:S.pos&&b.lat!=null?dist(S.pos.lat,S.pos.lon,b.lat,b.lon):null}})
    .sort(function(a,b){return S.pos?((a.d==null)-(b.d==null)||(a.d||0)-(b.d||0)):natCmp(a.b.nr,b.b.nr)});
 }
 function viewListe(){
-  var all=bwList(),y=year(),done=all.filter(doneThisYear).length,arten=ORG.types.map(function(t){return {t:t,n:all.filter(function(b){return typeOf(b).id===t.id}).length}}).filter(function(o){return o.n});
-  if(S.art&&!arten.some(function(o){return o.t.id===S.art})){S.art="";S.bez=""}
+  var all0=bwList(),y=year(),all=all0,arten=ORG.types.map(function(t){return {t:t,n:all.filter(function(b){return typeOf(b).id===t.id}).length}}).filter(function(o){return o.n});
+  var all=all0;if(S.art&&!arten.some(function(o){return o.t.id===S.art})){S.art="";S.bez=""}
   if(S.filter!=="offen"&&S.filter!=="heute")S.filter="alle";if(S.filter!=="heute")S.planEdit=false;
   var run=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status!=="abgeschlossen"&&S.bw[v.bw]});
   var h="";
@@ -795,7 +826,10 @@ function viewListe(){
   var ta=S.art?typeById(S.art):(arten.length===1?arten[0].t:null);
   if(ta){if(!S.art)S.art=ta.id;var gs=Array.from(new Set(all.filter(function(b){return typeOf(b).id===ta.id}).map(function(b){return String(b.bezirk||"")}).filter(Boolean))).sort(natCmp);
     if(gs.length>1)h+='<div class="chiprow" role="group" aria-label="'+esc(grp(ta))+'"><button type="button" data-act="setGrp" data-v="" aria-pressed="'+!S.bez+'">Alle</button>'+gs.map(function(g){return '<button type="button" data-act="setGrp" data-v="'+esc(g)+'" aria-pressed="'+(S.bez===g)+'">'+(g.length<=3?esc(grp(ta))+" ":"")+esc(g)+"</button>"}).join("")+"</div>"}
-  h+='<div class="count"><span class="small muted">'+done+" von "+all.length+" in "+y+' besichtigt</span>'+
+  var scope=all.filter(function(b){return (!S.art||typeOf(b).id===S.art)&&(!S.bez||String(b.bezirk||"")===S.bez)&&!planSkip(b)}),done=scope.filter(doneThisYear).length,pc=scope.length?Math.round(done*100/scope.length):0;
+  h+='<div class="row" style="align-items:center;gap:10px"><span class="small"><b>'+done+" von "+scope.length+"</b> "+(S.bez?esc(grp(typeById(S.art)||typeOf(scope[0]||{}))+" "+S.bez):"")+" "+y+' besichtigt</span><span class="prog"><i style="width:'+pc+'%"></i></span><span class="small muted">'+pc+" %</span></div>"+
+    (S.selMode?'<div class="alert warn" style="margin:0">Protokolle antippen, die gedruckt werden sollen. Bei jedem einzeln „ohne/mit Fotos“ wählen. <button type="button" class="btn soft sm" data-act="selAll" style="margin-top:6px">Alle angezeigten auswählen</button></div>':"")+
+    '<div class="count"><span class="small muted"></span>'+
     '<div class="seg" role="group" aria-label="Filter"><button type="button" data-act="filt" data-f="alle" aria-pressed="'+(S.filter!=="offen")+'">Alle</button><button type="button" data-act="filt" data-f="offen" aria-pressed="'+(S.filter==="offen")+'">Noch offen</button><button type="button" data-act="filt" data-f="heute" aria-pressed="'+(S.filter==="heute")+'">Heute'+(plan().ids.length?" ("+plan().ids.filter(function(i){return doneToday(S.bw[i])}).length+"/"+plan().ids.length+")":"")+'</button></div></div>'+
     (S.filter==="heute"?'<button type="button" class="btn '+(S.planEdit?"":"soft ")+'sm" data-act="planEdit" style="align-self:flex-start">'+(S.planEdit?"Auswahl fertig":"Bauwerke für heute auswählen")+"</button>":"")+"</section>";
   h+='<div id="results">'+resultsHtml()+"</div>";
@@ -807,6 +841,8 @@ function statHtml(b){var x=curVisit(b);if(x&&x.status==="abgeschlossen"&&x.datum
   return (unsafe(b)?'<span class="chip bad">Nicht verkehrssicher</span>':hasMangel(b)?'<span class="chip warn">Mit Befund</span>':'<span class="chip ok">Ohne Befund</span>')+'<span class="muted small">'+deDate(b.letzte.datum)+"</span>"}
 function tstat(b){var x=curVisit(b);if(x&&x.status==="abgeschlossen"&&x.datum!==today())x=null;
   if(x)return x.status==="abgeschlossen"?'<span class="ts ok"><span><i class="sd"></i>heute ✓</span></span>':'<span class="ts run"><span><i class="sd"></i>in Arbeit</span></span>';
+  if(planSkip(b)&&!doneThisYear(b))return '<span class="ts neu"><span><i class="sd"></i>keine Bes.</span><small>'+year()+" Prüfung</small></span>";
+  var pe=planExt(b);if(pe&&!(b.letzte&&String(b.letzte.datum).slice(0,4)===year()))return '<span class="ts ok"><span><i class="sd"></i>lt. Plan ✓</span><small>'+deDate(pe.datum)+"</small></span>";
   if(!b.letzte)return '<span class="ts neu"><span><i class="sd"></i>neu</span></span>';
   var c=unsafe(b)?"bad":hasMangel(b)?"warn":"ok",w=unsafe(b)?"nicht verkehrssicher":hasMangel(b)?"Befund":"o. B.";
   return '<span class="ts '+c+'"><span><i class="sd"></i>'+w+"</span><small>"+deDate(b.letzte.datum)+"</small></span>"}
@@ -816,8 +852,14 @@ function resultsHtml(){
   return '<div class="glass tlist"><div class="thead"><span>Nr.</span><span>Bauwerk</span><span style="text-align:right">Letzte</span></div>'+list.map(function(o){var b=o.b,t=typeOf(b);
     var sub=[b.bezirk?grp(t)+" "+b.bezirk:"",o.d!=null?"≈ "+fmtDist(o.d)+" Luftlinie":""].filter(Boolean).join(" · ");
     if(S.planEdit)return '<button type="button" class="trow" data-act="planToggle" data-bw="'+esc(b.id)+'" style="width:100%;border:0;border-bottom:1px solid var(--line);background:'+(inPlan(b.id)?"var(--okbg)":"transparent")+';font:inherit;text-align:left;cursor:pointer;color:inherit"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+'</span><span class="ts '+(inPlan(b.id)?"ok":"")+'">'+(inPlan(b.id)?"✓ heute":"+")+"</span></button>";
-    return '<a class="trow" href="#bw-'+esc(b.id)+'"><span class="tn">'+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
-    (heuteFertig().length?'<div style="display:flex;justify-content:center;padding:16px"><button type="button" class="btn soft" data-act="heuteZip">Heute an mich senden ('+heuteFertig().length+' Bauwerke, WhatsApp)</button></div>':"");
+    var dy=doneThisYear(b),sk=!dy&&planSkip(b),mk='<i class="mk '+(dy?"ok":sk?"sk":"op")+'" aria-label="'+(dy?year()+" besichtigt":sk?"keine Besichtigung":"offen")+'">'+(dy?"✓":sk?"–":"")+"</i>";
+    if(S.selMode){var sv0=selVisit(b),on=!!(S.sel&&S.sel[b.id]);if(!sv0)return '<div class="trow skp"><span class="tn">'+mk+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+'</b><span>kein Protokoll vorhanden</span></span><span></span></div>';
+      return '<div class="trow'+(on?" sel":"")+'"><button type="button" data-act="selRow" data-bw="'+esc(b.id)+'" style="display:contents;font:inherit;color:inherit"><span class="tn"><i class="mk '+(on?"ok":"op")+'">'+(on?"✓":"")+"</i>"+esc(b.nr)+'</span><span class="tm" style="text-align:left"><b>'+esc(b.name)+"</b><span>Protokoll "+deDate(sv0.datum)+" · "+sv0.fotos.length+" Fotos</span></span></button>"+
+        (on?'<button type="button" class="self" data-act="selFoto" data-bw="'+esc(b.id)+'" aria-pressed="'+!!S.sel[b.id].f+'">'+(S.sel[b.id].f?"mit Fotos":"ohne Fotos")+"</button>":"<span></span>")+"</div>"}
+    return '<a class="trow'+(dy?" dn":sk?" skp":"")+'" href="#bw-'+esc(b.id)+'"><span class="tn">'+mk+esc(b.nr)+'</span><span class="tm"><b>'+esc(b.name)+"</b>"+(sub?"<span>"+esc(sub)+"</span>":"")+"</span>"+tstat(b)+"</a>"}).join("")+"</div>"+
+    selBar()+(S.selMode?"":
+    '<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px 16px 0"><a class="btn soft sm" href="#dash">Übersicht &amp; Dashboard</a><button type="button" class="btn soft sm" data-act="selStart">Protokolle auswählen &amp; drucken</button><a class="btn soft sm" href="#papier">Papierkorb'+(trashRows(null).length?" ("+trashRows(null).length+")":"")+"</a></div>")+
+    (!S.selMode&&heuteFertig().length?'<div style="display:flex;justify-content:center;padding:16px"><button type="button" class="btn soft" data-act="heuteZip">Heute an mich senden ('+heuteFertig().length+' Bauwerke, WhatsApp)</button></div>':"");
 }
 
 /* Bauwerk anlegen / bearbeiten */
@@ -916,14 +958,280 @@ function steckbrief(b){var t=typeOf(b),sb=b.sib||null,tb=sb&&sb.tbw&&sb.tbw[0]||
     '<button type="button" class="btn soft sm" style="flex:1" data-act="planToggle" data-bw="'+esc(b.id)+'">'+(inPlan(b.id)?"✓ Für heute":"Für heute einplanen")+"</button>"+
     (lv?'<button type="button" class="btn soft sm" style="flex:1" data-act="preview" data-visit="'+esc(lv.id)+'">Letztes Protokoll</button>':"")+"</div></div>";
   return '<section class="glass sb">'+hero+head+'<div class="sb-grid">'+kv.join("")+"</div>"+more+mapStrip+act+(sb?'<div class="sb-foot">Bauwerksdaten aus SIB-Übersichtsblatt'+(sb.druck?" (Druck "+esc(sb.druck)+")":"")+"</div>":"")+"</section>"}
+/* ===== Nutzer, PIN, Unterschrift ===== */
+function allUsers(){return ORG.users||(ORG.users=[])}
+function users(){return allUsers().filter(function(u){return !u.weg})}
+function userById(id){return users().filter(function(u){return u.id===id})[0]||null}
+function me(){return userById(ls("me",""))}
+function vorgesetzte(){return users().filter(function(u){return u.rolle==="vorgesetzter"})}
+function uSlug(n){var s="u_"+String(n||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");return s.length>2?s:"u_"+Date.now().toString(36)}
+function rolleTxt(u){return u&&u.rolle==="vorgesetzter"?"Vorgesetzte/r":"Bearbeiter/in"}
+function pinHash(uid,pin){var s="bwc|"+uid+"|"+pin;
+  if(window.crypto&&crypto.subtle&&window.TextEncoder)return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ("0"+x.toString(16)).slice(-2)}).join("")});
+  var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Promise.resolve("x"+h)}
+function usersInit(){
+  if(!users().length&&Object.keys(S.visits).length){var n=SET.pruefer||"Dogan",u={id:uSlug(n),name:n,rolle:"bearbeiter",pin:null,sig:null,upd:Date.now()};allUsers().push(u);saveOrg();lss("me",u.id)}
+  var m=me();if(m&&SET.pruefer!==m.name){SET.pruefer=m.name;saveSet()}}
+function mergeUsers(a,b){var m={};(a||[]).concat(b||[]).forEach(function(u){var o=m[u.id];if(!o||(u.upd||0)>(o.upd||0))m[u.id]=u});return Object.keys(m).map(function(k){return m[k]})}
+function pinAsk(o){
+  return new Promise(function(res){S.pinRes=res;var list=o.users||users().map(function(u){return u.id});
+    if(!list.length){res(null);toast(o.leer||"Keine passende Person angelegt (Einstellungen → Nutzer).",5000);return}
+    var pre=o.uid&&list.indexOf(o.uid)>=0?o.uid:list[0];
+    openModal('<div class="glass panel" style="max-width:420px;margin:10vh auto 0"><h3>'+esc(o.title)+"</h3>"+(o.text?'<span class="small muted">'+esc(o.text)+"</span>":"")+
+      '<label class="fld">Person<select id="pinUser">'+list.map(function(id){var u=userById(id);return '<option value="'+esc(id)+'"'+(id===pre?" selected":"")+">"+esc(u.name)+" ("+rolleTxt(u)+")</option>"}).join("")+"</select></label>"+
+      '<label class="fld">PIN<input type="password" inputmode="numeric" maxlength="8" id="pinIn" autocomplete="off"></label><span class="small" id="pinErr" style="color:var(--bad)"></span>'+
+      '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="pinCancel">Abbrechen</button><button type="button" class="btn" style="flex:1" data-act="pinOk">Bestätigen</button></div></div>');
+    setTimeout(function(){var i=$("pinIn");if(i)i.focus()},60)})}
+function pinDone(u){var r=S.pinRes;S.pinRes=null;closeModal();if(r)r(u)}
+function pinCheck(){var uid=$("pinUser").value,pin=$("pinIn").value,u=userById(uid);
+  if(!u.pin){$("pinErr").textContent="Für "+u.name+" ist noch keine PIN festgelegt. Auf dessen Gerät: Einstellungen → Nutzer → PIN festlegen.";return}
+  pinHash(uid,pin).then(function(h){if(h===u.pin)pinDone(u);else{$("pinErr").textContent="PIN falsch.";$("pinIn").value="";$("pinIn").focus()}})}
+function pinSetDlg(u){var go=function(){openModal('<div class="glass panel" style="max-width:420px;margin:10vh auto 0"><h3>PIN für '+esc(u.name)+"</h3>"+
+    '<span class="small muted">4 bis 8 Ziffern. Die PIN braucht man zum Anmelden, Unterschreiben und Freigeben.</span>'+
+    '<label class="fld">Neue PIN<input type="password" inputmode="numeric" maxlength="8" id="pinN1" autocomplete="off"></label><label class="fld">Wiederholen<input type="password" inputmode="numeric" maxlength="8" id="pinN2" autocomplete="off"></label>'+
+    '<span class="small" id="pinErr" style="color:var(--bad)"></span><div class="row"><button type="button" class="btn soft" style="flex:1" data-act="closeModal">Abbrechen</button><button type="button" class="btn" style="flex:1" data-act="pinSave" data-u="'+esc(u.id)+'">Speichern</button></div></div>');
+    setTimeout(function(){var i=$("pinN1");if(i)i.focus()},60)};
+  if(u.pin)pinAsk({title:"Alte PIN eingeben",users:[u.id],uid:u.id}).then(function(ok){if(ok)go()});else go()}
+function pinSave(uid){var a=$("pinN1").value,b=$("pinN2").value,u=userById(uid);
+  if(!/^\d{4,8}$/.test(a)){$("pinErr").textContent="Bitte 4 bis 8 Ziffern.";return}if(a!==b){$("pinErr").textContent="Die beiden Eingaben sind verschieden.";return}
+  pinHash(uid,a).then(function(h){u.pin=h;u.upd=Date.now();saveOrg();closeModal();toast("PIN gespeichert");render();if(!u.sig&&me()&&me().id===u.id)setTimeout(function(){if(confirm("Jetzt noch die Unterschrift anlegen?"))sigPad(u.id)},300)})}
+function sigPad(uid){var u=userById(uid);
+  openModal('<div class="glass panel" style="max-width:600px;margin:6vh auto 0"><h3>Unterschrift – '+esc(u.name)+'</h3><span class="small muted">Mit dem Finger im weißen Feld unterschreiben (Handy am besten quer). Sie wird nur nach Eingabe Ihrer PIN in ein Protokoll gesetzt.</span>'+
+    '<canvas id="sigCv" width="1050" height="350" style="width:100%;aspect-ratio:3/1;background:#fff;border:1px solid var(--line);border-radius:8px;touch-action:none;cursor:crosshair"></canvas>'+
+    '<div class="row"><button type="button" class="btn soft" style="flex:1" data-act="sigClear">Löschen</button><button type="button" class="btn soft" style="flex:1" data-act="closeModal">Abbrechen</button><button type="button" class="btn" style="flex:1" data-act="sigSave" data-u="'+esc(uid)+'">Speichern</button></div></div>');
+  var c=$("sigCv"),g=c.getContext("2d"),dn=false,last=null;g.lineWidth=6;g.lineCap="round";g.lineJoin="round";g.strokeStyle=g.fillStyle="#1d2b7a";S.sigDirty=false;
+  function pt(e){var r=c.getBoundingClientRect();return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+  c.addEventListener("pointerdown",function(e){e.preventDefault();dn=true;last=pt(e);try{c.setPointerCapture(e.pointerId)}catch(_){}g.beginPath();g.arc(last.x,last.y,3,0,7);g.fill();S.sigDirty=true});
+  c.addEventListener("pointermove",function(e){if(!dn)return;var p=pt(e);g.beginPath();g.moveTo(last.x,last.y);g.lineTo(p.x,p.y);g.stroke();last=p});
+  ["pointerup","pointercancel"].forEach(function(t){c.addEventListener(t,function(){dn=false})})}
+function sigTrim(c){var g=c.getContext("2d"),d=g.getImageData(0,0,c.width,c.height).data,x0=c.width,y0=c.height,x1=0,y1=0;
+  for(var y=0;y<c.height;y+=2)for(var x=0;x<c.width;x+=2){if(d[(y*c.width+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+  if(x1<=x0||y1<=y0)return null;var p=12;x0=Math.max(0,x0-p);y0=Math.max(0,y0-p);x1=Math.min(c.width,x1+p);y1=Math.min(c.height,y1+p);
+  var w=x1-x0,h=y1-y0,s=Math.min(1,520/w,180/h),o=document.createElement("canvas");o.width=Math.max(1,Math.round(w*s));o.height=Math.max(1,Math.round(h*s));
+  o.getContext("2d").drawImage(c,x0,y0,w,h,0,0,o.width,o.height);return o.toDataURL("image/png")}
+function sigSave(uid){var u=userById(uid),c=$("sigCv");if(!S.sigDirty){toast("Bitte zuerst im Feld unterschreiben.");return}var url=sigTrim(c);if(!url){toast("Bitte zuerst im Feld unterschreiben.");return}
+  var fin=function(){u.sig=url;u.upd=Date.now();saveOrg();closeModal();toast("Unterschrift gespeichert");render()};
+  if(u.pin){closeModal();pinAsk({title:"Unterschrift speichern – PIN",users:[u.id],uid:u.id}).then(function(ok){if(ok)fin()})}else fin()}
+function viewWer(){var l=users().slice().sort(function(a,b){return a.name.localeCompare(b.name)});
+  return '<section class="glass panel"><h2>Wer sind Sie?</h2><span class="small muted">Bitte Ihren Namen wählen. Alles, was Sie anlegen, ändern, löschen oder unterschreiben, wird mit Ihrem Namen festgehalten.</span>'+
+    (l.length?l.map(function(u){return '<button type="button" class="btn soft block" data-act="userPick" data-u="'+esc(u.id)+'" style="justify-content:space-between"><b>'+esc(u.name)+'</b><span class="small muted">'+rolleTxt(u)+(u.pin?"":" · ohne PIN")+"</span></button>"}).join(""):
+      '<div class="alert warn" style="margin:0">Noch keine Personen angelegt. Wenn Kollegen schon mit BauwerkCheck arbeiten: zuerst unten „Mit Google anmelden“, dann erscheinen alle Namen.</div>')+
+    '<h3 style="margin-top:8px">Neue Person</h3><div class="row"><input type="text" id="nuName" placeholder="Nachname" style="flex:2"><select id="nuRolle" style="flex:1"><option value="bearbeiter">Bearbeiter/in</option><option value="vorgesetzter">Vorgesetzte/r</option></select></div>'+
+    '<button type="button" class="btn block" data-act="userAdd" data-self="1">Anlegen und anmelden</button>'+
+    (!SY.on||SY.needLogin?'<button type="button" class="btn soft block" data-act="login">Mit Google anmelden (Synchronisierung)</button>':"")+"</section>"}
+function userPick(uid){var u=userById(uid);var fin=function(){lss("me",u.id);SET.pruefer=u.name;saveSet();toast("Angemeldet als "+u.name);location.hash="#liste";render();if(!u.pin)setTimeout(function(){if(confirm("Für Sie ist noch keine PIN festgelegt. Jetzt festlegen? (Nötig zum Unterschreiben)"))pinSetDlg(u)},400)};
+  if(u.pin)pinAsk({title:"Anmelden als "+u.name,users:[u.id],uid:u.id}).then(function(ok){if(ok)fin()});else fin()}
+function userAdd(self){var n=($("nuName")||{}).value,r=($("nuRolle")||{}).value||"bearbeiter";n=String(n||"").trim();if(!n){toast("Bitte einen Namen eingeben.");return}
+  var id=uSlug(n);while(allUsers().some(function(z){return z.id===id}))id+="_2";
+  var mk=function(){var u={id:id,name:n,rolle:r,pin:null,sig:null,upd:Date.now()};allUsers().push(u);saveOrg();toast(n+" angelegt");if(self)userPick(id);else render()};
+  var vs=vorgesetzte().filter(function(v){return v.pin});
+  if(r==="vorgesetzter"&&vs.length)pinAsk({title:"Neue/n Vorgesetzte/n anlegen",text:"Nur mit PIN einer/eines Vorgesetzten.",users:vs.map(function(v){return v.id})}).then(function(ok){if(ok)mk()});else mk()}
+function userRolle(uid){var u=userById(uid),neu=u.rolle==="vorgesetzter"?"bearbeiter":"vorgesetzter",vs=vorgesetzte().filter(function(v){return v.pin});
+  var mk=function(){u.rolle=neu;u.upd=Date.now();saveOrg();toast(u.name+": "+rolleTxt(u));render()};
+  if(vs.length)pinAsk({title:"Rolle ändern",text:u.name+" wird "+(neu==="vorgesetzter"?"Vorgesetzte/r":"Bearbeiter/in")+". Nur mit PIN einer/eines Vorgesetzten.",users:vs.map(function(v){return v.id})}).then(function(ok){if(ok)mk()});else mk()}
+function userDel(uid){var u=userById(uid),vs=vorgesetzte().filter(function(v){return v.pin});if(!confirm(u.name+" aus der Nutzerliste entfernen? Frühere Einträge mit diesem Namen bleiben erhalten."))return;
+  var mk=function(){u.weg=true;u.upd=Date.now();saveOrg();if(ls("me","")===uid)lss("me","");render()};
+  if(vs.length)pinAsk({title:"Person entfernen",text:"Nur mit PIN einer/eines Vorgesetzten.",users:vs.map(function(v){return v.id})}).then(function(ok){if(ok)mk()});else mk()}
+function nutzerHtml(){var m=me(),l=users();
+  return '<section class="glass panel" id="nutzer"><h3>Nutzer</h3>'+
+    (m?'<div class="row between" style="align-items:center"><span>Angemeldet: <b>'+esc(m.name)+"</b> · "+rolleTxt(m)+'</span><button type="button" class="btn soft sm" data-act="userSwitch">Wechseln</button></div>'+
+      '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="pinSet" data-u="'+esc(m.id)+'">'+(m.pin?"PIN ändern":"PIN festlegen")+'</button><button type="button" class="btn soft sm" style="flex:1" data-act="sigEdit" data-u="'+esc(m.id)+'">'+(m.sig?"Unterschrift ändern":"Unterschrift anlegen")+"</button></div>"+
+      (m.sig?'<img src="'+m.sig+'" alt="Ihre Unterschrift" style="max-height:56px;max-width:220px;align-self:flex-start;background:#fff;border-radius:6px;padding:4px 8px;border:1px solid var(--line)">':'<span class="small muted">Noch keine Unterschrift hinterlegt.</span>'):
+      '<button type="button" class="btn block" data-act="userSwitch">Anmelden</button>')+
+    '<details class="sub"><summary>Alle Personen ('+l.length+")</summary><div>"+
+    l.map(function(u){return '<div class="row between" style="align-items:center;border-top:1px solid var(--line);padding-top:6px"><span class="small"><b>'+esc(u.name)+"</b><br>"+rolleTxt(u)+" · PIN "+(u.pin?"✓":"–")+" · Unterschrift "+(u.sig?"✓":"–")+'</span><span class="row" style="gap:6px"><button type="button" class="btn soft sm" data-act="userRolle" data-u="'+esc(u.id)+'">Rolle</button><button type="button" class="btn danger sm" data-act="userDel" data-u="'+esc(u.id)+'" aria-label="'+esc(u.name)+' entfernen">✕</button></span></div>'}).join("")+
+    '<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><input type="text" id="nuName" placeholder="Nachname" style="flex:2"><select id="nuRolle" style="flex:1"><option value="bearbeiter">Bearbeiter/in</option><option value="vorgesetzter">Vorgesetzte/r</option></select></div>'+
+    '<button type="button" class="btn soft sm" data-act="userAdd" style="align-self:flex-start">Person hinzufügen</button>'+
+    '<span class="small muted">Jede Person legt auf ihrem eigenen Gerät PIN und Unterschrift an. Vorgesetzte können auch am Gerät der Bearbeiterin/des Bearbeiters mit ihrer PIN unterschreiben.</span></div></details></section>'}
+
+/* ===== Unterschriften im Protokoll, 30-Tage-Sperre ===== */
+var SPERRE_TAGE=30;
+function sigOf(x){return x.sig||{}}
+function lockInfo(x){var s=sigOf(x);if(!s.v)return null;var bis=Date.parse(s.v.t)+SPERRE_TAGE*864e5,fr=x.freigabe&&Date.parse(x.freigabe.bis)>Date.now();return {bis:bis,locked:Date.now()>bis&&!fr}}
+function sigPanel(x){var s=sigOf(x),li=lockInfo(x),id=esc(x.id);
+  function one(k,lab){var e=s[k];return '<div class="sigbox"><span class="k">'+lab+"</span>"+(e?'<img alt="Unterschrift '+esc(e.n)+'" src="'+e.img+'"><span class="small">'+esc(e.n)+" · "+dtTxt(e.t)+"</span>":
+    '<button type="button" class="btn soft sm" data-act="sign" data-k="'+k+'" data-visit="'+id+'"'+(k==="v"&&!s.b?" disabled":"")+">Unterschreiben</button>")+"</div>"}
+  return '<section class="glass panel" id="sigPanel">'+stepH(null,"Unterschriften",li?(li.locked?'<span class="chip bad">gesperrt</span>':'<span class="chip ok">änderbar bis '+deDate(isoLocal(new Date(li.bis).toISOString()))+"</span>"):(s.b?'<span class="chip warn">Vorgesetzte/r fehlt</span>':'<span class="chip">offen</span>'))+
+    '<div class="sigrow">'+one("b","Bearbeiter/in")+one("v","Vorgesetzte/r")+"</div>"+
+    '<span class="small muted">'+(li&&li.locked?"Gesperrt: "+SPERRE_TAGE+" Tage nach der Unterschrift der/des Vorgesetzten. Ändern oder Löschen nur nach Freigabe durch eine/n Vorgesetzte/n (PIN).":
+      s.v?"Nach "+SPERRE_TAGE+" Tagen wird das Protokoll gesperrt. Bei einer Änderung werden die Unterschriften zurückgesetzt.":"Unterschreiben nur mit eigener PIN. Die/der Vorgesetzte kann auch an diesem Gerät mit der eigenen PIN unterschreiben.")+"</span></section>"}
+function signVisit(x,k){var m=me(),cands=k==="v"?vorgesetzte().map(function(u){return u.id}):users().map(function(u){return u.id}),b=S.bw[x.bw];
+  if(k==="v"&&!sigOf(x).b){toast("Zuerst unterschreibt die Bearbeiterin/der Bearbeiter.");return}
+  pinAsk({title:k==="b"?"Unterschrift Bearbeiter/in":"Unterschrift Vorgesetzte/r",text:"Protokoll "+b.nr+" vom "+deDate(x.datum),users:cands,uid:k==="b"&&m?m.id:null,leer:"Noch keine/n Vorgesetzte/n angelegt (Einstellungen → Nutzer)."}).then(function(u){if(!u)return;
+    if(!u.sig){toast("Für "+u.name+" ist noch keine Unterschrift hinterlegt.",4000);if(m&&m.id===u.id)sigPad(u.id);return}
+    x.sig=Object.assign({},sigOf(x));x.sig[k]={u:u.id,n:u.name,t:new Date().toISOString(),img:u.sig};
+    logV(x,k==="b"?"unterschrieben (Bearbeiter/in)":"unterschrieben (Vorgesetzte/r)",u.name);x.freigabe=null;SY.ob.prot[x.id]=1;saveOb();if(S.files)delete S.files[x.id];
+    saveV(x).then(function(){render();toast("Unterschrift gesetzt: "+u.name)})})}
+function needFreigabe(x,was){var li=lockInfo(x);if(!li||!li.locked)return Promise.resolve(true);
+  var vs=vorgesetzte().filter(function(v){return v.pin});
+  return pinAsk({title:"Freigabe nötig",text:"Das Protokoll ist gesperrt. "+was+" nur nach Freigabe durch eine/n Vorgesetzte/n.",users:vs.map(function(v){return v.id}),leer:"Keine/n Vorgesetzte/n mit PIN angelegt."}).then(function(u){if(!u)return false;
+    x.freigabe={u:u.id,n:u.name,t:new Date().toISOString(),bis:new Date(Date.now()+7*864e5).toISOString()};logV(x,"Freigabe durch Vorgesetzte/n ("+was+")",u.name);return true})}
+function sigReset(x){var s=sigOf(x);if(!s.b&&!s.v)return;x.sigAlt=(x.sigAlt||[]).concat([{b:s.b?{n:s.b.n,t:s.b.t}:null,v:s.v?{n:s.v.n,t:s.v.t}:null,weg:new Date().toISOString()}]);x.sig={};logV(x,"Unterschriften zurückgesetzt (Änderung)")}
+function dataUrlImg(url){return new Promise(function(res){var im=new Image();im.onload=function(){var b=atob(url.split(",")[1]),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);res({w:im.naturalWidth,h:im.naturalHeight,bytes:a})};im.onerror=function(){res(null)};im.src=url})}
+function xlsSig(z,d,x){var s=sigOf(x),ks=["b","v"].filter(function(k){return s[k]&&s[k].img});if(!ks.length)return Promise.resolve(d);
+  return Promise.all(ks.map(function(k){return dataUrlImg(s[k].img)})).then(function(imgs){
+    return Promise.all([z.file("xl/drawings/_rels/drawing1.xml.rels").async("string"),z.file("[Content_Types].xml").async("string")]).then(function(r){var rels=r[0],ct=r[1],add="";
+      ks.forEach(function(k,i){var im=imgs[i];if(!im)return;var rid="rIdSig"+k,col=k==="b"?0:5,cx=Math.round(1500000),cy=Math.round(cx*im.h/im.w);if(cy>520000){cy=520000;cx=Math.round(cy*im.w/im.h)}
+        z.file("xl/media/sig_"+k+".png",im.bytes);rels=rels.replace("</Relationships>",'<Relationship Id="'+rid+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/sig_'+k+'.png"/></Relationships>');
+        add+='<xdr:oneCellAnchor><xdr:from><xdr:col>'+col+'</xdr:col><xdr:colOff>60000</xdr:colOff><xdr:row>66</xdr:row><xdr:rowOff>20000</xdr:rowOff></xdr:from><xdr:ext cx="'+cx+'" cy="'+cy+'"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="'+(900+i)+'" name="Unterschrift '+(k==="b"?"Bearbeiter":"Vorgesetzter")+'"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="'+rid+'"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor>'});
+      if(!/Extension="png"/i.test(ct))ct=ct.replace("<Default ",'<Default Extension="png" ContentType="image/png"/><Default ');
+      z.file("xl/drawings/_rels/drawing1.xml.rels",rels);z.file("[Content_Types].xml",ct);
+      return d.replace("</xdr:wsDr>",add+"</xdr:wsDr>")})})}
+
+/* ===== Papierkorb für Fotos und Dokumente ===== */
+var PK_TAGE=30;
+function trTage(e){return Math.max(0,PK_TAGE-Math.floor((Date.now()-Date.parse(e.am))/864e5))}
+function trOffen(l){return (l||[]).filter(function(e){return !e.r})}
+function mergeTrash(a,b){var m={};(a||[]).concat(b||[]).forEach(function(e){var k=(e.f||e.a).key,o=m[k];if(!o)m[k]=Object.assign({},e);else if(e.r&&!o.r){o.r=e.r;o.rv=e.rv}});return Object.keys(m).map(function(k){return m[k]})}
+function fotoRestore(x,k){var t=(x.trash||[]).filter(function(e){return e.f.key===k&&!e.r})[0];if(!t)return;
+  ensureBlob(k).then(function(bl){if(!bl){toast("Foto nicht verfügbar (noch nicht geladen). Internet prüfen.",4000);return}
+    var nk=k.replace(/_r[0-9a-z]+$/,"")+"_r"+Date.now().toString(36);return putBlob(nk,bl).then(function(){var nf=Object.assign({},t.f,{key:nk});x.fotos.push(nf);
+      if(!nf.driveId)queueBlob(nk,"v:"+x.id,x.bw,fotoName(x,x.fotos.length-1));t.r=new Date().toISOString();t.rv=wer();logV(x,"Foto wiederhergestellt",t.f.tag||"");
+      if(x.status==="abgeschlossen"){SY.ob.prot[x.id]=1;saveOb()}if(S.files)delete S.files[x.id];return saveV(x).then(function(){render();toast("Foto wiederhergestellt")})})})}
+function arcRestore(b,k){var t=(b.trash||[]).filter(function(e){return e.a.key===k&&!e.r})[0];if(!t)return;
+  ensureBlob(k).then(function(bl){if(!bl){toast("Datei nicht verfügbar (noch nicht geladen). Internet prüfen.",4000);return}
+    var nk=k.replace(/_r[0-9a-z]+$/,"")+"_r"+Date.now().toString(36);return putBlob(nk,bl).then(function(){var na=Object.assign({},t.a,{key:nk});arcOf(b).push(na);
+      if(!na.driveId)queueBlob(nk,"bw:"+b.id,b.id,"Archiv "+na.jahr+" "+na.name);t.r=new Date().toISOString();t.rv=wer();return saveB(b).then(function(){render();toast("Wiederhergestellt")})})})}
+function purgeTrash(){var now=Date.now();
+  Object.keys(S.visits).forEach(function(k){var x=S.visits[k];if(!x.trash||!x.trash.length)return;var keep=[],ch=false;
+    x.trash.forEach(function(e){var age=now-Date.parse(e.am);if(age>PK_TAGE*864e5){ch=true;if(!e.r){delBlob(e.f.key).catch(function(){});if(e.f.driveId)queueTrash(e.f.driveId)}}else keep.push(e)});if(ch){x.trash=keep;saveV(x)}});
+  Object.keys(S.bw).forEach(function(k){var b=S.bw[k];if(!b.trash||!b.trash.length)return;var keep=[],ch=false;
+    b.trash.forEach(function(e){var age=now-Date.parse(e.am);if(age>PK_TAGE*864e5){ch=true;if(!e.r){delBlob(e.a.key).catch(function(){});if(e.a.driveId)queueTrash(e.a.driveId)}}else keep.push(e)});if(ch){b.trash=keep;saveB(b)}})}
+function trashRows(bwId){var out=[];
+  Object.keys(S.visits).forEach(function(k){var x=S.visits[k];if(bwId&&x.bw!==bwId)return;trOffen(x.trash).forEach(function(e){var b=S.bw[x.bw]||{nr:x.bw};out.push({am:e.am,html:'<b>'+esc(b.nr||"")+"</b> · Foto"+(e.f.tag?" „"+esc(e.f.tag)+"“":"")+" aus Besichtigung "+deDate(x.datum),von:e.von,tage:trTage(e),btn:'data-act="trFoto" data-visit="'+esc(x.id)+'" data-key="'+esc(e.f.key)+'"',img:e.f.key})})});
+  Object.keys(S.bw).forEach(function(k){var b=S.bw[k];if(bwId&&b.id!==bwId)return;trOffen(b.trash).forEach(function(e){out.push({am:e.am,html:'<b>'+esc(b.nr)+"</b> · "+esc(katName(e.a.kat||(e.a.art==="foto"?"foto":"protokoll")))+": "+esc(e.a.name||""),von:e.von,tage:trTage(e),btn:'data-act="trArc" data-bw="'+esc(b.id)+'" data-key="'+esc(e.a.key)+'"',img:e.a.art==="foto"?e.a.key:null})})});
+  if(!bwId)papier().forEach(function(e){out.push({am:e.am,html:'<b>'+esc(e.nr||"")+"</b> · "+(e.typ==="bw"?"Bauwerk "+esc(e.name||"")+(e.visits&&e.visits.length?" mit "+e.visits.length+" Besichtigung(en)":""):"Besichtigung vom "+deDate(e.v.datum)),von:e.von,tage:pkTage(e),btn:'data-act="pkRestore" data-p="'+esc(e.id)+'"',img:null})});
+  else papier().forEach(function(e){if(e.typ==="v"&&e.v.bw===bwId)out.push({am:e.am,html:"Besichtigung vom "+deDate(e.v.datum),von:e.von,tage:pkTage(e),btn:'data-act="pkRestore" data-p="'+esc(e.id)+'"',img:null})});
+  return out.sort(function(a,b){return String(b.am).localeCompare(String(a.am))})}
+function trashHtml(rows,title){if(!rows.length)return "";
+  return '<div class="trl"><span class="small muted">'+title+"</span>"+rows.map(function(r){return '<div class="trrow">'+(r.img?'<img data-key="'+esc(r.img)+'" alt="">':"")+'<span class="small" style="flex:1;min-width:0">'+r.html+'<br><span class="muted">gelöscht '+dtTxt(r.am)+" von "+esc(wName(r.von))+" · noch "+r.tage+' Tage</span></span><button type="button" class="btn soft sm" '+r.btn+">Zurückholen</button></div>"}).join("")+"</div>"}
+function viewPapier(){var rows=trashRows(null);
+  return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a><section class="glass panel"><h2>Papierkorb</h2><span class="small muted">Alles Gelöschte bleibt '+PK_TAGE+' Tage erhalten – mit Namen, wer es gelöscht hat – und kann zurückgeholt werden. Danach wird es endgültig entfernt; im Verlauf bleibt der Eintrag stehen.</span>'+
+    (rows.length?trashHtml(rows,rows.length+" Einträge"):'<span class="small">Der Papierkorb ist leer.</span>')+"</section>"}
+
+/* ===== Bauwerksseite: Stammdaten, Dokumente, Karte, Besichtigung ===== */
+var KATS=[["foto","Fotos"],["schrift","Schriftverkehr"],["plan","Pläne"],["protokoll","Frühere Protokolle"],["sonst","Sonstiges"]];
+function katOf(a){return a.kat||(a.art==="foto"?"foto":"protokoll")}
+function katName(k){var o=KATS.filter(function(z){return z[0]===k})[0];return o?o[1]:"Dokument"}
+function planOf(b,y){y=y||year();return b&&b.plan&&b.plan[y]||null}
+function planSkip(b,y){var p=planOf(b,y);return !!(p&&p.bes===false)}
+function planExt(b,y){y=y||year();var p=planOf(b,y);return p&&p.datum&&String(p.datum).slice(0,4)===y?p:null}
+function sbTop(b){var t=typeOf(b),sb=b.sib||null,tb=sb&&sb.tbw&&sb.tbw[0]||null,lv=lastDone(b),y=year(),dy=doneThisYear(b),sk=planSkip(b);
+  var fot=arcOf(b).filter(function(a){return katOf(a)==="foto"}).sort(function(p,q){return String(q.ts||"").localeCompare(String(p.ts||""))})[0];
+  var fk=sb&&sb.fotoKey?sb.fotoKey:(lv&&lv.fotos[0]?lv.fotos[0].key:(fot?fot.key:null)),src=sb&&sb.fotoKey?"Übersichtsblatt":(lv&&lv.fotos[0]?"Besichtigung "+deDate(lv.datum):"Foto");
+  var badge='<span class="chip '+(dy?"ok":sk?"":"warn")+' sb-badge">'+(dy?y+" besichtigt ✓":sk?y+" keine Besichtigung":y+" noch offen")+"</span>";
+  var hero=fk?'<div class="sb-hero"><img class="ph" data-key="'+esc(fk)+'" alt="Foto '+esc(b.nr)+'"><span class="sb-src">'+esc(src)+"</span>"+badge+"</div>":"";
+  var head='<div class="sb-head"><span class="eyebrow">'+esc(t.name)+(b.bezirk?" · "+esc(grp(t))+" "+esc(b.bezirk):"")+(tb&&tb.ort?" · "+esc(tb.ort.replace(/^Kassel\s*/,"")):"")+"</span><h2>"+esc(b.nr+" · "+b.name)+"</h2>"+
+    (b.adresse?'<span class="small muted">'+esc(b.adresse)+"</span>":"")+(!hero?'<div style="margin-top:6px">'+badge.replace(" sb-badge","")+"</div>":"")+"</div>";
+  var kv=[];function add(k,v,full){if(v)kv.push('<div'+(full?' class="full"':"")+'><span class="k">'+k+'</span><span class="v">'+v+"</span></div>")}
+  if(tb){add("Teil-Bauwerk",esc(tb.tbw));add("Zustandsnote",tb.zn&&tb.zn!=="0,0"?'<span class="zn '+znCls(tb.zn)+'">'+esc(tb.zn)+"</span>":"–");
+    add("Art",esc(tb.art||"")||"–");add("Konstruktion",esc(tb.kon||"")||"–");
+    add("Länge",esc(sbUnit(tb.len,"m"))||esc(b.laenge||"")||"–");add("Mittl. Höhe",esc(sbUnit(tb.h,"m"))||esc(b.hoehe||"")||"–");add("Fläche",esc(sbUnit(tb.fl,"m²"))||esc(b.flaeche||"")||"–");add("Segmente",esc(tb.seg||"")||"–");
+    add("Letzte HP",esc(tb.hp||"")||"–");add("Letzte EP",esc(tb.ep||"")||"–");add("Baujahr",esc(tb.bj||"")||"–");add("Baulast",esc((tb.baulast||"").replace(/\s*\(siehe.*$/,""))||esc(b.eigentum||"")||"–");
+    if(tb.bem)add("Bemerkung",esc(tb.bem),true)}
+  else{add("Länge",esc(b.laenge||"")||"–");add("Ansichtshöhe",esc(b.hoehe||"")||"–");add("Fläche",esc(b.flaeche||"")||"–");add("Eigentümer",esc(b.eigentum||"")||"–")}
+  var pl=planOf(b);if(pl&&(pl.note||pl.geraet))add("Begehungsplan "+y,esc([pl.note?"Note "+pl.note:"",pl.geraet?"Gerät: "+pl.geraet:""].filter(Boolean).join(" · ")),true);
+  var more=sb&&sb.tbw.length>1?sb.tbw.slice(1).map(function(o){return '<div class="sb-tb"><b>Teil-BW '+esc(o.tbw)+"</b> · ZN "+(o.zn?'<span class="zn '+znCls(o.zn)+'">'+esc(o.zn)+"</span>":"–")+(o.len?" · L "+esc(sbUnit(o.len,"m")):"")+(o.ep?" · EP "+esc(o.ep):"")+(o.bem&&o.bem!=="Nur EP!"?"<br>"+esc(o.bem):"")+"</div>"}).join(""):"";
+  var hin=b.hinweise&&b.hinweise.length?'<div class="sb-tb"><b>Hinweise</b><ul style="margin:4px 0 0;padding-left:18px">'+b.hinweise.map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ul></div>":"";
+  return '<section class="glass sb">'+hero+head+'<div class="sb-grid">'+kv.join("")+"</div>"+more+hin+
+    '<div class="sb-foot row between" style="align-items:center"><span>'+(sb?"Daten aus SIB-Übersichtsblatt"+(sb.druck?" (Druck "+esc(sb.druck)+")":""):"Stammdaten")+'</span><a class="btn soft sm" href="#edit-'+esc(b.id)+'">Bearbeiten</a></div></section>'}
+function docsHtml(b){var all=arcOf(b),n=all.length;
+  return '<section class="glass panel" id="docs">'+stepH(null,"Dokumente",'<span class="muted small">'+n+"</span>")+
+    KATS.map(function(k){var l=all.filter(function(a){return katOf(a)===k[0]}).sort(function(p,q){return String(q.jahr||"").localeCompare(String(p.jahr||""))||String(q.ts||"").localeCompare(String(p.ts||""))}),did=b.id+"|"+k[0],foto=k[0]==="foto";
+      if(!l.length&&k[0]==="sonst")return "";
+      return '<details class="sub" data-doc="'+esc(did)+'"'+((S.docOpen||{})[did]?" open":"")+"><summary>"+k[1]+" ("+l.length+")</summary><div>"+
+        (foto?(l.length?'<div class="photos">'+l.map(function(a){return '<button type="button" class="ph" data-act="arcFoto" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'"><img data-key="'+esc(a.key)+'" alt="Foto '+esc(a.jahr||"")+'"><span class="cap">'+esc(a.name&&/Übersichtsblatt/.test(a.name)?"SIB":(a.jahr||""))+"</span></button>"}).join("")+"</div>":""):
+          l.map(function(a){return '<div class="row between" style="gap:8px;align-items:center"><span class="small" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">'+esc(a.name)+' <span class="muted">'+esc(a.jahr||"")+"</span>"+(a.gelesen?' <span class="chip ok">gelesen</span>':"")+'</span><button type="button" class="btn soft sm" data-act="arcOpen" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'">Öffnen</button><button type="button" class="btn danger sm" data-act="arcDel" data-bw="'+esc(b.id)+'" data-key="'+esc(a.key)+'" aria-label="Löschen">✕</button></div>'}).join(""))+
+        (!l.length?'<span class="small muted">Noch nichts hinterlegt.</span>':"")+
+        '<label class="btn soft sm" style="align-self:flex-start">'+(foto?"Fotos hinzufügen":"Datei hinzufügen")+'<input type="file" '+(foto?'accept="image/*" data-arcfoto':'accept=".pdf,.xlsx,.xlsm,.xls,.docx,.doc,.dwg,.dxf,.jpg,.jpeg,.png,.msg,.eml,.txt,application/pdf,image/*" data-arcdoc')+'="'+esc(b.id)+'" data-kat="'+k[0]+'" multiple></label>'+
+        (k[0]==="protokoll"?'<span class="small muted">Ein Kasseler Excel-Protokoll wird gelesen: Prüfpunkte und Texte werden als letzter Stand übernommen, wenn es das neueste ist.</span>':"")+"</div></details>"}).join("")+
+    trashHtml(trashRows(b.id).filter(function(r){return /data-act="trArc"/.test(r.btn)}),"Gelöschte Dokumente (zurückholbar)")+"</section>"}
+function mapHtml(b){var ll=b.lat!=null&&b.lon!=null;
+  return '<section class="glass sb">'+(ll?'<div class="sb-hero map" style="height:190px">'+osmTiles(+b.lat,+b.lon,17)+"</div>":"")+
+    '<div class="sb-act"><div class="row"><a class="btn soft sm" style="flex:1" href="'+esc(navUrl(b))+'" target="_blank" rel="noopener">Navigation (Google Maps)</a>'+
+    (S.pos?'<button type="button" class="btn soft sm" style="flex:1" data-act="setCoord" data-bw="'+esc(b.id)+'">Standort hier speichern</button>':'<button type="button" class="btn soft sm" style="flex:1" data-act="gps">Standort ermitteln</button>')+"</div>"+
+    (!ll?'<span class="muted small">Noch keine Position gespeichert. Vor Ort „Standort ermitteln“ und dann „Standort hier speichern“.</span>':"")+"</div></section>"}
+function besKopf(b,x){var y=year(),dy=doneThisYear(b),sk=planSkip(b),pe=planExt(b),pl=planOf(b);
+  var h='<section class="glass panel" id="bes">'+stepH(null,"Besichtigung "+y,'<span class="chip '+(dy?"ok":sk?"":"warn")+'">'+(dy?"erledigt ✓":sk?"keine":"offen")+"</span>");
+  if(sk)h+='<span class="small">Lt. Begehungsplan '+y+" keine Besichtigung"+(pl.pruef?" ("+esc(pl.pruef)+")":"")+".</span>";
+  if(pe&&!(b.letzte&&String(b.letzte.datum).slice(0,4)===y))h+='<span class="small">Lt. Begehungsplan besichtigt am '+deDate(pe.datum)+(pe.zeichen?" ("+esc(pe.zeichen)+")":"")+" – ohne Protokoll in BauwerkCheck.</span>";
+  if(!x)h+='<button type="button" class="btn block big" data-act="start" data-bw="'+esc(b.id)+'">Besichtigung starten</button>'+
+    '<button type="button" class="btn soft sm" style="align-self:flex-start" data-act="planToggle" data-bw="'+esc(b.id)+'">'+(inPlan(b.id)?"✓ Für heute eingeplant":"Für heute einplanen")+"</button>";
+  return h+"</section>"}
+function fruehereHtml(b,x){var vs=visitsOf(b.id).filter(function(v){return !x||v.id!==x.id});var tr=trashRows(b.id).filter(function(r){return !/data-act="trArc"/.test(r.btn)});
+  if(!vs.length&&!tr.length)return "";
+  return '<section class="glass panel">'+stepH(null,"Frühere Besichtigungen",'<span class="muted small">'+vs.length+"</span>")+
+    vs.map(function(v){var s=sigOf(v);return '<div class="row between" style="align-items:center;border-top:1px solid var(--line);padding-top:6px"><span class="small" style="flex:1">'+deDate(v.datum)+(v.pruefer?" · "+esc(v.pruefer):"")+" · "+v.fotos.length+" Fotos"+(v.status!=="abgeschlossen"?' · <span style="color:var(--warn)">in Arbeit</span>':"")+(s.v?" · ✍ unterschrieben":s.b?" · ✍ Bearbeiter/in":"")+'</span><button type="button" class="btn soft sm" data-act="preview" data-visit="'+esc(v.id)+'">Protokoll</button></div>'}).join("")+
+    trashHtml(tr,"Gelöscht (zurückholbar)")+"</section>"}
+
+/* ===== Auswahl drucken ===== */
+function selVisit(b){var y=year(),vs=visitsOf(b.id).filter(function(v){return v.status==="abgeschlossen"});return vs.filter(function(v){return v.datum.slice(0,4)===y})[0]||vs[0]||null}
+function selList(){var s=S.sel||{};return Object.keys(s).map(function(id){var b=S.bw[id],v=b&&selVisit(b);return v?{v:v,f:!!s[id].f,b:b}:null}).filter(Boolean).sort(function(a,b){return natCmp(a.b.nr,b.b.nr)})}
+function selBar(){if(!S.selMode)return "";var l=selList(),nf=l.filter(function(o){return o.f}).length;
+  return '<div class="selbar glass"><span class="small"><b>'+l.length+"</b> ausgewählt"+(nf?" · "+nf+" mit Fotos":"")+'</span><div class="row" style="gap:6px"><button type="button" class="btn soft sm" data-act="selCancel">Abbrechen</button><button type="button" class="btn soft sm" data-act="selZip"'+(l.length?"":" disabled")+'>ZIP</button><button type="button" class="btn sm" data-act="selPdf"'+(l.length?"":" disabled")+">PDF drucken</button></div></div>"}
+function selPdf(){var l=selList();if(!l.length)return;toast("PDF wird erstellt ("+l.length+") …",20000);
+  buildPdf(l.map(function(o){return o.v}),l.map(function(o){return o.f})).then(function(bl){showFiles([new File([bl],fsafe("Protokolle "+today()+" ("+l.length+").pdf"),{type:"application/pdf"})],{title:"Ausgewählte Protokolle",note:l.length+" Protokolle"+(l.some(function(o){return o.f})?", davon "+l.filter(function(o){return o.f}).length+" mit Fotos":"")+". Zum Drucken öffnen oder teilen."})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)})}
+
+/* ===== Dashboard ===== */
+function viewDash(){var y=S.dashY||year(),all=bwList(),plan=all.filter(function(b){return !planSkip(b,y)});
+  var doneY=function(b){return (b.letzte&&String(b.letzte.datum).slice(0,4)===y)||!!planExt(b,y)||visitsOf(b.id).some(function(v){return v.status==="abgeschlossen"&&v.datum.slice(0,4)===y})};
+  var done=plan.filter(doneY),vsY=Object.keys(S.visits).map(function(k){return S.visits[k]}).filter(function(v){return v.status==="abgeschlossen"&&v.datum.slice(0,4)===y&&S.bw[v.bw]});
+  var bef=done.filter(function(b){return b.letzte&&String(b.letzte.datum).slice(0,4)===y&&hasMangel(b)}).length,uns=done.filter(function(b){return b.letzte&&String(b.letzte.datum).slice(0,4)===y&&unsafe(b)}).length,
+    sp=vsY.filter(function(v){return v.sonder}).length,sb=vsY.filter(function(v){return sigOf(v).b}).length,sv=vsY.filter(function(v){return sigOf(v).v}).length,pct=plan.length?Math.round(done.length*100/plan.length):0;
+  var tile=function(n,l,c){return '<div class="kpi'+(c?" "+c:"")+'"><b>'+n+"</b><span>"+l+"</span></div>"};
+  var groups={};plan.forEach(function(b){var t=typeOf(b),k=t.name+(b.bezirk?" · "+grp(t)+" "+b.bezirk:"");(groups[k]=groups[k]||{k:k,n:0,d:0,art:t.id,bez:b.bezirk||""}).n++;if(doneY(b))groups[k].d++});
+  var gl=Object.keys(groups).map(function(k){return groups[k]}).sort(function(a,b){return natCmp(a.k,b.k)});
+  var mon=[0,0,0,0,0,0,0,0,0,0,0,0];vsY.forEach(function(v){mon[+v.datum.slice(5,7)-1]++});var mx=Math.max.apply(null,mon.concat([1]));
+  var ys=[];for(var j=+year();j>=+year()-3;j--)ys.push(String(j));
+  return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+
+    '<section class="glass panel"><div class="row between" style="align-items:center"><h2>Übersicht '+y+'</h2><div class="seg" role="group">'+ys.map(function(j){return '<button type="button" data-act="dashY" data-v="'+j+'" aria-pressed="'+(j===y)+'">'+j+"</button>"}).join("")+"</div></div>"+
+    '<div class="bigbar"><div style="width:'+pct+'%"></div></div><span class="small"><b>'+done.length+" von "+plan.length+"</b> Bauwerken besichtigt ("+pct+" %) · "+(plan.length-done.length)+" offen"+(all.length-plan.length?" · "+(all.length-plan.length)+" ohne Besichtigung (Prüfung)":"")+"</span>"+
+    '<div class="kpis">'+tile(done.length,"besichtigt","ok")+tile(plan.length-done.length,"offen","warn")+tile(bef,"mit Befund",bef?"warn":"")+tile(uns,"nicht verkehrssicher",uns?"bad":"")+tile(sp,"Sonderprüfung")+tile(sb+" / "+sv,"unterschrieben Bearb. / Vorg.")+"</div></section>"+
+    '<section class="glass panel"><h3>Nach Bezirk</h3>'+gl.map(function(g){var p=g.n?Math.round(g.d*100/g.n):0;return '<button type="button" class="dashrow" data-act="dashGo" data-art="'+esc(g.art)+'" data-bez="'+esc(g.bez)+'"><span class="small" style="flex:1;text-align:left">'+esc(g.k)+'</span><span class="minibar"><i style="width:'+p+'%"></i></span><span class="small" style="width:64px;text-align:right"><b>'+g.d+"</b>/"+g.n+"</span></button>"}).join("")+"</section>"+
+    '<section class="glass panel"><h3>Besichtigungen je Monat</h3><div class="months">'+mon.map(function(n,i){return '<div><i style="height:'+Math.round(n*100/mx)+'%" title="'+n+'"></i><span>'+["J","F","M","A","M","J","J","A","S","O","N","D"][i]+"</span><b>"+(n||"")+"</b></div>"}).join("")+"</div></section>"+
+    '<section class="glass panel"><h3>Ausdrucken</h3><div class="row"><button type="button" class="btn soft" style="flex:1" data-act="jahresPdf">Jahresübersicht PDF</button><button type="button" class="btn soft" style="flex:1" data-act="jahresXlsx">Excel</button></div>'+
+    '<button type="button" class="btn soft block" data-act="selStart">Protokolle auswählen und drucken</button></section>'}
+
+/* ===== Begehungsplan (Excel) einlesen ===== */
+function planParse(file){var tries=[/stw.*besicht/i,/st(ü|ue)tzw/i,/besicht/i],i=0;
+  function next(){var re=tries[i++];return planParse1(file,re).then(function(r){return r.list.length||i>=tries.length?r:next()})}return next()}
+function planParse1(file,re){return parseXlsx(file,re).then(function(res){var rows=res.rows,title=(rows.slice(0,3).map(function(r){return r.join(" ")}).join(" ")),ym=title.match(/(20\d\d)/)||file.name.match(/(20\d\d)/),y=ym?ym[1]:year();
+  var cur={},out=[],offs=[];rows.slice(0,8).forEach(function(r){r.forEach(function(c,i){if(/^Bezirk\s*\d+/i.test(c)&&offs.indexOf(i)<0)offs.push(i)})});if(!offs.length)offs=[0,10,20,30];
+  rows.forEach(function(r){offs.forEach(function(g){var c0=String(r[g]||"").trim(),mb=c0.match(/^Bezirk\s*(\d+)/i);if(mb){cur[g]=mb[1];return}
+    if(c0!=="M"||!r[g+1]||!String(r[g+2]||"").trim())return;var nr=String(r[g+1]).replace(/\.0+$/,"").trim(),bes=String(r[g+6]||"").trim(),dm=bes.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/),zm=bes.split("/")[1];
+    var note=String(r[g+5]||r[g+4]||"").trim();if(/^\d+(\.\d+)?$/.test(note))note=String(Math.round(parseFloat(note)*10)/10).replace(".",",");
+    out.push({id:"M"+nr,nr:"M "+nr,name:String(r[g+2]||"").replace(/\s+/g," ").trim(),pruef:String(r[g+3]||"").replace(/\s+/g," ").trim(),note:note,bes:/^bes/i.test(bes),
+      datum:dm?dm[3]+"-"+pad(+dm[2])+"-"+pad(+dm[1]):"",zeichen:zm?zm.trim():"",geraet:String(r[g+8]||"").trim(),bezirk:cur[g]||""})})});
+  return {jahr:y,list:out,sheet:res.name}})}
+function planPreview(p){S.planImp=p;var neu=p.list.filter(function(e){return !S.bw[e.id]}),ids={};p.list.forEach(function(e){ids[e.id]=1});
+  var weg=bwList().filter(function(b){return b.art==="stuetzwand"&&/^M\d/.test(b.id)&&!ids[b.id]}),keine=p.list.filter(function(e){return !e.bes}),ext=p.list.filter(function(e){return e.datum});
+  openModal('<div class="mbar"><b>Begehungsplan '+esc(p.jahr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div><div class="glass panel" style="max-width:560px;margin:0 auto">'+
+    '<span class="small">Blatt „'+esc(p.sheet)+"“: <b>"+p.list.length+"</b> Stützwände in "+Array.from(new Set(p.list.map(function(e){return e.bezirk}))).length+" Bezirken.</span>"+
+    '<ul class="small" style="margin:0;padding-left:18px"><li><b>'+neu.length+"</b> neu (werden angelegt)"+(neu.length?": "+esc(neu.slice(0,15).map(function(e){return e.nr}).join(", "))+(neu.length>15?" …":""):"")+"</li>"+
+    "<li><b>"+keine.length+"</b> ohne Besichtigung "+esc(p.jahr)+" (Prüfung)"+(keine.length?": "+esc(keine.slice(0,15).map(function(e){return e.nr}).join(", "))+(keine.length>15?" …":""):"")+"</li>"+
+    "<li><b>"+ext.length+"</b> im Plan schon mit Datum eingetragen</li>"+
+    (weg.length?"<li><b>"+weg.length+"</b> Bauwerke in BauwerkCheck, aber nicht im Plan: "+esc(weg.slice(0,15).map(function(b){return b.nr}).join(", "))+(weg.length>15?" …":"")+" – werden <b>nicht</b> gelöscht.</li>":"")+"</ul>"+
+    '<span class="small muted">Vorhandene Bauwerke behalten ihre Daten und Besichtigungen; ergänzt werden nur die Angaben aus dem Plan für '+esc(p.jahr)+".</span>"+
+    '<button type="button" class="btn block big" data-act="planApply">Übernehmen</button></div>')}
+function planApply(){var p=S.planImp;if(!p)return;var n=0,neu=0,jobs=[];
+  p.list.forEach(function(e){var b=S.bw[e.id];if(!b){b={id:e.id,nr:e.nr,name:e.name.split(/,|\s-\s/)[0].slice(0,80)||e.nr,art:"stuetzwand",bezirk:e.bezirk,adresse:"",eigentum:"",laenge:"",hoehe:"",flaeche:"",hinweise:e.name.length>60?[e.name]:[],letzte:null,archiv:[]};neu++}
+    b.plan=b.plan||{};b.plan[p.jahr]={bes:e.bes,pruef:e.pruef,note:e.note,geraet:e.geraet,datum:e.datum,zeichen:e.zeichen,bez:e.name,stand:new Date().toISOString()};if(!b.bezirk)b.bezirk=e.bezirk;n++;jobs.push(saveB(b))});
+  Promise.all(jobs).then(function(){closeModal();S.planImp=null;render();toast("Begehungsplan "+p.jahr+": "+n+" Bauwerke übernommen"+(neu?", "+neu+" neu angelegt":"")+".",6000)})}
+
 function viewBw(b){
   var x=curVisit(b);
-  if(!x)return headHtml(b,steckbrief(b)+(b.letzte&&(b.letzte.schaden||b.letzte.verunreinigungen||b.letzte.sonstige||hasMangel(b))?lastHtml(b):""),true)+moreHtml(b);
+  if(x&&x.status!=="abgeschlossen")return viewBwVisit(b,x,false);
+  var massn=headHtml(b,"",true).replace(/^<a [^>]*>‹ Bauwerke<\/a>/,"").replace(/<section class="alert warn"><b>Hinweise<\/b>[\s\S]*$/,"");
+  return '<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+sbTop(b)+docsHtml(b)+mapHtml(b)+massn+besKopf(b,x)+
+    (x?viewBwVisit(b,x,true):(b.letzte?lastHtml(b):""))+fruehereHtml(b,x);
+}
+function viewBwVisit(b,x,inner){
   var done=x.status==="abgeschlossen",id=esc(x.id),pts=ppOf(x);
   var diff=0;for(var i=0;i<pts.length;i++)if(x.ja[i]!==x.ref[i])diff++;
-  var h=headHtml(b,done?'<section class="glass panel"><div class="row between"><h3>Besichtigung vom '+deDate(x.datum)+'</h3><span class="chip ok">abgeschlossen</span></div>'+vermerkHtml(x)+
+  var donePanel='<section class="glass panel"><div class="row between"><h3>Besichtigung vom '+deDate(x.datum)+'</h3><span class="chip ok">abgeschlossen</span></div>'+vermerkHtml(x)+
     '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="editLast" data-visit="'+id+'">Bearbeiten</button><button type="button" class="btn soft sm" style="flex:1" data-act="start" data-bw="'+esc(b.id)+'">Neue Besichtigung</button></div>'+
-    "</section>":
+    "</section>";
+  var h=inner?donePanel:headHtml(b,done?donePanel:
     (x.erledigt?'<div class="alert warn">Du bearbeitest die Besichtigung vom <b>'+deDate(x.datum)+'</b>. Änderungen werden im Verlauf festgehalten. Zum Schluss wieder „Besichtigung abschließen“ tippen.</div>':""));
   var bad=pts.filter(function(p,i){return p.pos&&!x.ja[i]});
   if(bad.length)h+='<div class="alert bad"><b>Nicht gegeben: '+esc(bad.map(function(p){return p.t}).join(", "))+'.</b> Sofort Vorgesetzte informieren und Gefahrenstelle fotografieren.</div>';
@@ -931,10 +1239,10 @@ function viewBw(b){
   var fotos='<section class="glass panel">'+stepH(done?null:1,"Fotos",'<span class="muted small">'+x.fotos.length+"</span>");
   if(!done)fotos+='<button type="button" class="btn block big" data-act="camOpen" data-visit="'+id+'">Foto aufnehmen</button>';
   if(x.fotos.length){fotos+='<div class="photos">';x.fotos.forEach(function(f,i){
-    fotos+='<div class="phw"><button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+'</span></button><button type="button" class="phx" data-act="delFoto" data-visit="'+id+'" data-i="'+i+'" aria-label="Foto '+(i+1)+' löschen">✕</button></div>'});fotos+="</div>"}
+    fotos+='<div class="phw"><button type="button" class="ph'+(b.refKey===f.key?" ref":"")+'" data-act="viewFoto" data-visit="'+id+'" data-i="'+i+'"><img data-key="'+esc(f.key)+'" alt="'+esc(f.tag)+'"><span class="cap">'+esc(f.tag)+'</span></button>'+(done?"":'<button type="button" class="phx" data-act="delFoto" data-visit="'+id+'" data-i="'+i+'" aria-label="Foto '+(i+1)+' löschen">✕</button>')+'</div>'});fotos+="</div>"}
   else if(done)fotos+='<span class="small muted">Keine Fotos.</span>';
   if(!done)fotos+='<div class="row between" style="align-items:center"><label class="btn soft sm">Fotos vom Gerät<input type="file" accept="image/*" multiple data-gal="'+id+'"></label><label class="small vdate" style="display:flex;align-items:center;gap:6px">Datum<input type="date" data-vdate="'+id+'" value="'+esc(x.datum)+'" max="'+today()+'" style="width:auto"></label></div>';
-  fotos+="</section>";
+  fotos+=trashHtml(trashRows(b.id).filter(function(r){return r.btn.indexOf('data-visit="'+x.id+'"')>=0}),"Gelöschte Fotos (30 Tage zurückholbar)")+"</section>";
   var pp='<div class="pp"><div class="pp-head"><span>Ja</span><span>Nein</span></div>';
   pts.forEach(function(pt,i){var on=x.ja[i],ch=on!==x.ref[i];
     pp+='<div class="pp-row'+(ch?" chg":"")+'"><span class="pp-nr">'+pad(i+1)+'</span><span class="pp-t">'+esc(pt.t)+(ch?'<span class="pp-chg">geändert</span>':"")+"</span>"+
@@ -943,7 +1251,7 @@ function viewBw(b){
   pp+='<div class="pp-row"><span class="pp-nr">SP</span><span class="pp-t">Sonderprüfung veranlasst</span>'+ynHtml("sonderSet",0,id,x.sonder,false,done,"Sonderprüfung veranlasst")+"</div></div>";
   if(done){
     /* Abgeschlossen: Protokoll oben, darunter eine kurze Zusammenfassung */
-    h+=exportPanel(x)+(x.datum===today()?'<section class="glass panel">'+nextHtml(b)+"</section>":"");
+    h+=exportPanel(x)+sigPanel(x)+(x.datum===today()?'<section class="glass panel">'+nextHtml(b)+"</section>":"");
     var befund=[],chg=[];pts.forEach(function(p,i){if(!p.pos&&x.ja[i])befund.push(i+1);if(x.ja[i]!==x.ref[i])chg.push(pad(i+1)+" "+p.t+": jetzt "+(x.ja[i]?"Ja":"Nein"))});
     h+='<section class="glass panel"><h3>Zusammenfassung</h3>'+
       '<div class="small"><span class="muted">Ergebnis: </span><b>'+esc(x.befund||"")+"</b></div>"+
@@ -954,7 +1262,7 @@ function viewBw(b){
       (x.verunreinigungen?'<div class="small"><span class="muted">Verunreinigungen: </span>'+esc(x.verunreinigungen)+"</div>":"")+
       (x.sonstige?'<div class="small"><span class="muted">Sonstiges: </span>'+esc(x.sonstige)+"</div>":"")+
       '<details class="sub"><summary>Alle Prüfpunkte anzeigen</summary><div>'+pp+"</div></details></section>";
-    h+=fotos+moreHtml(b);
+    h+=fotos;
     return h;
   }
   /* In Arbeit: 1 Fotos → 2 Prüfpunkte → 3 Bemerkungen → 4 Protokoll */
@@ -969,7 +1277,7 @@ function viewBw(b){
     fld(x,"verunreinigungen","Verunreinigungen",false)+fld(x,"sonstige","Sonstige Mängel / Auffälligkeiten",false);
   x.audios.forEach(function(a,i){h+='<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><span class="small muted" style="flex:1">Sprachnotiz '+esc(a.zeit)+'</span><audio controls data-key="'+esc(a.key)+'" style="width:100%"></audio></div>'});
   h+="</div></details></section>";
-  h+=moreHtml(b);
+  h+='<details class="glass"><summary>Bauwerksdaten, Dokumente, Karte</summary><div class="panel" style="padding:0">'+sbTop(b)+docsHtml(b)+mapHtml(b)+"</div></details>";
   h+='<div class="finbar"><button type="button" class="btn block big'+(diff?"":" ok")+'" data-act="finish" data-visit="'+id+'">Besichtigung abschließen<small>'+(diff?diff+(diff>1?" Änderungen":" Änderung")+" gegenüber zuletzt":"alles unverändert wie zuletzt")+"</small></button></div>";
   return h;
 }
@@ -1015,8 +1323,8 @@ function lookRefresh(){if(!$("lookPop").hidden)$("lookPop").innerHTML=lookHtml()
 /* Einstellungen */
 function viewEinst(){
   var t=document.documentElement.getAttribute("data-theme")||"auto";
-  var h='<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a><section class="glass panel"><h2>Einstellungen</h2>'+
-    '<label class="fld">Name (erscheint im Protokoll)<input type="text" id="s_pruefer" value="'+esc(SET.pruefer)+'"></label>'+
+  var h='<a class="btn soft sm back" href="#liste" style="align-self:flex-start">‹ Bauwerke</a>'+nutzerHtml()+'<section class="glass panel"><h2>Einstellungen</h2>'+
+
     '<span class="muted small">Datum auf Fotos</span>'+seg("stamp",[["aus","Kein Datum"],["datum","Datum"],["zeit","Datum + Uhrzeit"]])+
     "</section>"+
     '<details class="glass" id="lookDet"'+(S.lookDet?" open":"")+'><summary>Darstellung</summary><div class="panel" id="lookIn">'+lookHtml(true)+"</div></details>";
@@ -1027,6 +1335,8 @@ function viewEinst(){
   h+='<details class="glass" id="verwDet"'+(S.einstOpen?" open":"")+'><summary>Verwaltung</summary><div class="panel">'+
     '<a class="btn soft block" href="#neu">Bauwerke hinzufügen / Liste importieren</a>'+
     '<button type="button" class="btn soft block" data-act="sammel">Mehrere Protokolle: Sammel-PDF, ZIP, Jahresübersicht</button>'+
+    '<label class="btn soft block">Begehungsplan (Excel) einlesen<input type="file" accept=".xlsx,.xlsm" id="planIn"></label>'+
+    '<span class="muted small">Die jährliche Liste „Begehungsplan Stützwände“ (Blatt „Stw Besicht“). Neue Bauwerke werden angelegt, nichts wird gelöscht; Bauwerke ohne „Bes.“ zählen in dem Jahr nicht als offen.</span>'+
     '<label class="btn soft block">SIB-Übersichtsblätter importieren (PDF)<input type="file" accept="application/pdf,.pdf" id="sibIn"></label>'+
     '<span class="muted small">Daten und Foto je Bauwerk werden aus dem Sammel-PDF eines Bezirks übernommen (z. B. „Bezirk 3.pdf“).</span>'+
     '<h3 style="margin-top:8px">Datensicherung</h3><button type="button" class="btn soft block" data-act="backup">Sicherung herunterladen (ZIP)</button>'+
@@ -1034,7 +1344,7 @@ function viewEinst(){
     '<h3 style="margin-top:8px">Speicher auf diesem Gerät</h3><div class="small" id="speicherInfo">…</div>'+
     '<div class="row"><button type="button" class="btn soft sm" style="flex:1" data-act="freeSpace" data-m="12">Fotos älter als 1 Jahr entfernen</button><button type="button" class="btn soft sm" style="flex:1" data-act="freeSpace" data-m="3">älter als 3 Monate</button></div>'+
     '<span class="muted small">Nur Fotos, die schon in Google Drive liegen; sie werden bei Bedarf wieder geladen.</span>'+
-    papierHtml()+
+    '<a class="btn soft block" href="#papier">Papierkorb'+(trashRows(null).length?" ("+trashRows(null).length+")":"")+'</a>'+
     '<button type="button" class="btn danger block" data-act="wipe" style="margin-top:8px">Alle Daten auf diesem Gerät löschen</button></div></details>';
   setTimeout(speicherInfo,0);
   h+='<p class="muted small" style="text-align:center">BauwerkCheck · Version '+APPVER+"</p>";
@@ -1305,13 +1615,14 @@ function buildProtokoll(x,b){
       for(var n=0;n<18;n++){var r=18+2*n;s=setCell(s,"J"+r,"s",x.ja[n]?62:30);s=setCell(s,"L"+r,"s",x.ja[n]?30:62)}
       s=setCell(s,"J61","s",x.sonder?62:30);s=setCell(s,"L61","s",x.sonder?30:62);s=setCell(s,"B66","n",serial(absDate(x)));
       d=setBox(d,"Textfeld 1",x.verunreinigungen);d=setBox(d,"Textfeld 4",schadenText(x));d=setBox(d,"Textfeld 3",x.sonstige);
+      return xlsSig(z,d,x).then(function(d2){d=d2;
       if(!/fullCalcOnLoad/.test(w))w=w.replace(/<calcPr\b/,'<calcPr fullCalcOnLoad="1"');
       s2=s2.replace(/(<c r="A(?:48|97|146|195|244|293|342|391|440)"[^>]*>(?:<f[^>]*\/>|<f[^>]*>[^<]*<\/f>))<v>[^<]*<\/v>/g,"$1<v>"+serial(today())+"</v>").replace(/(<c r="C(?:48|97|146|195|244|293|342|391|440)"[^>]*>(?:<f[^>]*\/>|<f[^>]*>[^<]*<\/f>))<v>[^<]*<\/v>/g,"$1<v>"+nr+"</v>");
       z.file("xl/worksheets/sheet1.xml",s);z.file("xl/drawings/drawing1.xml",d);z.file("xl/workbook.xml",w);z.file("xl/worksheets/sheet2.xml",s2);
       if(SET.protFormat==="xlsx"){z.file("[Content_Types].xml",ct.replace("application/vnd.ms-excel.sheet.macroEnabled.main+xml","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml").replace(/<Override PartName="\/xl\/vbaProject\.bin"[^>]*\/>/,""));
         z.file("xl/_rels/workbook.xml.rels",rels.replace(/<Relationship [^>]*vbaProject[^>]*\/>/,""));z.remove("xl/vbaProject.bin")}
       return z.generateAsync({type:"blob",compression:"DEFLATE",mimeType:MIME[SET.protFormat]});
-    })});
+    })})});
 }
 function buildStandard(x,b){ // allgemeines Excel-Protokoll für alle Bauwerksarten
   var r=0,rows=[],pts=ppOf(x),t=typeById(x.typ)||typeOf(b);
@@ -1379,16 +1690,16 @@ function arcHtml(b){
   return h;
 }
 function arcAdd(b,files,art){
-  var list=Array.prototype.slice.call(files),sel=($("arcJahr")||{}).value||String(+year()-1),n=0,read=0;
+  var list=Array.prototype.slice.call(files),sel=($("arcJahr")||{}).value||year(),n=0,read=0,kat=S.arcKat||(art==="foto"?"foto":"protokoll");S.arcKat="";
   toast((art==="foto"?"Fotos":"Dateien")+" werden gespeichert …",8000);
   return list.reduce(function(p,f){return p.then(function(){
     var m=f.name.match(/(?:^|\D)(20\d\d)(?:\D|$)/),jahr=art==="datei"&&m?m[1]:sel,key="arc_"+b.id+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     var blobP=art==="foto"?fileToJpeg(f):Promise.resolve(f);
     return blobP.then(function(bl){return putBlob(key,bl).then(function(){
       var ext=art==="foto"?"jpg":(f.name.split(".").pop()||"bin").toLowerCase(),name=art==="foto"?fsafe(b.nr+" Foto "+jahr+" ("+(arcOf(b).filter(function(a){return a.art==="foto"&&a.jahr===jahr}).length+1)+").jpg"):f.name;
-      var e={key:key,art:art,jahr:jahr,name:name,mime:art==="foto"?"image/jpeg":(f.type||""),ts:new Date().toISOString()};arcOf(b).push(e);n++;
+      var e={key:key,art:art,kat:kat,jahr:jahr,name:name,mime:art==="foto"?"image/jpeg":(f.type||""),ts:new Date().toISOString(),von:wer()};arcOf(b).push(e);n++;
       queueBlob(key,"bw:"+b.id,b.id,"Archiv "+jahr+" "+name);
-      if(art==="datei"&&/\.xls[xm]$/i.test(f.name))return readKasselProt(f).then(function(r){if(!r)return;e.gelesen=true;if(r.datum)e.jahr=r.datum.slice(0,4);read++;
+      if(art==="datei"&&kat==="protokoll"&&/\.xls[xm]$/i.test(f.name))return readKasselProt(f).then(function(r){if(!r)return;e.gelesen=true;if(r.datum)e.jahr=r.datum.slice(0,4);read++;
         if(!b.letzte||!b.letzte.datum||(r.datum&&r.datum>b.letzte.datum))b.letzte=r}).catch(function(){});
     })})})},Promise.resolve())
   .then(function(){return saveB(b)}).then(function(){toast(n+(art==="foto"?" Foto(s)":" Datei(en)")+" gespeichert"+(read?" – Protokoll gelesen, letzter Stand: "+deDate(b.letzte.datum):"")+".",5000);render()})
@@ -1475,6 +1786,8 @@ function pdfProt(doc,x,b){
   if(kas&&!x.ja[2]){doc.setFont("helvetica","bold");doc.setFontSize(9.5);txt("Schreiben an Eigentümer wird verfasst und abgesandt",L,y+11);doc.setFont("helvetica","normal")}
   y=Math.max(y+26,262);doc.setFontSize(10);
   txt((ORG.ort?ORG.ort+", ":"")+deDate(absDate(x)),L,y);txt("Gesehen"+ortSuffix(),R-70,y);
+  var sgx=sigOf(x);[["b",L],["v",R-70]].forEach(function(o){var e=sgx[o[0]];if(!e||!e.img)return;try{var ip=doc.getImageProperties(e.img),hh=10,ww=Math.min(60,hh*ip.width/ip.height);hh=ww*ip.height/ip.width;doc.addImage(e.img,"PNG",o[1]+2,y+12.5-hh,ww,hh)}catch(_){}
+    doc.setFontSize(6.5);doc.setTextColor(90);txt(e.n+" · "+dtTxt(e.t),o[1],y+20.5);doc.setTextColor(0)});
   doc.setLineWidth(.2);doc.line(L,y+13,L+70,y+13);doc.line(R-70,y+13,R,y+13);doc.setFontSize(7.5);doc.setTextColor(90);txt("Unterschrift Prüfer",L,y+17);txt("Unterschrift Vorgesetzte/r",R-70,y+17);
   var ev=erledigtOf(x);if(ev){doc.setFontSize(7);txt("Abgeschlossen am "+dtTxt(ev.t)+" von "+wName(ev)+(x.geaendert?" · geändert am "+dtTxt(x.geaendert.t)+" von "+wName(x.geaendert):""),L,y+23)}doc.setTextColor(0);
 }
@@ -1498,7 +1811,7 @@ var LOGO=null;
 function loadLogo(){if(LOGO||!/kassel/i.test(ORG.kommune||""))return Promise.resolve();return fetch("logo-kassel.jpg").then(function(r){return r.ok?r.blob():null}).then(function(bl){if(!bl)return;return new Promise(function(res){var fr=new FileReader();fr.onload=function(){LOGO=fr.result;res()};fr.onerror=function(){res()};fr.readAsDataURL(bl)})}).catch(function(){})}
 function buildPdf(list,mitFotos){
   return Promise.all([loadPdf(),loadLogo()]).then(function(r){var J=r[0];var doc=new J({unit:"mm",format:"a4"});
-    return list.reduce(function(p,x,i){return p.then(function(){var b=S.bw[x.bw]||{nr:x.bw,name:""};if(i)doc.addPage();pdfProt(doc,x,b);if(mitFotos)return pdfFotos(doc,x,b)})},Promise.resolve())
+    return list.reduce(function(p,x,i){return p.then(function(){var b=S.bw[x.bw]||{nr:x.bw,name:""};if(i)doc.addPage();pdfProt(doc,x,b);if(Array.isArray(mitFotos)?mitFotos[i]:mitFotos)return pdfFotos(doc,x,b)})},Promise.resolve())
       .then(function(){return doc.output("blob")})})}
 function dlPdf(x,mitFotos){toast("PDF wird erstellt …",8000);var b=S.bw[x.bw];
   buildPdf([x],mitFotos).then(function(bl){showFiles([new File([bl],pdfName(x,b,mitFotos),{type:"application/pdf"})],{title:"PDF "+(mitFotos?"mit Fotos":"Protokoll")})}).catch(function(e){toast("Fehler: "+(e&&e.message||e),5000)})}
@@ -1590,11 +1903,12 @@ function parseDelim(t){
   return lines.map(function(l){var out=[],cur="",q=false;for(var i=0;i<l.length;i++){var c=l[i];if(c==='"'){if(q&&l[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===sep&&!q){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(function(s){return s.trim()})});
 }
 function parseXlsx(file){
+  var SHRE=arguments[1]||null;
   return JSZip.loadAsync(file).then(function(z){
     var P=new DOMParser();function xml(p){var f=z.file(p);return f?f.async("string").then(function(s){return P.parseFromString(s,"application/xml")}):Promise.resolve(null)}
     return Promise.all([xml("xl/workbook.xml"),xml("xl/_rels/workbook.xml.rels"),xml("xl/sharedStrings.xml")]).then(function(r){
       var wb=r[0],rels=r[1],ss=r[2];if(!wb)throw new Error("Keine Excel-Datei (.xlsx)");
-      var sh=wb.getElementsByTagName("sheet")[0],rid=sh.getAttribute("r:id")||sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id"),target="worksheets/sheet1.xml";
+      var shs=wb.getElementsByTagName("sheet"),sh=shs[0];if(SHRE)Array.prototype.some.call(shs,function(e){if(SHRE.test(e.getAttribute("name")||"")){sh=e;return true}});var rid=sh.getAttribute("r:id")||sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id"),target="worksheets/sheet1.xml";
       if(rels)Array.prototype.forEach.call(rels.getElementsByTagName("Relationship"),function(e){if(e.getAttribute("Id")===rid)target=e.getAttribute("Target")});
       target=target.replace(/^\/?xl\//,"").replace(/^\//,"");
       var strs=ss?Array.prototype.map.call(ss.getElementsByTagName("si"),function(si){return Array.prototype.map.call(si.getElementsByTagName("t"),function(t){return t.textContent}).join("")}):[];
@@ -1604,7 +1918,7 @@ function parseXlsx(file){
           Array.prototype.forEach.call(row.getElementsByTagName("c"),function(c){var t=c.getAttribute("t"),v=c.getElementsByTagName("v")[0],val="";
             if(t==="s"&&v)val=strs[+v.textContent]||"";else if(t==="inlineStr")val=Array.prototype.map.call(c.getElementsByTagName("t"),function(x){return x.textContent}).join("");else if(v)val=v.textContent;
             var i=c.getAttribute("r")?ci(c.getAttribute("r")):out.length;while(out.length<i)out.push("");out[i]=String(val).trim()});return out});
-      })})});
+      }).then(function(rows){return SHRE?{rows:rows,name:sh.getAttribute("name")||""}:rows})})});
 }
 function impStart(rows){
   rows=rows.filter(function(r){return r.some(function(c){return c})});
@@ -1736,7 +2050,7 @@ function ppFotos(x,i){return x.fotos.filter(function(f){return f.pp===i}).length
 function backupDue(){if(SY.on&&SY.email&&!SY.needLogin&&!SY.err)return false;var n=Object.keys(S.visits).length;if(!n)return false;var lb=ls("lastBackup",0);return Date.now()-lb>7*864e5}
 
 /* ---------- Wer / wann / Verlauf ---------- */
-function wer(){return {n:SET.pruefer||"",e:SY.email||""}}
+function wer(){var u=me();return {n:u?u.name:(SET.pruefer||""),e:SY.email||"",u:u?u.id:""}}
 function wName(w){return w&&(w.n||w.e)||"unbekannt"}
 function dtTxt(iso){if(!iso)return "";var d=new Date(iso);return pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear()+", "+pad(d.getHours())+":"+pad(d.getMinutes())+" Uhr"}
 function isoLocal(iso){var d=iso?new Date(iso):new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
@@ -1825,6 +2139,31 @@ document.addEventListener("click",function(ev){
   if(a==="look"){lookOpen($("lookPop").hidden);return}
   if(a==="fvNav"){fvStep(+el.dataset.d);return}
   if(a==="sammel"){openSammel();return}
+  if(a==="pinOk"){pinCheck();return}
+  if(a==="pinCancel"){pinDone(null);return}
+  if(a==="pinSet"){pinSetDlg(userById(el.dataset.u));return}
+  if(a==="pinSave"){pinSave(el.dataset.u);return}
+  if(a==="sigEdit"){sigPad(el.dataset.u);return}
+  if(a==="sigClear"){var sc=$("sigCv");sc.getContext("2d").clearRect(0,0,sc.width,sc.height);S.sigDirty=false;return}
+  if(a==="sigSave"){sigSave(el.dataset.u);return}
+  if(a==="userPick"){userPick(el.dataset.u);return}
+  if(a==="userAdd"){userAdd(!!el.dataset.self);return}
+  if(a==="userSwitch"){location.hash="#wer";return}
+  if(a==="userRolle"){userRolle(el.dataset.u);return}
+  if(a==="userDel"){userDel(el.dataset.u);return}
+  if(a==="sign"){var sv=S.visits[el.dataset.visit];if(sv)signVisit(sv,el.dataset.k);return}
+  if(a==="trFoto"){var tv2=S.visits[el.dataset.visit];if(tv2)fotoRestore(tv2,el.dataset.key);return}
+  if(a==="trArc"){var tb2=S.bw[el.dataset.bw];if(tb2)arcRestore(tb2,el.dataset.key);return}
+  if(a==="selStart"){S.selMode=true;S.sel=S.sel||{};S.planEdit=false;location.hash="#liste";render();return}
+  if(a==="selCancel"){S.selMode=false;S.sel={};render();return}
+  if(a==="selRow"){var sid=el.dataset.bw;S.sel=S.sel||{};if(S.sel[sid])delete S.sel[sid];else S.sel[sid]={f:false};var rr=$("results");if(rr)rr.innerHTML=resultsHtml();hydrate();return}
+  if(a==="selFoto"){var fid=el.dataset.bw;if(S.sel&&S.sel[fid])S.sel[fid].f=!S.sel[fid].f;var r2=$("results");if(r2)r2.innerHTML=resultsHtml();hydrate();return}
+  if(a==="selAll"){S.sel=S.sel||{};filtered().forEach(function(o){if(selVisit(o.b)&&!S.sel[o.b.id])S.sel[o.b.id]={f:false}});var r3=$("results");if(r3)r3.innerHTML=resultsHtml();hydrate();return}
+  if(a==="selPdf"){selPdf();return}
+  if(a==="selZip"){zipVisits(selList().map(function(o){return o.v}));return}
+  if(a==="dashY"){S.dashY=el.dataset.v;render();return}
+  if(a==="dashGo"){S.art=el.dataset.art||"";S.bez=el.dataset.bez||"";location.hash="#liste";return}
+  if(a==="planApply"){planApply();return}
   if(a==="heuteZip"){zipVisits(heuteFertig());return}
   if(a==="sammelAll"){document.querySelectorAll("[data-sammel]").forEach(function(c){c.checked=el.dataset.v==="1"});return}
   if(a==="sammelPdf"){var sel=sammelSel();if(!sel.length){toast("Bitte mindestens ein Protokoll wählen.");return}var mf=el.dataset.f==="1";toast("Sammel-PDF wird erstellt ("+sel.length+") …",15000);
@@ -1863,8 +2202,8 @@ document.addEventListener("click",function(ev){
   if(a==="arcFoto"){arcFotoView(el.dataset.bw,el.dataset.key);return}
   if(a==="arcOpen"){var ab=S.bw[el.dataset.bw],aa=arcFind(ab,el.dataset.key);ensureBlob(el.dataset.key).then(function(bl){if(!bl){toast("Datei nicht verfügbar");return}showFiles([new File([bl],aa.name,{type:aa.mime||bl.type||""})],{title:"Archiv "+aa.jahr})});return}
   if(a==="arcRef"){var rb=S.bw[el.dataset.bw],rk=el.dataset.key,ra=arcFind(rb,rk);if(rb.refKey&&/^ref_/.test(rb.refKey)){queueTrash(rb.refDriveId);delBlob(rb.refKey)}rb.refKey=rk;rb.refHeading=null;rb.refDriveId=ra&&ra.driveId||null;saveB(rb);S.arcOpen=rb.id;toast("Als Vergleichsbild gespeichert");closeModal();render();return}
-  if(a==="arcDel"){if(!confirm(el.dataset.foto?"Dieses Foto löschen?":"Diese Datei löschen?"))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
-    if(da.driveId)queueTrash(da.driveId);delete SY.ob.blobs[dk];saveOb();delBlob(dk);saveB(db);S.arcOpen=db.id;render();toast("Gelöscht");
+  if(a==="arcDel"){if(!confirm((el.dataset.foto?"Dieses Foto löschen?":"Diese Datei löschen?")+"\n\nEs kommt in den Papierkorb und kann 30 Tage lang zurückgeholt werden."))return;var db=S.bw[el.dataset.bw],dk=el.dataset.key,da=arcFind(db,dk);if(!da)return;db.archiv=arcOf(db).filter(function(z){return z.key!==dk});if(db.refKey===dk){db.refKey=null;db.refDriveId=null}
+    db.trash=(db.trash||[]).concat([{a:da,von:wer(),am:new Date().toISOString()}]);saveB(db);S.arcOpen=db.id;closeModal();render();toast("In den Papierkorb gelegt (30 Tage zurückholbar)");
     var rest=arcFotoList(db);if(da.art==="foto"&&S.fv&&S.fv.arc&&rest.length)arcFotoView(db.id,rest[Math.min(S.fv.i,rest.length-1)]);else closeModal();return}
   if(a==="clearRef"){var br=S.bw[el.dataset.bw];if(br.refKey&&/^ref_/.test(br.refKey)){queueTrash(br.refDriveId);delBlob(br.refKey)}br.refKey=null;br.refHeading=null;br.refDriveId=null;saveB(br);closeModal();render();return}
   if(a==="setRef"){var bs=S.bw[el.dataset.bw],fk=el.dataset.key,meta=null;Object.keys(S.visits).forEach(function(v){S.visits[v].fotos.forEach(function(ff){if(ff.key===fk)meta=ff})});if(bs.refKey&&/^ref_/.test(bs.refKey)){queueTrash(bs.refDriveId);delBlob(bs.refKey)}bs.refKey=fk;bs.refHeading=meta&&meta.heading;bs.refDriveId=meta&&meta.driveId||null;saveB(bs);toast("Als Vergleichsbild gespeichert");closeModal();render();return}
@@ -1887,7 +2226,7 @@ document.addEventListener("click",function(ev){
   if(a==="wipe"){if(!confirm("Wirklich ALLE Daten auf diesem Gerät löschen?\n\nOhne Synchronisierung oder Sicherung sind sie dann verloren."))return;wipe();return}
   if(!x)return;
   if(a==="viewFoto"){viewFoto(id,+el.dataset.i);return}
-  if(a==="delFoto"){if(!confirm("Dieses Foto löschen?"))return;var di=+el.dataset.i,f=x.fotos.splice(di,1)[0];logEdit(x,"Foto gelöscht","Foto "+(di+1)+(f.tag?" ("+f.tag+")":""));delBlob(f.key);x.del=(x.del||[]).concat(f.key);queueTrash(f.driveId);delete SY.ob.blobs[f.key];
+  if(a==="delFoto"){if(!confirm("Dieses Foto löschen?\n\nEs kommt in den Papierkorb und kann 30 Tage lang zurückgeholt werden."))return;var di=+el.dataset.i,f=x.fotos.splice(di,1)[0];logV(x,"Foto gelöscht","Foto "+(di+1)+(f.tag?" ("+f.tag+")":""));x.del=(x.del||[]).concat(f.key);x.trash=(x.trash||[]).concat([{f:f,von:wer(),am:new Date().toISOString()}]);
     if(x.status==="abgeschlossen")SY.ob.prot[x.id]=1;saveOb();if(S.files)delete S.files[x.id];var bf=S.bw[x.bw];if(bf.refKey===f.key){bf.refKey=null;bf.refDriveId=null;saveB(bf)}
     saveV(x);render();toast("Foto gelöscht");if(S.fv&&!S.fv.arc&&x.fotos.length)viewFoto(x.id,Math.min(di,x.fotos.length-1));else closeModal();return}
   if(a==="delAudio"){if(!confirm("Diese Sprachnotiz löschen?"))return;var au=x.audios.splice(+el.dataset.i,1)[0];delBlob(au.key);x.del=(x.del||[]).concat(au.key);queueTrash(au.driveId);delete SY.ob.blobs[au.key];saveOb();saveV(x);render();return}
@@ -1901,6 +2240,9 @@ document.addEventListener("click",function(ev){
   if(a==="dict"){dictToggle(id,el.dataset.k);return}
   if(a==="finish"){if(S.dict)dictStop();S.show=S.show||{};S.show[x.bw]=x.id;finishVisit(x).then(function(){render();doneFx();var e=$("protPanel");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})});return}
   if(a==="reopen"){reopenVisit(x).then(render);return}
+  if(a==="editLast"&&!el.dataset.ok){var sg=sigOf(x);needFreigabe(x,"Ändern").then(function(ok){if(!ok)return;
+      if((sg.b||sg.v)&&!(x.freigabe&&Date.parse(x.freigabe.bis)>Date.now()&&lockInfo(x)&&lockInfo(x).bis<Date.now())&&!confirm("Das Protokoll ist schon unterschrieben. Bei einer Änderung werden die Unterschriften entfernt und müssen neu geleistet werden.\n\nFortfahren?"))return;
+      sigReset(x);el.dataset.ok="1";el.click();delete el.dataset.ok});return}
   if(a==="editLast"){if(S.show)delete S.show[x.bw];reopenVisit(x).then(function(){closeModal&&$("modal")&&!$("modal").hidden&&closeModal();location.hash="#bw-"+x.bw;render();scrollTo(0,0);toast("Besichtigung vom "+deDate(x.datum)+" wieder geöffnet")});return}
   if(a==="share"){share(x);return}
   if(a==="dlPdf"){dlPdf(x,el.dataset.f==="1");return}
@@ -1911,6 +2253,7 @@ document.addEventListener("click",function(ev){
   if(a==="dlFotos"){exportFiles(x,"fotos").then(function(fs){showFiles(fs,{title:"Fotos ("+fs.length+")"})}).catch(function(e){toast("Fehler: "+e.message)});return}
   if(a==="dlZip"){dlZip(x);return}
   if(a==="sendZip"){zipVisits([x]);return}
+  if(a==="delVisit"&&!el.dataset.ok&&lockInfo(x)&&lockInfo(x).locked){needFreigabe(x,"Löschen").then(function(ok){if(ok){saveV(x);el.dataset.ok="1";el.click();delete el.dataset.ok}});return}
   if(a==="delVisit"){if(!confirm("Besichtigung vom "+deDate(x.datum)+" löschen?\n\nSie kommt in den Papierkorb und kann 30 Tage lang wiederhergestellt werden (Einstellungen → Papierkorb)."))return;
     var bv=S.bw[x.bw];if(x.status==="abgeschlossen"&&bv.letzte&&bv.letzte.datum===x.datum){bv.letzte=x.basisLetzte||null;saveB(bv)}
     x.fotos.concat(x.audios).forEach(function(f){delete SY.ob.blobs[f.key]});delete SY.ob.prot[x.id];saveOb();
@@ -1928,11 +2271,12 @@ document.addEventListener("change",function(ev){
   if(el.id==="impFile"&&el.files[0]){impFile(el.files[0]);el.value="";return}
   if(el.id==="arcJahr"){S.arcJahr=el.value;return}
   if(el.hasAttribute&&el.hasAttribute("data-opt-tilt")){SET.tilt=el.checked;saveSet();if(SET.tilt)startReflex(true);return}
-  if((el.dataset.arcfoto||el.dataset.arcdoc)&&el.files.length){var arb=S.bw[el.dataset.arcfoto||el.dataset.arcdoc],fl=Array.prototype.slice.call(el.files);el.value="";S.arcOpen=arb.id;arcAdd(arb,fl,el.dataset.arcfoto?"foto":"datei");return}
+  if((el.dataset.arcfoto!=null&&el.dataset.arcfoto!==""||el.dataset.arcdoc)&&el.files.length){var arb=S.bw[el.dataset.arcfoto||el.dataset.arcdoc],fl=Array.prototype.slice.call(el.files),kt=el.dataset.kat||"";el.value="";S.arcOpen=arb.id;S.docOpen=S.docOpen||{};if(kt)S.docOpen[arb.id+"|"+kt]=1;S.arcKat=kt;arcAdd(arb,fl,el.dataset.arcfoto?"foto":"datei");return}
   if(el.dataset.map&&S.imp){S.imp.map[el.dataset.map]=+el.value;render();return}
   if(el.dataset.imp==="art"&&S.imp){if(el.value==="__neu"){S.retImport=true;location.hash="#art-neu";return}S.imp.art=el.value;render();return}
   if(el.dataset.imp==="letter"&&S.imp){S.imp.letter=el.checked;render();return}
   if(el.id==="restoreIn"&&el.files[0]){restore(el.files[0]);el.value="";return}
+  if(el.id==="planIn"&&el.files[0]){var pf=el.files[0];el.value="";toast("Begehungsplan wird gelesen …",8000);planParse(pf).then(function(p){if(!p.list.length){toast("Keine Stützwände im Plan gefunden.",5000);return}planPreview(p)}).catch(function(e){toast("Fehler: "+(e&&e.message||e),6000)});return}
   if(el.id==="sibIn"&&el.files[0]){var sf=el.files[0];el.value="";sibImport(sf);return}
   if(el.id==="hgIn"&&el.files[0]){var hf=el.files[0];el.value="";fileToJpeg(hf,2200).then(function(bl){return putBlob("hintergrund",bl)}).then(function(){SET.hgFoto=true;saveSet();applyLook();toast("Hintergrund gesetzt")}).catch(function(){toast("Foto konnte nicht gelesen werden.")});return}
   if(el.id==="sysCam"&&el.files.length){var xs=S.visits[CAM.visit],f0=el.files[0];el.value="";if(!xs)return;
@@ -1956,7 +2300,9 @@ document.addEventListener("input",function(ev){
 });
 document.addEventListener("focusin",function(e){if(e.target.id==="q")S.typing=true});
 document.addEventListener("focusout",function(e){if(e.target.id==="q")S.typing=false});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("modal").hidden)closeModal()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("modal").hidden){if(S.pinRes)pinDone(null);else closeModal()}
+  if(e.key==="Enter"&&e.target&&(e.target.id==="pinIn")){e.preventDefault();pinCheck()}if(e.key==="Enter"&&e.target&&(e.target.id==="pinN2")){e.preventDefault();var sb=document.querySelector('[data-act="pinSave"]');if(sb)sb.click()}});
+document.addEventListener("toggle",function(e){var d=e.target;if(d&&d.dataset&&d.dataset.doc){S.docOpen=S.docOpen||{};S.docOpen[d.dataset.doc]=d.open}},true);
 function pgFx(){var ap=$("app");if(!ap)return;ap.classList.remove("pgin");void ap.offsetWidth;ap.classList.add("pgin")}
 function doneFx(){var d=document.createElement("div");d.className="donefx";d.setAttribute("aria-hidden","true");
   d.innerHTML='<div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><span>Abgeschlossen</span>';
@@ -2004,7 +2350,7 @@ function migrateOld(){ // Daten der ersten Demo-Version übernehmen (Positionen,
 dbOpen().then(function(){return Promise.all([all("bauwerke"),all("visits")])}).then(function(r){
   (r[0]||[]).forEach(function(b){S.bw[b.id]=b});(r[1]||[]).forEach(function(v){S.visits[v.id]=v});
   return seed().then(seedB3).then(seedB3p25).then(seedSibB3).then(function(){if(!ls("migrated3",false)){migrateOld();lss("migrated3",true)}});
-}).then(function(){purgePapier();applyLook();applyOrg();startReflex(false);render();startSync()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
+}).then(function(){purgePapier();usersInit();purgeTrash();applyLook();applyOrg();startReflex(false);render();startSync()}).catch(function(e){$("app").innerHTML='<div class="glass empty">Speicher nicht verfügbar (privates Fenster?). Bitte normal öffnen.</div>';console.error(e)});
 function startSync(){updSync();
   if(SY.justIn)toast("Mit Google verbunden – Daten werden abgeglichen …",3500);
   if(SY.on){if(tokOk())syncNow();else{SY.needLogin=true;updSync();maybeSilent()}}
