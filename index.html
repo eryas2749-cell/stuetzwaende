@@ -1732,7 +1732,7 @@ function readKasselProt(file){
           res.schaden=res.schaden.replace(/^\s*Keine Schadenserweiterung gegenüber.*$/gim,"").trim();return res})})})});
 }
 function arcFind(b,k){return arcOf(b).filter(function(a){return a.key===k})[0]}
-function arcFotoList(b){var out=[];arcYears(b).forEach(function(y){arcOf(b).forEach(function(a){if(a.jahr===y&&a.art==="foto")out.push(a.key)})});return out}
+function arcFotoList(b){return arcOf(b).filter(function(a){return katOf(a)==="foto"}).sort(function(p,q){return String(q.jahr||"").localeCompare(String(p.jahr||""))||String(q.ts||"").localeCompare(String(p.ts||""))}).map(function(a){return a.key})}
 function arcFotoView(bwId,k){var b=S.bw[bwId],a=arcFind(b,k);if(!a)return;var keys=arcFotoList(b),i=Math.max(0,keys.indexOf(k)),n=keys.length;
   blobUrl(k).then(function(u){if(!u){toast("Foto nicht verfügbar");return}S.fv={arc:true,bw:bwId,i:i};
   openModal('<div class="mbar"><b>Foto '+(i+1)+" / "+n+" · "+esc(b.nr)+" · "+esc(a.jahr)+'</b><button type="button" class="cglass cbtn" data-act="closeModal">Schließen</button></div>'+
